@@ -6,6 +6,5 @@ oauth.json
 __pycache__/
 *.py[cod]
 .venv/
-data/
 .pytest_cache/
 *.egg-info/

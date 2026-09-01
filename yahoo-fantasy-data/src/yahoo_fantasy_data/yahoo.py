@@ -1,6 +1,7 @@
 """HTTP access and snapshot orchestration."""
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import UTC, datetime
 import json
 from pathlib import Path
@@ -12,7 +13,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
-from .config import Settings, load_settings
+from .config import Settings, load_settings, storage_league_name
 from .errors import (
     YahooAPIError,
     YahooAuthenticationError,
@@ -34,7 +35,7 @@ class YahooHTTPClient:
         self.settings = settings
         self.session = session or requests.Session()
         self.session.headers.update({"User-Agent": USER_AGENT, "Accept": "application/json"})
-        retry = Retry(total=2, backoff_factor=0.6, status_forcelist=(429, 500, 502, 503, 504), allowed_methods=("GET",))
+        retry = Retry(total=2, backoff_factor=0.6, status_forcelist=(429, 500, 502, 503, 504, 999), allowed_methods=("GET",))
         self.session.mount("https://", HTTPAdapter(max_retries=retry))
 
     def get(self, path: str, *, params: dict[str, Any] | None = None, token: str | None = None, official: bool = False) -> dict[str, Any]:
@@ -48,8 +49,8 @@ class YahooHTTPClient:
             raise YahooAuthenticationError(f"Yahoo requires authentication for {path}.")
         if response.status_code == 404:
             raise YahooNotFoundError(f"Yahoo resource was not found: {path}")
-        if response.status_code == 429:
-            raise YahooRateLimitError("Yahoo rate limited the request; retry later.")
+        if response.status_code in (429, 999):
+            raise YahooRateLimitError(f"Yahoo rate limited or denied the request (HTTP {response.status_code}); retry later.")
         if response.status_code >= 400:
             raise YahooAPIError(f"Yahoo returned HTTP {response.status_code} for {path}: {response.text[:240]}")
         try:
@@ -105,14 +106,17 @@ def league_metadata(season: int, league_id: str, settings: Settings | None = Non
     active_settings, public, game_id, key = _context(season, league_id, settings)
     payload = public.league(key)
     private = first_value(payload, "is_private")
-    league_type = first_value(payload, "league_type")
-    if str(private).lower() in {"1", "true"} or str(league_type).lower() == "private":
+    # Yahoo can report ``league_type=private`` for a league whose website
+    # setting says "Make League Publicly Viewable: Yes". That field is not a
+    # reliable anonymous-access signal. Only an explicit is_private flag stops
+    # collection; individual collectors report endpoint authentication needs.
+    if str(private).lower() in {"1", "true"}:
         raise YahooPrivateLeagueError(f"League {key} is private and will not be archived.")
     return payload, active_settings, public, game_id, key
 
 
 def _snapshot_path(settings: Settings, league_id: str, season: int, data_type: str, week: int) -> Path:
-    return settings.data_dir / str(league_id) / str(season) / data_type / f"{data_type}_week_{week}.csv.gz"
+    return settings.data_dir / storage_league_name(settings.league_nickname, league_id) / str(season) / data_type / f"{data_type}_week_{week}.csv.gz"
 
 
 def write_snapshot(frame: pd.DataFrame, path: Path, overwrite: bool) -> str:
@@ -124,7 +128,7 @@ def write_snapshot(frame: pd.DataFrame, path: Path, overwrite: bool) -> str:
 
 
 def _metadata_path(settings: Settings, league_id: str, season: int) -> Path:
-    return settings.data_dir / str(league_id) / str(season) / "metadata.json"
+    return settings.data_dir / storage_league_name(settings.league_nickname, league_id) / str(season) / "metadata.json"
 
 
 def update_metadata(settings: Settings, season: int, league_id: str, game_id: str, key: str, payload: Any, week: int, statuses: dict[str, str]) -> None:
@@ -144,11 +148,17 @@ def update_metadata(settings: Settings, season: int, league_id: str, game_id: st
     path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
 
 
-def collect_week(season: int, league_id: str, week: int, overwrite: bool = False, *, settings: Settings | None = None) -> dict[str, str]:
+def collect_week(season: int, league_id: str, week: int, overwrite: bool = False, *, settings: Settings | None = None, league_nickname: str | None = None, _metadata_context: tuple[Any, Any, str, str] | None = None, _schedule_matrix: pd.DataFrame | None = None) -> dict[str, str]:
     """Collect independent datasets, retaining successes when another endpoint fails."""
     if week < 1:
         raise ValueError("week must be at least 1")
-    payload, active_settings, _public, game_id, key = league_metadata(season, league_id, settings)
+    active_settings = settings or load_settings()
+    if league_nickname is not None:
+        active_settings = replace(active_settings, league_nickname=league_nickname)
+    if _metadata_context is None:
+        payload, active_settings, _public, game_id, key = league_metadata(season, league_id, active_settings)
+    else:
+        payload, _public, game_id, key = _metadata_context
     from .collectors import draft, league_settings, players, projections, schedule, teams
     jobs: dict[str, tuple[str, Callable[..., pd.DataFrame]]] = {
         "player_data": ("player_data", players.get_player_data),
@@ -165,7 +175,15 @@ def collect_week(season: int, league_id: str, week: int, overwrite: bool = False
             statuses[name] = "skipped_existing"
             continue
         try:
-            frame = collector(season, str(league_id), week, settings=active_settings, game_id=game_id, provider=_public)
+            frame = (
+                schedule.get_schedule_matrix(
+                    season, str(league_id), week,
+                    int(first_value(payload, "end_week", week)),
+                    settings=active_settings, game_id=game_id, provider=_public,
+                )
+                if name == "schedule" and _schedule_matrix is None
+                else (_schedule_matrix if name == "schedule" else collector(season, str(league_id), week, settings=active_settings, game_id=game_id, provider=_public))
+            )
             statuses[name] = write_snapshot(frame, path, overwrite=True)
         except YahooAuthenticationError:
             statuses[name] = "authentication_required"
@@ -176,9 +194,31 @@ def collect_week(season: int, league_id: str, week: int, overwrite: bool = False
     return statuses
 
 
-def backfill_season(season: int, league_id: str, start_week: int = 1, end_week: int | None = None, overwrite: bool = False, *, settings: Settings | None = None) -> dict[int, dict[str, str]]:
-    payload, active_settings, _public, _game_id, _key = league_metadata(season, league_id, settings)
+def backfill_season(season: int, league_id: str, start_week: int = 1, end_week: int | None = None, overwrite: bool = False, *, settings: Settings | None = None, league_nickname: str | None = None) -> dict[int, dict[str, str]]:
+    active_settings = settings or load_settings()
+    if league_nickname is not None:
+        active_settings = replace(active_settings, league_nickname=league_nickname)
+    payload, active_settings, public, game_id, key = league_metadata(season, league_id, active_settings)
     resolved_end = end_week or int(first_value(payload, "end_week", start_week))
     if resolved_end < start_week:
         raise ValueError("end_week must not precede start_week")
-    return {week: collect_week(season, league_id, week, overwrite, settings=active_settings) for week in range(start_week, resolved_end + 1)}
+    from .collectors.schedule import get_schedule_matrix
+    schedule_matrix: pd.DataFrame | None = None
+    schedule_missing = overwrite or any(
+        not _snapshot_path(active_settings, league_id, season, "schedule", week).exists()
+        for week in range(start_week, resolved_end + 1)
+    )
+    if schedule_missing:
+        schedule_matrix = get_schedule_matrix(
+            season, str(league_id), start_week, resolved_end,
+            settings=active_settings, game_id=game_id, provider=public,
+        )
+    context = (payload, public, game_id, key)
+    return {
+        week: collect_week(
+            season, league_id, week, overwrite, settings=active_settings,
+            league_nickname=league_nickname, _metadata_context=context,
+            _schedule_matrix=schedule_matrix,
+        )
+        for week in range(start_week, resolved_end + 1)
+    }

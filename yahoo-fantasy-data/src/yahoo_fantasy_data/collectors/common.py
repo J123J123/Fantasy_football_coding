@@ -35,13 +35,24 @@ def player_rows(payload: Any, base: dict[str, Any], projected: bool = False) -> 
         row["bye_week"] = first_value(player, "bye_weeks") or player.get("bye_week")
         row["percent_owned"] = first_value(player, "percent_owned")
         row["percent_started"] = first_value(player, "percent_started")
-        stats = stat_columns(player, "projected_" if projected else "")
-        row.update(stats)
-        # Yahoo varies here; retain an explicitly supplied points value too.
-        points = first_value(player, "fantasy_points") or first_value(player, "total")
-        # The collection endpoint can silently return season totals. Do not label
-        # those as weekly actuals when Yahoo did not honour the requested week.
-        coverage = first_value(player, "coverage_type")
-        row["projected_points" if projected else "fantasy_points_actual"] = points if projected or coverage == "week" else None
+        if projected:
+            # Yahoo includes actual and projected structures in one response.
+            # Read only the explicit weekly projection fields.
+            projected_points = player.get("player_projected_points", {})
+            projected_stats = player.get("player_projected_stats", {})
+            projection_week = first_value(projected_points, "week")
+            projection_coverage = first_value(projected_points, "coverage_type")
+            row["projection_week_returned"] = projection_week
+            row.update(stat_columns(projected_stats, "projected_"))
+            row["projected_points"] = (
+                first_value(projected_points, "total")
+                if projection_coverage == "week" and str(projection_week) == str(base["week"])
+                else None
+            )
+        else:
+            row.update(stat_columns(player))
+            points = first_value(player, "fantasy_points") or first_value(player, "total")
+            coverage = first_value(player, "coverage_type")
+            row["fantasy_points_actual"] = points if coverage == "week" else None
         rows.append(row)
     return rows

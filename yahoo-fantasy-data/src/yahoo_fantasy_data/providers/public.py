@@ -24,12 +24,21 @@ class PublicYahooProvider:
         return self.get(f"league/{league_key}")
 
     def players(self, league_key: str, week: int, start: int, count: int, projected: bool = False) -> dict[str, Any]:
-        extras = ";out=stats" if not projected else ";out=stats"
-        path = f"league/{league_key}/players;start={start};count={count};week={week}{extras}"
-        params: dict[str, Any] = {"week": week}
         if projected:
-            params.update(show_projected_stats=1, show_live_projected_points=1)
-        return self.get(path, **params)
+            # ``week`` on the players collection is silently ignored by Yahoo.
+            # The stats sub-resource returns weekly player projection fields.
+            path = (
+                f"league/{league_key}/players;start={start};count={count};sort=AR"
+                f"/stats;type=week;week={week}"
+            )
+            return self.get(
+                path,
+                format="json_f",
+                show_projected_stats=1,
+                show_live_projected_points=1,
+            )
+        path = f"league/{league_key}/players;start={start};count={count};week={week};out=stats"
+        return self.get(path, week=week)
 
     def teams_roster(self, league_key: str, week: int) -> dict[str, Any]:
         return self.get(f"league/{league_key}/teams/roster;week={week}", week=week)

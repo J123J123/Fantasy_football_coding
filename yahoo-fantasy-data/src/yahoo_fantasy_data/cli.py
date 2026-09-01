@@ -23,12 +23,14 @@ def _args() -> argparse.ArgumentParser:
         command.add_argument("--league", required=True)
         command.add_argument("--week", type=int, required=True)
         command.add_argument("--overwrite", action="store_true")
+        command.add_argument("--nickname", help="Local data-folder nickname (collect only)")
     backfill = commands.add_parser("backfill")
     backfill.add_argument("--season", type=int, required=True)
     backfill.add_argument("--league", required=True)
     backfill.add_argument("--start-week", type=int, default=1)
     backfill.add_argument("--end-week", type=int)
     backfill.add_argument("--overwrite", action="store_true")
+    backfill.add_argument("--nickname", help="Local data-folder nickname")
     return parser
 
 
@@ -64,9 +66,9 @@ def main() -> None:
     args = _args().parse_args()
     try:
         if args.command == "collect":
-            print(json.dumps(collect_week(args.season, args.league, args.week, args.overwrite), indent=2))
+            print(json.dumps(collect_week(args.season, args.league, args.week, args.overwrite, league_nickname=args.nickname), indent=2))
         elif args.command == "backfill":
-            print(json.dumps(backfill_season(args.season, args.league, args.start_week, args.end_week, args.overwrite), indent=2))
+            print(json.dumps(backfill_season(args.season, args.league, args.start_week, args.end_week, args.overwrite, league_nickname=args.nickname), indent=2))
         else:
             print(json.dumps(connectivity_report(args.season, args.league, args.week), indent=2, default=str))
     except YahooAPIError as error:
