@@ -1,0 +1,20 @@
+{
+  "end_week": "17",
+  "game_id": "461",
+  "last_collected_week": 17,
+  "last_updated": "2026-09-01T19:56:11.872518+00:00",
+  "league_id": "918145",
+  "league_key": "461.l.918145",
+  "league_name": "Conarroe Fantasy B League",
+  "league_type": "public",
+  "season": 2025,
+  "sources": {
+    "draft": "skipped_existing",
+    "league_settings": "skipped_existing",
+    "player_data": "written",
+    "projection_data": "written",
+    "schedule": "skipped_existing",
+    "team_data": "written"
+  },
+  "start_week": "1"
+}
