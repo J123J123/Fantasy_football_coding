@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Fantasy League Weekly Report</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#66727e;--paper:#fff;--canvas:#eceff2;--rule:#d8dee4;--rule-dark:#aeb8c2;
+  --navy:#17354f;--navy-2:#2c5574;--gold:#ab8438;--green:#2f7256;--red:#a74b4b;
+  --soft-blue:#eef4f8;--soft-gold:#f7f2e7;--soft-green:#eaf3ee;--soft-red:#f8ecec;--soft-gray:#f6f8f9;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--canvas)}
+body{margin:0;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;line-height:1.4}
+.report{width:min(1280px,calc(100% - 28px));margin:24px auto 72px;background:var(--paper);border:1px solid #cbd2d9}
+.masthead{border-top:7px solid var(--navy);padding:32px 40px 24px;display:grid;grid-template-columns:1fr auto;gap:28px;align-items:end;border-bottom:1px solid var(--rule-dark)}
+.kicker,.section-kicker{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:850;color:var(--gold)}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:0;color:#111820}
+h1{font-size:42px;line-height:1.04;letter-spacing:-.025em;margin-top:4px}
+.meta{text-align:right;color:var(--muted);font-size:13px}.meta strong{display:block;color:var(--ink);font-size:15px}
+.intro{display:grid;grid-template-columns:1.25fr .75fr;gap:36px;padding:26px 40px 30px;border-bottom:1px solid var(--rule)}
+.intro h2{font-size:28px;margin-bottom:10px}.intro p{margin:0;color:#515d68;font-size:14px;max-width:760px}
+.issuebox{border:1px solid var(--rule);display:grid;grid-template-columns:repeat(3,1fr);align-self:start}.issuebox div{padding:13px}.issuebox div+div{border-left:1px solid var(--rule)}
+.label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:850}.big{font-size:20px;font-weight:850;color:var(--navy);margin-top:4px}
+.index{padding:22px 40px 26px;border-bottom:1px solid var(--rule);background:#fbfcfd}
+.index-title{font-weight:850;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--navy);margin-bottom:12px}
+.index-grid{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--rule-dark);border-left:1px solid var(--rule)}
+.index-grid a{text-decoration:none;color:var(--ink);padding:12px 13px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);font-size:12px;min-height:63px;display:block}
+.index-grid a span{display:block;font-family:Georgia,"Times New Roman",serif;font-size:15px;font-weight:700;margin-top:3px}.index-grid a:hover{background:var(--soft-blue)}
+.section{padding:32px 40px 36px;border-bottom:1px solid var(--rule)}
+.section-head{display:grid;grid-template-columns:minmax(280px,.8fr) 1.2fr;gap:36px;align-items:end;margin-bottom:20px}.section-head h3{font-size:27px;margin-top:4px}.deck{margin:0;color:#596570;font-size:13px}
+.table-wrap{width:100%;overflow:auto;border:1px solid var(--rule)}
+table{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
+th{background:#f6f8fa;color:#33404c;text-transform:uppercase;letter-spacing:.055em;font-size:9px;font-weight:850;padding:8px 9px;border-bottom:1px solid var(--rule-dark);white-space:nowrap;text-align:right}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:inherit;z-index:1}
+td{padding:7px 9px;border-bottom:1px solid #e5e9ed;text-align:right;white-space:nowrap}
+tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.manager{font-weight:780;color:#1d2b37}.muted{color:var(--muted)}
+.pos{background:var(--soft-green)!important;color:#215a43;font-weight:760}.neg{background:var(--soft-red)!important;color:#8b3434;font-weight:760}.neutral{background:var(--soft-gray)!important}
+.note{margin-top:12px;color:#66727e;font-size:11px}.tiny-note{margin-top:10px;color:#7b858e;font-size:10px}
+.grid{display:grid;gap:18px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{border:1px solid var(--rule);background:#fff}.card-head{padding:10px 12px;border-bottom:1px solid var(--rule);background:#f8fafb;display:flex;justify-content:space-between;gap:12px;align-items:baseline}.card-title{font-family:Georgia,"Times New Roman",serif;font-weight:700}.card-sub{font-size:10px;color:var(--muted)}
+.matrix-wrap{width:100%;overflow:auto;border:1px solid var(--rule)}.matrix{min-width:max-content}.matrix th,.matrix td{min-width:48px;text-align:center;padding:6px 7px}.matrix th:first-child,.matrix td:first-child{min-width:125px;text-align:left}.matrix td.diag{background:var(--soft-gold);font-weight:850}.matrix td.zero{color:#a1a9b0}
+.manager-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}.manager-card{border:1px solid var(--rule)}.manager-card h4{font-family:Georgia,"Times New Roman",serif;font-size:16px;margin:0;padding:9px 11px;background:#f7f9fa;border-bottom:1px solid var(--rule)}.manager-card table{font-size:10px}.manager-card th{font-size:8px;padding:6px}.manager-card td{padding:5px 6px}
+.metric-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:16px}.metric{border:1px solid var(--rule);padding:10px 11px}.metric b{display:block;font-size:18px;color:var(--navy)}.metric span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:750}
+.odds{border:1px solid var(--rule)}.odds-row{display:grid;grid-template-columns:130px 1fr 62px 80px;gap:10px;align-items:center;padding:7px 10px;border-bottom:1px solid #e6eaee;font-size:11px}.odds-row:last-child{border-bottom:0}.odds-track{height:8px;background:#e6ebef;position:relative}.odds-track>span{display:block;height:100%;background:var(--navy-2)}.odds-pct{font-weight:800;text-align:right}.odds-last{text-align:right;color:var(--muted)}
+.chartbox{border:1px solid var(--rule);padding:14px 14px 10px}.chart-title{font-family:Georgia,"Times New Roman",serif;font-weight:700;margin-bottom:12px}.stack-chart{height:260px;display:flex;align-items:flex-end;gap:10px;border-bottom:1px solid var(--rule-dark);padding:0 8px}.barcol{height:100%;flex:1;min-width:42px;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch}.stack{height:var(--h);display:flex;flex-direction:column-reverse}.seg{display:block}.s1{background:#355f80}.s2{background:#759066}.s3{background:#a9aa9d}.s4{background:#b67e58}.barlabel{font-size:9px;text-align:center;padding-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.legend{display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:10px;color:var(--muted)}.legend i{display:inline-block;width:9px;height:9px;margin-right:4px;vertical-align:-1px}
+.empty{padding:16px;border:1px dashed var(--rule-dark);color:var(--muted);font-size:12px;background:#fbfcfd}
+.footer{display:flex;justify-content:space-between;gap:20px;padding:18px 40px 22px;font-size:10px;color:var(--muted)}
+@media(max-width:850px){.report{width:100%;margin:0;border:0}.masthead,.intro,.section-head{grid-template-columns:1fr}.masthead,.intro,.index,.section{padding-left:18px;padding-right:18px}.meta{text-align:left}.index-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3{grid-template-columns:1fr}.odds-row{grid-template-columns:100px 1fr 55px}.odds-last{display:none}.stack-chart{overflow-x:auto}.footer{padding-left:18px;padding-right:18px}}
+@media print{html,body{background:#fff}.report{width:100%;margin:0;border:0}.index{display:none}.section{break-inside:avoid}.table-wrap,.matrix-wrap{overflow:visible}.footer{border-top:1px solid var(--rule)}}
+</style>
+</head>
+<body>
+<main class="report">
+  <header class="masthead">
+    <div><div class="kicker">Weekly fantasy analytics</div><h1 id="title">The Fantasy League Weekly Report™</h1></div>
+    <div class="meta"><strong id="league-name">League</strong><span id="season-week">Season · Week</span></div>
+  </header>
+
+  <section class="intro">
+    <div><h2 id="intro-title">Fantasy Football Analytics</h2><p id="intro-copy">A reusable report template driven entirely by embedded JSON.</p></div>
+    <div class="issuebox"><div><div class="label">League</div><div class="big" id="issue-league">—</div></div><div><div class="label">Through</div><div class="big" id="issue-week">—</div></div><div><div class="label">Teams</div><div class="big" id="issue-teams">—</div></div></div>
+  </section>
+
+  <nav class="index"><div class="index-title">Report index</div><div class="index-grid" id="report-index"></div></nav>
+
+  <div id="sections"></div>
+
+  <footer class="footer"><span><strong>Template:</strong> self-contained HTML driven by JSON.</span><span id="footer-generated"></span></footer>
+</main>
+
+<!--
+  POPULATION POINT:
+  Replace ONLY the JSON inside the script tag below.
+  The JavaScript renderer beneath it should not need to change week to week.
+-->
+<script id="report-data" type="application/json">
+{
+  "meta": {
+    "title": "The Fantasy League Weekly Report™",
+    "season": 2026,
+    "league_name": "Example League",
+    "current_week": 5,
+    "author": "Joey Schiazza",
+    "generated_at": "2026-09-05",
+    "intro": "A clean weekly fantasy-football report. This file contains sample data only; replace the JSON block with calculated report data."
+  },
+  "teams": [
+    {"team_id":"t1","manager":"Mike","team_name":"Mike's Team"},
+    {"team_id":"t2","manager":"Joey","team_name":"Joey's Team"},
+    {"team_id":"t3","manager":"Laura","team_name":"Laura's Team"},
+    {"team_id":"t4","manager":"Justin","team_name":"Justin's Team"}
+  ],
+  "boned_index": {
+    "description": "How opponents perform against each manager compared with how those opponents perform against everyone else.",
+    "weeks": [2,3,4,5],
+    "rows": [
+      {"team_id":"t1","values":{"2":-16.5,"3":-6.9,"4":-2.6,"5":-6.4},"ranks":{"2":3,"3":2,"4":5,"5":5},"difference":-3.8,"rank_delta":0},
+      {"team_id":"t2","values":{"2":24.7,"3":-1.4,"4":-0.6,"5":5.7},"ranks":{"2":12,"3":5,"4":8,"5":9},"difference":6.2,"rank_delta":1},
+      {"team_id":"t3","values":{"2":16.8,"3":1.2,"4":-6.6,"5":-9.6},"ranks":{"2":9,"3":7,"4":3,"5":3},"difference":-3.0,"rank_delta":0},
+      {"team_id":"t4","values":{"2":-19.2,"3":-1.3,"4":1.7,"5":8.4},"ranks":{"2":2,"3":6,"4":9,"5":10},"difference":6.7,"rank_delta":1}
+    ]
+  },
+  "boned_detail": {
+    "description": "Manager-by-manager weekly detail behind the Boned Index.",
+    "managers": [
+      {"team_id":"t1","rows":[{"week":1,"opponent":"Adam","opponent_score":88.56,"opponent_games":4,"opponent_avg":97.96,"ratio":0.90},{"week":2,"opponent":"Laura","opponent_score":103.68,"opponent_games":4,"opponent_avg":107.92,"ratio":0.96}],"averages":{"opponent_score":96.12,"opponent_avg":102.94,"ratio":0.93}},
+      {"team_id":"t2","rows":[{"week":1,"opponent":"Doctor","opponent_score":92.92,"opponent_games":4,"opponent_avg":100.57,"ratio":0.92},{"week":2,"opponent":"Mateo","opponent_score":123.74,"opponent_games":4,"opponent_avg":82.52,"ratio":1.50}],"averages":{"opponent_score":108.33,"opponent_avg":91.55,"ratio":1.21}}
+    ]
+  },
+  "freaky_friday": {
+    "description": "Wins each manager would have if they had played another manager's schedule, plus head-to-head comparisons.",
+    "schedule_swap": {
+      "matrix": {
+        "t1":{"t1":5,"t2":3,"t3":3,"t4":2},
+        "t2":{"t1":3,"t2":2,"t3":3,"t4":2},
+        "t3":{"t1":3,"t2":3,"t3":3,"t4":4},
+        "t4":{"t1":3,"t2":2,"t3":4,"t4":3}
+      },
+      "summary":[
+        {"team_id":"t1","total":13,"rank":2,"max":5,"avg":3.25,"min":2},
+        {"team_id":"t2","total":10,"rank":4,"max":3,"avg":2.50,"min":2},
+        {"team_id":"t3","total":13,"rank":2,"max":4,"avg":3.25,"min":3},
+        {"team_id":"t4","total":12,"rank":3,"max":4,"avg":3.00,"min":2}
+      ]
+    },
+    "head_to_head": {
+      "matrix": {
+        "t1":{"t1":0,"t2":3,"t3":3,"t4":2},
+        "t2":{"t1":2,"t2":0,"t3":3,"t4":2},
+        "t3":{"t1":2,"t2":2,"t3":0,"t4":2},
+        "t4":{"t1":3,"t2":3,"t3":3,"t4":0}
+      }
+    }
+  },
+  "bhole": {
+    "description": "How a fixed weekly score adjustment would have changed each team's win total.",
+    "deltas": [-10,-5,-2.5,0,2.5,5,10],
+    "rows": [
+      {"team_id":"t1","wins":{"-10":2,"-5":3,"-2.5":4,"0":5,"2.5":5,"5":5,"10":5},"range":3,"avg_width":17.4},
+      {"team_id":"t2","wins":{"-10":2,"-5":2,"-2.5":2,"0":2,"2.5":2,"5":2,"10":3},"range":1,"avg_width":32.6},
+      {"team_id":"t3","wins":{"-10":3,"-5":3,"-2.5":3,"0":3,"2.5":3,"5":5,"10":5},"range":2,"avg_width":18.6},
+      {"team_id":"t4","wins":{"-10":3,"-5":3,"-2.5":3,"0":3,"2.5":3,"5":3,"10":3},"range":0,"avg_width":30.0}
+    ]
+  },
+  "studs_duds": {
+    "description": "Counts of big over-performances and under-performances among starters.",
+    "rows": [
+      {"team_id":"t1","studs":1,"studded_on":0,"duds":2,"dudded_on":0,"s2d_diff":-1},
+      {"team_id":"t2","studs":1,"studded_on":1,"duds":1,"dudded_on":0,"s2d_diff":-1},
+      {"team_id":"t3","studs":1,"studded_on":0,"duds":1,"dudded_on":1,"s2d_diff":1},
+      {"team_id":"t4","studs":0,"studded_on":1,"duds":2,"dudded_on":3,"s2d_diff":0}
+    ]
+  },
+  "grower_shower": {
+    "description": "Compares expected wins with actual wins using weekly win probabilities and blended win scenarios.",
+    "weeks": [1,2,3,4,5],
+    "weights": {"expected_wins":0.8,"actual_vs_opp_avg":0.075,"avg_vs_opp_actual":0.075,"avg_vs_opp_avg":0.05},
+    "rows": [
+      {"team_id":"t1","weekly_probability":{"1":0.61,"2":0.57,"3":0.72,"4":0.87,"5":0.85},"expected_wins":3.61,"actual_vs_opp_avg":4,"avg_vs_opp_actual":5,"avg_vs_opp_avg":5,"actual_wins":5,"ratio":1.31,"rank":2},
+      {"team_id":"t2","weekly_probability":{"1":0.33,"2":0.20,"3":0.63,"4":0.84,"5":0.53},"expected_wins":2.52,"actual_vs_opp_avg":2,"avg_vs_opp_actual":3,"avg_vs_opp_avg":5,"actual_wins":2,"ratio":0.76,"rank":10},
+      {"team_id":"t3","weekly_probability":{"1":0.93,"2":0.43,"3":0.92,"4":0.81,"5":0.71},"expected_wins":3.80,"actual_vs_opp_avg":3,"avg_vs_opp_actual":4,"avg_vs_opp_avg":4,"actual_wins":3,"ratio":0.80,"rank":9},
+      {"team_id":"t4","weekly_probability":{"1":0.36,"2":0.68,"3":0.68,"4":0.95,"5":0.15},"expected_wins":2.83,"actual_vs_opp_avg":2,"avg_vs_opp_actual":2,"avg_vs_opp_avg":4,"actual_wins":3,"ratio":1.09,"rank":5}
+    ]
+  },
+  "managerial_expertise": {
+    "description": "Lineup efficiency, Yahoo projection decisions, value-over-baseline measures, and Stud/Dud management.",
+    "rows": [
+      {"team_id":"t1","actual_points":554.18,"optimal_points":660.22,"efficiency":0.839,"using_yahoo_games":4,"using_yahoo_efficiency":0.873,"not_using_yahoo_games":1,"not_using_yahoo_efficiency":0.699,"wins_added":0,"losses_added":0,"net_added":0,"sheep_pct":0.80,"plums":"80%","vobl":17.82,"vobm":-312.3,"wobl":5,"wobm":0,"all_studs":1,"studs_benched":0,"all_duds":2,"duds_started":0},
+      {"team_id":"t2","actual_points":522.70,"optimal_points":633.04,"efficiency":0.826,"using_yahoo_games":0,"using_yahoo_efficiency":null,"not_using_yahoo_games":5,"not_using_yahoo_efficiency":0.826,"wins_added":0,"losses_added":-1,"net_added":-1,"sheep_pct":0.00,"plums":"All Balls","vobl":-13.66,"vobm":-343.7,"wobl":5,"wobm":0,"all_studs":1,"studs_benched":0,"all_duds":1,"duds_started":0},
+      {"team_id":"t3","actual_points":535.34,"optimal_points":580.14,"efficiency":0.923,"using_yahoo_games":4,"using_yahoo_efficiency":0.913,"not_using_yahoo_games":1,"not_using_yahoo_efficiency":0.961,"wins_added":0,"losses_added":0,"net_added":0,"sheep_pct":0.80,"plums":"105%","vobl":-1.02,"vobm":-331.1,"wobl":3,"wobm":0,"all_studs":1,"studs_benched":0,"all_duds":1,"duds_started":0},
+      {"team_id":"t4","actual_points":533.90,"optimal_points":608.10,"efficiency":0.878,"using_yahoo_games":2,"using_yahoo_efficiency":0.898,"not_using_yahoo_games":3,"not_using_yahoo_efficiency":0.864,"wins_added":0,"losses_added":0,"net_added":0,"sheep_pct":0.40,"plums":"96%","vobl":-2.46,"vobm":-332.5,"wobl":5,"wobm":0,"all_studs":0,"studs_benched":0,"all_duds":2,"duds_started":0}
+    ]
+  },
+  "vobl": {
+    "description": "Value over the baseline starter at each lineup slot.",
+    "positions": ["QB1","WR1","WR2","RB1","RB2","TE1","W/R/T1","DEF1","K1"],
+    "rows": [
+      {"team_id":"t1","total":17.82,"values":{"QB1":10.42,"WR1":37.60,"WR2":15.60,"RB1":-0.30,"RB2":-6.20,"TE1":-24.80,"W/R/T1":-2.50,"DEF1":-11.00,"K1":-1.00}},
+      {"team_id":"t2","total":-13.66,"values":{"QB1":-26.16,"WR1":10.00,"WR2":-3.40,"RB1":26.50,"RB2":7.00,"TE1":7.70,"W/R/T1":-12.30,"DEF1":-1.00,"K1":-22.00}},
+      {"team_id":"t3","total":-1.02,"values":{"QB1":39.38,"WR1":-10.90,"WR2":-19.00,"RB1":26.80,"RB2":-3.60,"TE1":-5.70,"W/R/T1":-31.00,"DEF1":6.00,"K1":-3.00}},
+      {"team_id":"t4","total":-2.46,"values":{"QB1":11.54,"WR1":-4.52,"WR2":-15.28,"RB1":4.30,"RB2":13.70,"TE1":-19.20,"W/R/T1":3.00,"DEF1":24.00,"K1":-20.00}}
+    ]
+  },
+  "playoff_odds": {
+    "description": "Monte Carlo outlook for the remainder of the season.",
+    "simulation_count": 10000,
+    "rows": [
+      {"team_id":"t1","make_playoffs":0.978,"division":0.844,"wildcard":0.134,"bye":0.794,"last_place":0.000},
+      {"team_id":"t4","make_playoffs":0.770,"division":0.564,"wildcard":0.206,"bye":0.301,"last_place":0.004},
+      {"team_id":"t3","make_playoffs":0.606,"division":0.085,"wildcard":0.521,"bye":0.073,"last_place":0.015},
+      {"team_id":"t2","make_playoffs":0.571,"division":0.212,"wildcard":0.358,"bye":0.136,"last_place":0.024}
+    ]
+  },
+  "draft_analysis": {
+    "description": "Points generated by players grouped by draft-round bucket, for actual and optimal lineups.",
+    "buckets": ["1-5","6-10","11-16","FA"],
+    "historical": [
+      {"team_id":"t1","values":{"1-5":339.40,"6-10":137.62,"11-16":96.58,"FA":115.60}},
+      {"team_id":"t2","values":{"1-5":249.10,"6-10":167.50,"11-16":122.30,"FA":94.14}},
+      {"team_id":"t3","values":{"1-5":276.04,"6-10":115.30,"11-16":112.20,"FA":26.40}},
+      {"team_id":"t4","values":{"1-5":268.40,"6-10":200.12,"11-16":53.18,"FA":102.40}}
+    ],
+    "optimal": [
+      {"team_id":"t1","values":{"1-5":309.10,"6-10":137.62,"11-16":97.90,"FA":115.60}},
+      {"team_id":"t2","values":{"1-5":249.10,"6-10":167.50,"11-16":122.30,"FA":94.14}},
+      {"team_id":"t3","values":{"1-5":261.04,"6-10":115.30,"11-16":177.40,"FA":26.40}},
+      {"team_id":"t4","values":{"1-5":252.40,"6-10":200.12,"11-16":53.18,"FA":102.40}}
+    ]
+  }
+}
+</script>
+
+<script>
+(() => {
+  const data = JSON.parse(document.getElementById('report-data').textContent);
+  const teamMap = new Map((data.teams || []).map(t => [String(t.team_id), t]));
+  const manager = id => teamMap.get(String(id))?.manager ?? String(id);
+  const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const n = (value, digits=2) => value == null || value === '' ? '—' : Number(value).toFixed(digits);
+  const pct = value => value == null || value === '' ? '—' : `${(Number(value)*100).toFixed(1)}%`;
+  const pctPoint = value => value == null || value === '' ? '—' : `${Number(value).toFixed(1)}%`;
+  const signClass = value => Number(value) > 10 ? 'pos' : Number(value) < -10 ? 'neg' : '';
+  const ratioClass = value => Number(value) >= 1.1 ? 'pos' : Number(value) <= .9 ? 'neg' : '';
+  const sectionDefs = [
+    ['boned','01','Luck / schedule','Boned Index'],
+    ['boned-detail','02','Luck / schedule','Boned Index by Manager by Week'],
+    ['freaky','03','Schedule strength','Freaky Friday'],
+    ['bhole','04','Close games','Between High Over Low Evaluation'],
+    ['studs','05','Player volatility','Studs to Duds Analysis'],
+    ['grower','06','Expected wins','Grower or Shower'],
+    ['expertise','07','Lineup management','Managerial Expertise'],
+    ['vobl','08','Roster value','Value Over Baseline — Expanded'],
+    ['playoffs','09','Season outlook','Playoff Odds'],
+    ['draft','10','Draft capital',"It's Not The Size of Your Draft, It's How You Use It"]
+  ];
+
+  document.title = `${data.meta?.title || 'Fantasy Report'} — ${data.meta?.league_name || ''}`;
+  document.getElementById('title').textContent = data.meta?.title || 'The Fantasy League Weekly Report™';
+  document.getElementById('league-name').textContent = data.meta?.league_name || 'League';
+  document.getElementById('season-week').textContent = `${data.meta?.season ?? ''} · Through Week ${data.meta?.current_week ?? ''}`;
+  document.getElementById('intro-title').textContent = `${data.meta?.season ?? ''} Fantasy Football Analytics`;
+  document.getElementById('intro-copy').textContent = data.meta?.intro || '';
+  document.getElementById('issue-league').textContent = data.meta?.league_name || '—';
+  document.getElementById('issue-week').textContent = `Week ${data.meta?.current_week ?? '—'}`;
+  document.getElementById('issue-teams').textContent = (data.teams || []).length;
+  document.getElementById('footer-generated').textContent = data.meta?.generated_at ? `Generated ${data.meta.generated_at}` : '';
+  document.getElementById('report-index').innerHTML = sectionDefs.map(([id,num,kicker,title]) => `<a href="#${id}"><small>${num} · ${esc(kicker)}</small><span>${esc(title)}</span></a>`).join('');
+
+  const sectionShell = (id,num,kicker,title,description,body) => `
+    <section class="section" id="${id}">
+      <div class="section-head"><div><div class="section-kicker">${num} · ${esc(kicker)}</div><h3>${esc(title)}</h3></div><p class="deck">${esc(description || '')}</p></div>
+      ${body || '<div class="empty">No data supplied for this section.</div>'}
+    </section>`;
+
+  function renderBoned(){
+    const s=data.boned_index;if(!s)return '';
+    const weeks=s.weeks || [];
+    const head=['<th>Manager</th>',...weeks.flatMap(w=>[`<th>Week ${w}</th>`,`<th>Rank</th>`]),'<th>Difference</th><th>Rank Δ</th>'].join('');
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td>${weeks.map(w=>`<td class="${signClass(r.values?.[w])}">${pctPoint(r.values?.[w])}</td><td>${r.ranks?.[w] ?? '—'}</td>`).join('')}<td class="${signClass(r.difference)}">${pctPoint(r.difference)}</td><td>${r.rank_delta ?? '—'}</td></tr>`).join('');
+    return sectionShell('boned','01','Luck / schedule','Boned Index',s.description,`<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderBonedDetail(){
+    const s=data.boned_detail;if(!s)return '';
+    const cards=(s.managers||[]).map(m=>{
+      const rows=(m.rows||[]).map(r=>`<tr><td>${r.week}</td><td>${esc(r.opponent)}</td><td>${n(r.opponent_score)}</td><td>${r.opponent_games ?? '—'}</td><td>${n(r.opponent_avg)}</td><td class="${ratioClass(r.ratio)}">${n(r.ratio)}</td></tr>`).join('');
+      const a=m.averages||{};
+      return `<div class="manager-card"><h4>${esc(manager(m.team_id))}</h4><div class="table-wrap"><table><thead><tr><th>Week</th><th>Opponent</th><th>Opp. score</th><th>Games</th><th>Opp. avg</th><th>Ratio</th></tr></thead><tbody>${rows}<tr><td colspan="2" class="manager">Average</td><td>${n(a.opponent_score)}</td><td>—</td><td>${n(a.opponent_avg)}</td><td class="${ratioClass(a.ratio)}">${n(a.ratio)}</td></tr></tbody></table></div></div>`;
+    }).join('');
+    return sectionShell('boned-detail','02','Luck / schedule','Boned Index by Manager by Week',s.description,`<div class="manager-grid">${cards || '<div class="empty">No manager detail supplied.</div>'}</div>`);
+  }
+
+  function matrixTable(matrix, diagonal=true){
+    const teams=data.teams||[];
+    return `<div class="matrix-wrap"><table class="matrix"><thead><tr><th>Manager</th>${teams.map(t=>`<th>${esc(t.manager)}</th>`).join('')}</tr></thead><tbody>${teams.map(row=>`<tr><td class="manager">${esc(row.manager)}</td>${teams.map(col=>{const v=matrix?.[row.team_id]?.[col.team_id];const cls=diagonal&&row.team_id===col.team_id?'diag':Number(v)===0?'zero':'';return `<td class="${cls}">${v ?? '—'}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;
+  }
+
+  function renderFreaky(){
+    const s=data.freaky_friday;if(!s)return '';
+    const summary=(s.schedule_swap?.summary||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td><td>${r.total ?? '—'}</td><td>${r.rank ?? '—'}</td><td>${r.max ?? '—'}</td><td>${n(r.avg)}</td><td>${r.min ?? '—'}</td></tr>`).join('');
+    const body=`<div class="grid grid-2"><div class="card"><div class="card-head"><span class="card-title">Played This Manager's Schedule</span><span class="card-sub">wins by schedule swap</span></div>${matrixTable(s.schedule_swap?.matrix)}</div><div class="card"><div class="card-head"><span class="card-title">Schedule Swap Summary</span><span class="card-sub">total / rank / range</span></div><div class="table-wrap"><table><thead><tr><th>Manager</th><th>Total</th><th>Rank</th><th>Max</th><th>Avg</th><th>Min</th></tr></thead><tbody>${summary}</tbody></table></div></div></div><div style="height:18px"></div><div class="card"><div class="card-head"><span class="card-title">Head to Head Wins</span><span class="card-sub">wins if this manager played that manager</span></div>${matrixTable(s.head_to_head?.matrix)}</div>`;
+    return sectionShell('freaky','03','Schedule strength','Freaky Friday',s.description,body);
+  }
+
+  function renderBhole(){
+    const s=data.bhole;if(!s)return '';
+    const d=s.deltas||[];
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td>${d.map(x=>`<td>${r.wins?.[x] ?? '—'}</td>`).join('')}<td>${r.range ?? '—'}</td><td>${n(r.avg_width,1)}</td></tr>`).join('');
+    return sectionShell('bhole','04','Close games','Between High Over Low Evaluation',s.description,`<div class="table-wrap"><table><thead><tr><th>Team</th>${d.map(x=>`<th>${Number(x)>0?'+':''}${x}</th>`).join('')}<th>Range</th><th>Avg width</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderStuds(){
+    const s=data.studs_duds;if(!s)return '';
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td><td>${r.studs ?? '—'}</td><td>${r.studded_on ?? '—'}</td><td>${r.duds ?? '—'}</td><td>${r.dudded_on ?? '—'}</td><td class="${Number(r.s2d_diff)>0?'pos':Number(r.s2d_diff)<0?'neg':''}">${r.s2d_diff ?? '—'}</td></tr>`).join('');
+    return sectionShell('studs','05','Player volatility','Studs to Duds Analysis',s.description,`<div class="table-wrap"><table><thead><tr><th>Team</th><th>Studs</th><th>Stud-ed on</th><th>Duds</th><th>Dud-ed on</th><th>S2D diff</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderGrower(){
+    const s=data.grower_shower;if(!s)return '';
+    const weeks=s.weeks||[];
+    const weights=s.weights||{};
+    const weightStrip=`<div class="metric-strip"><div class="metric"><b>${pct(weights.expected_wins)}</b><span>Expected wins weight</span></div><div class="metric"><b>${pct(weights.actual_vs_opp_avg)}</b><span>Actual vs opp avg</span></div><div class="metric"><b>${pct(weights.avg_vs_opp_actual)}</b><span>Avg vs opp actual</span></div><div class="metric"><b>${pct(weights.avg_vs_opp_avg)}</b><span>Avg vs opp avg</span></div></div>`;
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td>${weeks.map(w=>`<td>${n(r.weekly_probability?.[w],2)}</td>`).join('')}<td>${n(r.expected_wins,2)}</td><td>${r.actual_vs_opp_avg ?? '—'}</td><td>${r.avg_vs_opp_actual ?? '—'}</td><td>${r.avg_vs_opp_avg ?? '—'}</td><td>${r.actual_wins ?? '—'}</td><td class="${ratioClass(r.ratio)}">${n(r.ratio,2)}</td><td>${r.rank ?? '—'}</td></tr>`).join('');
+    return sectionShell('grower','06','Expected wins','Grower or Shower',s.description,`${weightStrip}<div class="table-wrap"><table><thead><tr><th>Team</th>${weeks.map(w=>`<th>W${w}</th>`).join('')}<th>Exp wins</th><th>Act vs opp avg</th><th>Avg vs opp act</th><th>Avg vs opp avg</th><th>Actual wins</th><th>G/S ratio</th><th>Rank</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderExpertise(){
+    const s=data.managerial_expertise;if(!s)return '';
+    const cols=[['actual_points','Actual pts',v=>n(v)],['optimal_points','Optimal pts',v=>n(v)],['efficiency','Efficiency',pct],['using_yahoo_games','Yahoo games',v=>v??'—'],['using_yahoo_efficiency','Yahoo eff.',pct],['not_using_yahoo_games','Non-Yahoo games',v=>v??'—'],['not_using_yahoo_efficiency','Non-Yahoo eff.',pct],['wins_added','Wins +',v=>v??'—'],['losses_added','Losses +',v=>v??'—'],['net_added','Net',v=>v??'—'],['sheep_pct','% Sheep',pct],['plums','Plums',v=>v??'—'],['vobl','VOBL',v=>n(v)],['vobm','VOBM',v=>n(v,1)],['wobl','WOBL',v=>v??'—'],['wobm','WOBM',v=>v??'—'],['all_studs','Studs',v=>v??'—'],['studs_benched','Studs benched',v=>v??'—'],['all_duds','Duds',v=>v??'—'],['duds_started','Duds started',v=>v??'—']];
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td>${cols.map(([k,,f])=>`<td>${esc(f(r[k]))}</td>`).join('')}</tr>`).join('');
+    return sectionShell('expertise','07','Lineup management','Managerial Expertise',s.description,`<div class="table-wrap"><table><thead><tr><th>Team</th>${cols.map(([,h])=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderVobl(){
+    const s=data.vobl;if(!s)return '';
+    const positions=s.positions||[];
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td><td class="${signClass(r.total)}">${n(r.total)}</td>${positions.map(p=>`<td class="${signClass(r.values?.[p])}">${n(r.values?.[p])}</td>`).join('')}</tr>`).join('');
+    return sectionShell('vobl','08','Roster value','Value Over Baseline — Expanded',s.description,`<div class="table-wrap"><table><thead><tr><th>Team</th><th>VOBL</th>${positions.map(p=>`<th>${esc(p)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderPlayoffs(){
+    const s=data.playoff_odds;if(!s)return '';
+    const sorted=[...(s.rows||[])].sort((a,b)=>(b.make_playoffs??0)-(a.make_playoffs??0));
+    const bars=sorted.map(r=>`<div class="odds-row"><span class="manager">${esc(manager(r.team_id))}</span><span class="odds-track"><span style="width:${Math.max(0,Math.min(100,(r.make_playoffs??0)*100))}%"></span></span><span class="odds-pct">${pct(r.make_playoffs)}</span><span class="odds-last">${pct(r.last_place)} last</span></div>`).join('');
+    const rows=sorted.map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td><td>${pct(r.make_playoffs)}</td><td>${pct(r.division)}</td><td>${pct(r.wildcard)}</td><td>${pct(r.bye)}</td><td>${pct(r.last_place)}</td></tr>`).join('');
+    const note=s.simulation_count?`<div class="tiny-note">${Number(s.simulation_count).toLocaleString()} simulations.</div>`:'';
+    return sectionShell('playoffs','09','Season outlook','Playoff Odds',s.description,`<div class="grid grid-2"><div class="odds">${bars}</div><div class="table-wrap"><table><thead><tr><th>Manager</th><th>Playoffs</th><th>Division</th><th>Wildcard</th><th>Bye</th><th>Last</th></tr></thead><tbody>${rows}</tbody></table></div></div>${note}`);
+  }
+
+  function stackedChart(rows,buckets,title){
+    const totals=(rows||[]).map(r=>buckets.reduce((a,b)=>a+Number(r.values?.[b]||0),0));
+    const max=Math.max(1,...totals);
+    const bars=(rows||[]).map((r,i)=>{
+      const total=totals[i]||0;const h=Math.max(2,total/max*100);
+      const segs=buckets.map((b,j)=>{const v=Number(r.values?.[b]||0);const pctH=total? v/total*100:0;return `<span class="seg s${j+1}" title="${esc(b)}: ${n(v)}" style="height:${pctH}%"></span>`}).join('');
+      return `<div class="barcol"><div class="stack" style="--h:${h}%">${segs}</div><div class="barlabel" title="${esc(manager(r.team_id))}">${esc(manager(r.team_id))}</div></div>`;
+    }).join('');
+    const legend=buckets.map((b,j)=>`<span><i class="s${j+1}"></i>${esc(b)}</span>`).join('');
+    return `<div class="chartbox"><div class="chart-title">${esc(title)}</div><div class="stack-chart">${bars}</div><div class="legend">${legend}</div></div>`;
+  }
+
+  function renderDraft(){
+    const s=data.draft_analysis;if(!s)return '';
+    const buckets=s.buckets||[];
+    return sectionShell('draft','10','Draft capital',"It's Not The Size of Your Draft, It's How You Use It",s.description,`<div class="grid grid-2">${stackedChart(s.historical,buckets,'Historical Points From Rounds')}${stackedChart(s.optimal,buckets,'Optimal Points From Rounds')}</div>`);
+  }
+
+  const html=[renderBoned(),renderBonedDetail(),renderFreaky(),renderBhole(),renderStuds(),renderGrower(),renderExpertise(),renderVobl(),renderPlayoffs(),renderDraft()].filter(Boolean).join('');
+  document.getElementById('sections').innerHTML=html;
+})();
+</script>
+</body>
+</html>
