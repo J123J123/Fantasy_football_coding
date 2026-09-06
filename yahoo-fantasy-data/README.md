@@ -90,3 +90,62 @@ YAHOO_INTEGRATION=1 pytest -m integration tests/test_integration_public.py
 ```
 
 It uses no OAuth or cookies. Run the CLI `test` command first and treat its report as the authoritative statement of which endpoints Yahoo currently permits anonymously.
+
+### Weekly team points for reconciliation
+
+Collection and backfill now also write:
+
+```text
+data/<league nickname>/<season>/points recon/points_recon_week_<week>.csv.gz
+```
+
+These are gzip-compressed CSVs, readable directly with `pandas.read_csv(path)`.
+Each row contains `season`, `week`, league identifiers, `team_id`, `team_key`,
+`team_name`, `official_points`, `points_coverage_type`, and `points_week_returned`.
+The source is Yahoo's league teams weekly stats endpoint, independent of the
+player-score collector. It includes teams without a scheduled matchup.
+
+`official_points` is that team's points **for the requested week**, not a
+cumulative season total. Complete weekly snapshots can later be concatenated
+and summed per team for season reconciliation. Scores for an ongoing week
+reflect the value at collection time and can change with play/stat corrections.
+Wrong-week, season-coverage, empty, or nonnumeric team-score responses fail
+without saving a snapshot.
+
+Existing files remain skipped with `overwrite=False`. Running backfill on an
+older archive adds the missing `points recon` snapshots while retaining the
+other existing datasets. The metadata status key is `points_recon`.
+Restart a running notebook kernel after updating the collector to load the new
+code. Bronze/silver ingestion of this folder is a separate follow-up.
+
+### Player page size and pacing
+
+Actual-player and projection pulls request 200 players per page by default.
+The public endpoint was checked with 200-player actual-stat and projection
+requests; both returned 200 unique players with populated scores. Override with `YAHOO_PLAYER_PAGE_SIZE=25` (or another positive
+integer) if needed. Pagination advances by the number actually returned and
+continues until an empty page, so a server-side cap cannot silently truncate
+the archive. Repeated player IDs fail collection rather than looping forever.
+
+`YAHOO_REQUEST_DELAY` now also applies **between player/projection page requests**
+(default 1.5 seconds through `load_settings`). Previously these loops had no
+inter-page delay. For a 1,250-player pool, 200-player pages need 8 requests
+including the terminal empty page, compared with 51 using 25-player pages.
+
+HTTP 429/999 responses stop collection/backfill; the notebook batch also stops
+rather than moving to the next league. They are not automatically retried by
+the HTTP adapter. Completed snapshots remain on disk; retry later with
+`overwrite=False` to resume missing snapshots. Restart the notebook kernel to
+load these changes. Larger pages and pacing reduce request volume/bursts but
+cannot guarantee Yahoo will not block requests.
+
+Within a backfill run, draft results and league settings are each fetched once
+and reused for missing weekly snapshots, with the snapshot week updated. These
+endpoints expose the original draft/current settings, not historical weekly
+settings. The cache is discarded after each league backfill, so subsequent
+runs fetch fresh data. A new 17-week archive saves 32 requests this way. Existing
+snapshots still remain untouched unless overwrite is explicitly enabled.
+
+Team rosters and reconciliation points already retrieve all teams per weekly
+request. The schedule matrix is already built once per backfill and reused;
+its underlying scoreboards still require separate weekly requests.

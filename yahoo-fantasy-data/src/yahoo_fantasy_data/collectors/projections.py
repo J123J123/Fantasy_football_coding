@@ -1,6 +1,7 @@
 """Historical Yahoo projection collector; it never falls back to HTML."""
 from __future__ import annotations
 
+import time
 from typing import Any
 import pandas as pd
 
@@ -16,14 +17,25 @@ def get_projection_data(season: int, league_id: str, week: int, *, settings: Set
     projection_provider = ProjectionProvider(provider)
     base = context_row(season, league_id, week, game_id)
     records: list[dict[str, Any]] = []
-    start, page_size = 0, 25
+    start, page_size = 0, settings.player_page_size if settings is not None else 200
+    if page_size < 1:
+        raise ValueError("player_page_size must be positive")
+    seen = set()
     while True:
         payload = projection_provider.players(key, week, start, page_size)
         page = player_rows(payload, base, projected=True)
-        records.extend(page)
-        if len(page) < page_size:
+        if not page:
             break
-        start += page_size
+        ids = [row["player_id"] for row in page]
+        if len(set(ids)) != len(ids) or seen.intersection(ids):
+            raise YahooProjectionUnavailableError("Yahoo repeated player IDs during pagination; snapshot not saved.")
+        seen.update(ids)
+        records.extend(page)
+        # Advance by the actual response size in case Yahoo caps a larger request.
+        # Only an empty page proves completion under a silently capped endpoint.
+        start += len(page)
+        if settings is not None:
+            time.sleep(settings.request_delay)
     frame = stable_frame(records, ["player_id"])
     # A successful player endpoint is not proof of historical projections: Yahoo
     # can return season actuals while ignoring projection parameters.

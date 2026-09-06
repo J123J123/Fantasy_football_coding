@@ -37,11 +37,17 @@ class PublicYahooProvider:
                 show_projected_stats=1,
                 show_live_projected_points=1,
             )
-        path = f"league/{league_key}/players;start={start};count={count};week={week};out=stats"
-        return self.get(path, week=week)
+        path = (
+            f"league/{league_key}/players;start={start};count={count}"
+            f"/stats;type=week;week={week}"
+        )
+        return self.get(path)
 
     def teams_roster(self, league_key: str, week: int) -> dict[str, Any]:
         return self.get(f"league/{league_key}/teams/roster;week={week}", week=week)
+
+    def team_points(self, league_key: str, week: int) -> dict[str, Any]:
+        return self.get(f"league/{league_key}/teams/stats;type=week;week={week}")
 
     def scoreboard(self, league_key: str, week: int) -> dict[str, Any]:
         return self.get(f"league/{league_key}/scoreboard;week={week}", week=week)

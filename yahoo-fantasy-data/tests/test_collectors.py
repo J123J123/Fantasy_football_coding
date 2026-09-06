@@ -13,7 +13,7 @@ class FakeProvider:
         self.weeks.append(week)
         if start:
             return {"players": []}
-        return {"players": {"0": {"player_key": "461.p.7", "player_id": "7", "name": {"full": "Test Player"}, "primary_position": "QB"}, "count": 1}}
+        return {"players": {"0": {"player_key": "461.p.7", "player_id": "7", "name": {"full": "Test Player"}, "primary_position": "QB", "player_points": {"coverage_type": "week", "week": week, "total": 0}}, "count": 1}}
 
     def teams_roster(self, key: str, week: int):
         self.weeks.append(week)
@@ -25,7 +25,7 @@ def test_player_pagination_and_week_are_preserved() -> None:
     frame = get_player_data(2025, "1", 5, game_id="461", provider=provider)
     assert len(frame) == 1
     assert frame.loc[0, "week"] == 5
-    assert provider.weeks == [5]
+    assert provider.weeks == [5, 5]
 
 
 def test_roster_slot_parsing_and_historical_week() -> None:
@@ -50,12 +50,77 @@ class PagedProvider(FakeProvider):
     def players(self, key: str, week: int, start: int, count: int, projected: bool = False):
         self.weeks.append(week)
         self.starts.append(start)
-        size = 25 if start == 0 else 1
-        return {"players": {str(index): {"player_key": f"461.p.{start + index}", "player_id": str(start + index), "name": {"full": f"Player {start + index}"}} for index in range(size)}}
+        if start > count:
+            return {"players": []}
+        size = count if start == 0 else 1
+        return {"players": {str(index): {"player_key": f"461.p.{start + index}", "player_id": str(start + index), "name": {"full": f"Player {start + index}"}, "player_points": {"coverage_type": "week", "week": week, "total": 0}} for index in range(size)}}
 
 
 def test_player_pagination_requests_the_next_offset() -> None:
     provider = PagedProvider()
     frame = get_player_data(2025, "1", 5, game_id="461", provider=provider)
-    assert len(frame) == 26
-    assert provider.starts == [0, 25]
+    assert len(frame) == 201
+    assert provider.starts == [0, 200, 201]
+
+
+def test_actual_points_use_only_matching_weekly_points():
+    from yahoo_fantasy_data.collectors.common import player_rows
+    player = {
+        'player_key': '461.p.7',
+        'ownership': {'coverage_type': 'season', 'total': 99},
+        'player_projected_points': {'coverage_type': 'week', 'week': 5, 'total': 25},
+        'player_points': [{'coverage_type': 'week', 'week': 5}, {'total': 0}],
+        'player_stats': [{'coverage_type': 'week', 'week': 5},
+                         {'stats': [{'stat_id': '4', 'value': 100}]}],
+        'player_advanced_stats': {'coverage_type': 'season', 'stats': [{'stat_id': '4', 'value': 999}]},
+    }
+    row = player_rows({'player': player}, {'week': 5})[0]
+    assert row['fantasy_points_actual'] == 0
+    assert row['stat_4'] == 100
+    player['player_points'] = {'coverage_type': 'week', 'week': 6, 'total': 30}
+    assert player_rows({'player': player}, {'week': 5})[0]['fantasy_points_actual'] is None
+
+
+def test_player_collector_rejects_season_wrong_week_and_blank_scores():
+    import pytest
+    from yahoo_fantasy_data.errors import YahooAPIError
+
+    class InvalidProvider:
+        def players(self, *args):
+            return {'player': {'player_key': '461.p.7', 'player_points': self.points}}
+
+    provider = InvalidProvider()
+    for points in ({'coverage_type': 'season', 'total': 200},
+                   {'coverage_type': 'week', 'week': 6, 'total': 20},
+                   {'coverage_type': 'week', 'week': 5, 'total': ''}, {}):
+        provider.points = points
+        with pytest.raises(YahooAPIError, match='snapshot not saved'):
+            get_player_data(2025, '1', 5, game_id='461', provider=provider)
+
+
+def test_larger_pages_are_paced_and_server_caps_do_not_truncate(monkeypatch):
+    from yahoo_fantasy_data.collectors import players, projections
+    from yahoo_fantasy_data.config import Settings
+
+    class CappedProvider:
+        def __init__(self):
+            self.starts = []
+
+        def players(self, key, week, start, count, projected=False):
+            assert count == 100
+            self.starts.append(start)
+            return {'players': [
+                {'player_key': f'461.p.{i}',
+                 'player_points': {'coverage_type': 'week', 'week': week, 'total': i},
+                 'player_projected_points': {'coverage_type': 'week', 'week': week, 'total': i}}
+                for i in range(start, min(start + 2, 5))]}
+
+    delays = []
+    monkeypatch.setattr(players.time, 'sleep', delays.append)
+    for collector in (players.get_player_data, projections.get_projection_data):
+        provider = CappedProvider()
+        frame = collector(2025, '1', 5, game_id='461', provider=provider,
+                          settings=Settings(player_page_size=100, request_delay=2))
+        assert len(frame) == 5
+        assert provider.starts == [0, 2, 4, 5]
+    assert delays == [2] * 6

@@ -35,7 +35,7 @@ class YahooHTTPClient:
         self.settings = settings
         self.session = session or requests.Session()
         self.session.headers.update({"User-Agent": USER_AGENT, "Accept": "application/json"})
-        retry = Retry(total=2, backoff_factor=0.6, status_forcelist=(429, 500, 502, 503, 504, 999), allowed_methods=("GET",))
+        retry = Retry(total=2, backoff_factor=0.6, status_forcelist=(500, 502, 503, 504), allowed_methods=("GET",))
         self.session.mount("https://", HTTPAdapter(max_retries=retry))
 
     def get(self, path: str, *, params: dict[str, Any] | None = None, token: str | None = None, official: bool = False) -> dict[str, Any]:
@@ -116,7 +116,8 @@ def league_metadata(season: int, league_id: str, settings: Settings | None = Non
 
 
 def _snapshot_path(settings: Settings, league_id: str, season: int, data_type: str, week: int) -> Path:
-    return settings.data_dir / storage_league_name(settings.league_nickname, league_id) / str(season) / data_type / f"{data_type}_week_{week}.csv.gz"
+    filename = f"{data_type.replace(' ', '_')}_week_{week}.csv.gz"
+    return settings.data_dir / storage_league_name(settings.league_nickname, league_id) / str(season) / data_type / filename
 
 
 def write_snapshot(frame: pd.DataFrame, path: Path, overwrite: bool) -> str:
@@ -148,7 +149,7 @@ def update_metadata(settings: Settings, season: int, league_id: str, game_id: st
     path.write_text(json.dumps(metadata, indent=2, sort_keys=True) + "\n")
 
 
-def collect_week(season: int, league_id: str, week: int, overwrite: bool = False, *, settings: Settings | None = None, league_nickname: str | None = None, _metadata_context: tuple[Any, Any, str, str] | None = None, _schedule_matrix: pd.DataFrame | None = None) -> dict[str, str]:
+def collect_week(season: int, league_id: str, week: int, overwrite: bool = False, *, settings: Settings | None = None, league_nickname: str | None = None, _metadata_context: tuple[Any, Any, str, str] | None = None, _schedule_matrix: pd.DataFrame | None = None, _static_frames: dict[str, pd.DataFrame] | None = None) -> dict[str, str]:
     """Collect independent datasets, retaining successes when another endpoint fails."""
     if week < 1:
         raise ValueError("week must be at least 1")
@@ -159,11 +160,12 @@ def collect_week(season: int, league_id: str, week: int, overwrite: bool = False
         payload, active_settings, _public, game_id, key = league_metadata(season, league_id, active_settings)
     else:
         payload, _public, game_id, key = _metadata_context
-    from .collectors import draft, league_settings, players, projections, schedule, teams
+    from .collectors import draft, league_settings, players, points_recon, projections, schedule, teams
     jobs: dict[str, tuple[str, Callable[..., pd.DataFrame]]] = {
         "player_data": ("player_data", players.get_player_data),
         "projection_data": ("projection_data", projections.get_projection_data),
         "team_data": ("team_data", teams.get_team_data),
+        "points_recon": ("points recon", points_recon.get_points_recon),
         "schedule": ("schedule", schedule.get_schedule),
         "draft": ("draft", draft.get_draft_data),
         "league_settings": ("league_settings", league_settings.get_league_settings),
@@ -175,16 +177,26 @@ def collect_week(season: int, league_id: str, week: int, overwrite: bool = False
             statuses[name] = "skipped_existing"
             continue
         try:
-            frame = (
-                schedule.get_schedule_matrix(
-                    season, str(league_id), week,
-                    int(first_value(payload, "end_week", week)),
-                    settings=active_settings, game_id=game_id, provider=_public,
+            if _static_frames is not None and name in _static_frames:
+                frame = _static_frames[name].copy()
+                frame["week"] = week
+            else:
+                frame = (
+                    schedule.get_schedule_matrix(
+                        season, str(league_id), week,
+                        int(first_value(payload, "end_week", week)),
+                        settings=active_settings, game_id=game_id, provider=_public,
+                    )
+                    if name == "schedule" and _schedule_matrix is None
+                    else (_schedule_matrix if name == "schedule" else collector(season, str(league_id), week, settings=active_settings, game_id=game_id, provider=_public))
                 )
-                if name == "schedule" and _schedule_matrix is None
-                else (_schedule_matrix if name == "schedule" else collector(season, str(league_id), week, settings=active_settings, game_id=game_id, provider=_public))
-            )
+                # These endpoints return current league settings/original draft,
+                # not historical weekly data. Reuse only within this backfill.
+                if _static_frames is not None and name in {"draft", "league_settings"}:
+                    _static_frames[name] = frame.copy()
             statuses[name] = write_snapshot(frame, path, overwrite=True)
+        except YahooRateLimitError:
+            raise  # Stop backfill instead of issuing more requests while blocked.
         except YahooAuthenticationError:
             statuses[name] = "authentication_required"
         except Exception as error:  # each collector is deliberately isolated
@@ -214,11 +226,12 @@ def backfill_season(season: int, league_id: str, start_week: int = 1, end_week: 
             settings=active_settings, game_id=game_id, provider=public,
         )
     context = (payload, public, game_id, key)
+    static_frames: dict[str, pd.DataFrame] = {}
     return {
         week: collect_week(
             season, league_id, week, overwrite, settings=active_settings,
             league_nickname=league_nickname, _metadata_context=context,
-            _schedule_matrix=schedule_matrix,
+            _schedule_matrix=schedule_matrix, _static_frames=static_frames,
         )
         for week in range(start_week, resolved_end + 1)
     }

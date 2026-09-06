@@ -32,3 +32,17 @@ def test_http_maps_unauthorized_to_authentication_error() -> None:
     except YahooAuthenticationError:
         return
     raise AssertionError("expected YahooAuthenticationError")
+
+
+def test_actual_players_request_week_on_stats_subresource():
+    from yahoo_fantasy_data.providers.public import PublicYahooProvider
+
+    class RecordingClient:
+        def get(self, path, *, params):
+            self.path, self.params = path, params
+            return {}
+
+    client = RecordingClient()
+    PublicYahooProvider(client).players('461.l.1', 5, 25, 25)
+    assert client.path == 'league/461.l.1/players;start=25;count=25/stats;type=week;week=5'
+    assert client.params == {'format': 'json'}

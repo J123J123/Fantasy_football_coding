@@ -15,6 +15,7 @@ class Settings:
     league_nickname: str | None = None
     timeout: float = 20.0
     request_delay: float = 0.35
+    player_page_size: int = 200
     game_id: str | None = None
     client_id: str | None = None
     client_secret: str | None = None
@@ -32,6 +33,7 @@ def load_settings(data_dir: Path | None = None) -> Settings:
         league_nickname=os.getenv("YAHOO_LEAGUE_NICKNAME") or None,
         timeout=float(os.getenv("YAHOO_TIMEOUT", "20")),
         request_delay=float(os.getenv("YAHOO_REQUEST_DELAY", "1.5")),
+        player_page_size=int(os.getenv("YAHOO_PLAYER_PAGE_SIZE", "200")),
         game_id=os.getenv("YAHOO_GAME_ID") or None,
         client_id=os.getenv("YAHOO_CLIENT_ID") or None,
         client_secret=os.getenv("YAHOO_CLIENT_SECRET") or None,

@@ -50,9 +50,21 @@ def player_rows(payload: Any, base: dict[str, Any], projected: bool = False) -> 
                 else None
             )
         else:
-            row.update(stat_columns(player))
-            points = first_value(player, "fantasy_points") or first_value(player, "total")
-            coverage = first_value(player, "coverage_type")
-            row["fantasy_points_actual"] = points if coverage == "week" else None
+            # Scope both coverage and total to actual points, never projections,
+            # ownership percentages, or season-level advanced statistics.
+            points = player.get("player_points", {})
+            stats = player.get("player_stats", {})
+            points_week = first_value(points, "week")
+            points_coverage = first_value(points, "coverage_type")
+            row["actual_week_returned"] = points_week
+            row["actual_coverage_returned"] = points_coverage
+            row["actual_stats_week_returned"] = first_value(stats, "week")
+            row["actual_stats_coverage_returned"] = first_value(stats, "coverage_type")
+            weekly_points = points_coverage == "week" and str(points_week) == str(base["week"])
+            weekly_stats = (first_value(stats, "coverage_type") == "week"
+                            and str(first_value(stats, "week")) == str(base["week"]))
+            if weekly_stats:
+                row.update(stat_columns(stats))
+            row["fantasy_points_actual"] = first_value(points, "total") if weekly_points else None
         rows.append(row)
     return rows
