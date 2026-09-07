@@ -43,6 +43,9 @@ class PublicYahooProvider:
         )
         return self.get(path)
 
+    def teams(self, league_key: str) -> dict[str, Any]:
+        return self.get(f"league/{league_key}/teams")
+
     def teams_roster(self, league_key: str, week: int) -> dict[str, Any]:
         return self.get(f"league/{league_key}/teams/roster;week={week}", week=week)
 

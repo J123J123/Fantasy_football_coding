@@ -5,6 +5,7 @@ import argparse
 import json
 from typing import Any
 
+from .collectors.divisions import get_divisions
 from .collectors.players import get_player_data
 from .collectors.projections import get_projection_data
 from .collectors.schedule import get_schedule
@@ -17,6 +18,9 @@ from .yahoo import _context, backfill_season, collect_week, league_metadata
 def _args() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="python -m yahoo_fantasy_data")
     commands = parser.add_subparsers(dest="command", required=True)
+    auth = commands.add_parser("auth", help="Authorize your Yahoo account and save a refresh token")
+    auth.add_argument("--env-file", default=".env")
+    auth.add_argument("--redirect-uri", required=True, help="Exact redirect URI registered in Yahoo's app settings")
     for name in ("collect", "test"):
         command = commands.add_parser(name)
         command.add_argument("--season", type=int, required=True)
@@ -38,10 +42,11 @@ def connectivity_report(season: int, league_id: str, week: int) -> dict[str, Any
     settings = load_settings()
     metadata, _settings, public, game_id, key = league_metadata(season, league_id, settings)
     report: dict[str, Any] = {
-        "league": key, "league_type": "public", "official_api": {"reachable": False, "oauth_required": not settings.oauth_configured},
-        "public_internal_api": {"reachable": True, "anonymous_access": True},
+        "league": key, "league_type": "public", "official_api": {"oauth_configured": settings.oauth_configured},
+        "provider_policy": "public_first_with_optional_oauth_fallback",
     }
     checks = {
+        "divisions": lambda: get_divisions(season, league_id, week, settings=settings, game_id=game_id, provider=public),
         "players": lambda: get_player_data(season, league_id, week, settings=settings, game_id=game_id, provider=public),
         "historical_projections": lambda: get_projection_data(season, league_id, week, settings=settings, game_id=game_id, provider=public),
         "historical_team_rosters": lambda: get_team_data(season, league_id, week, settings=settings, game_id=game_id, provider=public),
@@ -65,7 +70,10 @@ def connectivity_report(season: int, league_id: str, week: int) -> dict[str, Any
 def main() -> None:
     args = _args().parse_args()
     try:
-        if args.command == "collect":
+        if args.command == "auth":
+            from .auth import authorize
+            authorize(args.env_file, args.redirect_uri)
+        elif args.command == "collect":
             print(json.dumps(collect_week(args.season, args.league, args.week, args.overwrite, league_nickname=args.nickname), indent=2))
         elif args.command == "backfill":
             print(json.dumps(backfill_season(args.season, args.league, args.start_week, args.end_week, args.overwrite, league_nickname=args.nickname), indent=2))

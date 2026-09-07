@@ -65,8 +65,8 @@ def get_game_id(season: int, *, provider: Any | None = None, settings: Settings 
     if active_settings.game_id:
         return active_settings.game_id
     if provider is None:
-        from .providers.public import PublicYahooProvider
-        provider = PublicYahooProvider(YahooHTTPClient(active_settings))
+        from .providers.fallback import FallbackYahooProvider
+        provider = FallbackYahooProvider(YahooHTTPClient(active_settings))
     payload = provider.games(season)
     for candidate in (item for item in _walk_values(payload) if isinstance(item, dict)):
         season_value = candidate.get("season")
@@ -96,8 +96,8 @@ def league_key(game_id: str, league_id: str) -> str:
 
 def _context(season: int, league_id: str, settings: Settings | None = None) -> tuple[Settings, Any, str, str]:
     active_settings = settings or load_settings()
-    from .providers.public import PublicYahooProvider
-    public = PublicYahooProvider(YahooHTTPClient(active_settings))
+    from .providers.fallback import FallbackYahooProvider
+    public = FallbackYahooProvider(YahooHTTPClient(active_settings))
     game_id = get_game_id(season, provider=public, settings=active_settings)
     return active_settings, public, game_id, league_key(game_id, str(league_id))
 
@@ -160,13 +160,14 @@ def collect_week(season: int, league_id: str, week: int, overwrite: bool = False
         payload, active_settings, _public, game_id, key = league_metadata(season, league_id, active_settings)
     else:
         payload, _public, game_id, key = _metadata_context
-    from .collectors import draft, league_settings, players, points_recon, projections, schedule, teams
+    from .collectors import divisions, draft, league_settings, players, points_recon, projections, schedule, teams
     jobs: dict[str, tuple[str, Callable[..., pd.DataFrame]]] = {
         "player_data": ("player_data", players.get_player_data),
         "projection_data": ("projection_data", projections.get_projection_data),
         "team_data": ("team_data", teams.get_team_data),
         "points_recon": ("points recon", points_recon.get_points_recon),
         "schedule": ("schedule", schedule.get_schedule),
+        "divisions": ("divisions", divisions.get_divisions),
         "draft": ("draft", draft.get_draft_data),
         "league_settings": ("league_settings", league_settings.get_league_settings),
     }
@@ -192,7 +193,7 @@ def collect_week(season: int, league_id: str, week: int, overwrite: bool = False
                 )
                 # These endpoints return current league settings/original draft,
                 # not historical weekly data. Reuse only within this backfill.
-                if _static_frames is not None and name in {"draft", "league_settings"}:
+                if _static_frames is not None and name in {"draft", "league_settings", "divisions"}:
                     _static_frames[name] = frame.copy()
             statuses[name] = write_snapshot(frame, path, overwrite=True)
         except YahooRateLimitError:

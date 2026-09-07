@@ -1,7 +1,7 @@
 """Configuration loaded without ever persisting credentials."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 import os
 import re
@@ -18,8 +18,8 @@ class Settings:
     player_page_size: int = 200
     game_id: str | None = None
     client_id: str | None = None
-    client_secret: str | None = None
-    refresh_token: str | None = None
+    client_secret: str | None = field(default=None, repr=False)
+    refresh_token: str | None = field(default=None, repr=False)
 
     @property
     def oauth_configured(self) -> bool:

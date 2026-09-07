@@ -9,7 +9,7 @@ def weekly(processor):
     if hasattr(processor, '_weekly_baseline'): return processor._weekly_baseline
     rows=[]; n=len(processor.teams); slots=processor.lineup_slots
     for week,players in processor.silver_player.groupby('week'):
-        positions=players['_eligibility'].to_dict()
+        positions=players['eligible_positions'].map(set).to_dict()
         baselines={}; consumed=set()
         # Allocate positional demand before flex demand, consuming each player once.
         ordered=sorted(slots,key=lambda s: ('/' in s[0] or 'FLEX' in s[0],s[0],s[1]))

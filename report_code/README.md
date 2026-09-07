@@ -30,10 +30,35 @@ json_text = report.to_json()            # Optional output path also accepted
 report.write_html("report_code/output/week5.html")
 ```
 
+`silver_player` exposes 19 core report fields: `player_id`, `player_name`, `week`,
+`position`, `eligible_positions` (a sorted list), `nfl_team`, `bye_week`,
+`team_id`, `team_name`, `roster_slot`, `is_starting`, `actual_points`,
+`projected_points`, `draft_round`, `draft_pick`, `draft_team_id`, `is_stud`,
+`is_dud`, and `volatility_known`. Team fields describe weekly roster ownership;
+`draft_team_id` identifies the original drafting team. Raw Yahoo stats, metadata,
+and duplicate source fields remain available in the bronze tables.
+
+It also includes `rank_<slot>` for each distinct starting position in the league
+(for example, `rank_qb`, `rank_rb`, and `rank_w_r_t` for W/R/T flex), plus
+`is_optimal`. Ranks use actual points, highest first, within each week and fantasy
+team; unrostered players form a separate FA pool. Ties share the minimum rank
+(1, 1, 3). Each position ranks its entire eligible pool independently, including
+flex; repeated slots such as RB1/RB2 share one rank column. Bench players are
+included, reserves (IR/NA/etc.) are excluded. Ineligible or unscored players have
+null ranks; known scores are ranked even when another player's score is missing.
+
+`is_optimal` selects one highest-scoring legal lineup per team/week and FA/week,
+respecting repeated positions, flex, and multi-position eligibility without
+reusing players. Equally good lineups may have different members; the flag marks
+one solution. It is null for playable players when missing scores, missing
+archived roster players, or insufficient eligible players prevent optimization.
+Reserves are always false. Team flags agree with `silver_lineups` selections.
+
 ## Tables and loading
 
 - Bronze properties: `bronze_draft`, `bronze_settings`, `bronze_player`,
-  `bronze_projection`, `bronze_schedule`, `bronze_team_data`.
+  `bronze_projection`, `bronze_schedule`, `bronze_team_data`, `bronze_divisions`,
+  `bronze_points_recon`.
 - `read_files(table, latest=False)` reads CSV or compressed CSV files. Player,
   projection, and roster snapshots concatenate from season start through the
   selected week. Draft, settings, and schedule choose the newest available
@@ -64,8 +89,13 @@ and reserve slots. Missing player scores and roster players absent from the
 player universe invalidate the sum. Season-coverage player totals are never
 used as weekly scores. Projections returned for another week are invalidated.
 
-The existing roster files do not contain official team scores. To verify
-against Yahoo, provide an independent CSV:
+`bronze_points_recon` reads weekly snapshots from the archive's `points recon/`
+folder through the selected week. `silver_reconciliation` automatically joins
+their independent Yahoo `official_points` on `(team_id, week)` and compares them
+with the starter totals. Missing snapshots leave those weeks unverified;
+duplicate team/week keys raise an error. You can override the archived source
+with `data_files={"points_recon": ...}` or supply an independent CSV with
+`official_scores_path` (which takes precedence):
 
 ```csv
 team_id,week,official_points

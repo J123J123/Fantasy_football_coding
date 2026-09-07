@@ -124,3 +124,70 @@ def test_larger_pages_are_paced_and_server_caps_do_not_truncate(monkeypatch):
         assert len(frame) == 5
         assert provider.starts == [0, 2, 4, 5]
     assert delays == [2] * 6
+
+
+def test_division_assignments_join_names_and_keep_unassigned_teams():
+    from yahoo_fantasy_data.collectors.divisions import get_divisions
+
+    class DivisionProvider:
+        def settings(self, key):
+            return {'settings': [{'divisions': {'0': {'division': [
+                {'division_id': '1'}, {'name': 'East'}]}, 'count': 1}}]}
+
+        def teams(self, key):
+            return {'teams': {'0': {'team': [{'team_key': key + '.t.1'},
+                    {'name': 'Team A'}, {'division_id': 1}]},
+                '1': {'team': [{'team_key': key + '.t.2'}, {'name': 'Team B'}]}, 'count': 2}}
+
+    frame = get_divisions(2025, '1', 5, game_id='461', provider=DivisionProvider())
+    assert frame.team_id.tolist() == ['1', '2']
+    assert frame.team_name.tolist() == ['Team A', 'Team B']
+    assert frame.loc[0, 'division_name'] == 'East'
+    assert frame.loc[[1], 'division_name'].isna().all()
+    assert frame.week.tolist() == [5, 5]
+
+
+def test_league_without_divisions_and_empty_team_response():
+    import pytest
+    from yahoo_fantasy_data.collectors.divisions import get_divisions
+    from yahoo_fantasy_data.errors import YahooAPIError
+
+    class DivisionProvider:
+        def settings(self, key):
+            return {'settings': {}}
+
+        def teams(self, key):
+            return {'team': {'team_key': key + '.t.1', 'name': 'Team A'}}
+
+    provider = DivisionProvider()
+    frame = get_divisions(2025, '1', 1, game_id='461', provider=provider)
+    assert frame.division_id.isna().all()
+    assert frame.division_name.isna().all()
+    provider.teams = lambda key: {'teams': []}
+    with pytest.raises(YahooAPIError, match='snapshot not saved'):
+        get_divisions(2025, '1', 1, game_id='461', provider=provider)
+
+
+def test_divisions_exclude_manager_contacts():
+    from yahoo_fantasy_data.collectors.divisions import get_divisions
+
+    class Provider:
+        def settings(self, key):
+            return {}
+
+        def teams(self, key):
+            return {'teams': [
+                {'team_key': key + '.t.1', 'name': 'Team A', 'managers': {
+                    '0': {'manager': [{'manager_id': '1'}, {'nickname': 'Alex'},
+                                      {'email': 'alex@example.test'}]},
+                    '1': {'manager': [{'manager_id': '2'}, {'name': 'Sam'},
+                                      {'nickname': 'Coach Sam'}]}, 'count': 2}},
+                {'team_key': key + '.t.2', 'name': 'Team B'},
+                {'team_key': key + '.t.3', 'managers': {'manager': {
+                    'manager_id': '3', 'email': 'pat@example.test'}}},
+            ]}
+
+    frame = get_divisions(2025, '1', 1, game_id='461', provider=Provider()).set_index('team_id')
+    assert 'manager_name' not in frame.columns
+    assert 'manager_email' not in frame.columns
+    assert len(frame) == 3

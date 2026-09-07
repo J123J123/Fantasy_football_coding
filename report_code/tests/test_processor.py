@@ -51,6 +51,119 @@ def test_metadata_week_snapshot_selection_and_joins(archive):
     assert ReportProcessor(archive/'metadata.json',1).bronze_draft.week.unique().tolist()==[1]
 
 
+def test_silver_player_compact_schema_and_aliases(archive):
+    processor = ReportProcessor(archive)
+    processor.bronze_player['bye_week'] = None
+    processor.bronze_player['bye_weeks_week'] = 7
+    processor.bronze_player['editorial_team_abbr'] = 'BUF'
+    table = processor.silver_player
+    assert table.columns.tolist() == [
+        'player_id', 'player_name', 'week', 'position', 'eligible_positions',
+        'nfl_team', 'bye_week', 'team_id', 'team_name', 'roster_slot', 'is_starting',
+        'actual_points', 'projected_points', 'draft_round', 'draft_pick', 'draft_team_id',
+        'is_stud', 'is_dud', 'volatility_known', 'rank_rb', 'rank_w_r_t', 'is_optimal',
+    ]
+    assert table.bye_week.eq(7).all()
+    assert table.nfl_team.eq('BUF').all()
+    assert table.iloc[0].position == 'RB'
+    assert table.iloc[0].eligible_positions == ['RB']
+    assert table.draft_pick.isna().all()
+    assert table.loc[table.player_id.eq('7'), 'team_id'].isna().all()
+    assert optimize(table.iloc[:3], [('RB', 1), ('W/R/T', 1)]) == [2, 0]
+
+
+def test_player_ranks_and_optimal_flags(archive):
+    processor = ReportProcessor(archive)
+    table = processor.silver_player
+    week = table.query('week == 1').set_index('player_id')
+    assert week.loc[['3', '1'], 'rank_rb'].tolist() == [1, 2]
+    assert pd.isna(week.loc['2', 'rank_rb'])
+    assert week.loc[['3', '1', '2'], 'rank_w_r_t'].tolist() == [1, 2, 3]
+    assert week.loc['4', 'rank_rb'] == 1  # Separate fantasy team.
+    assert week.loc[['7', '8'], 'rank_w_r_t'].tolist() == [1, 2]  # FA pool.
+    assert set(week.index[week.is_optimal]) == {'1', '3', '4', '5', '7', '8'}
+    for row in processor.silver_lineups.itertuples():
+        group = table[table.team_id.eq(row.team_id) & table.week.eq(row.week)]
+        assert set(group.index[group.is_optimal]) == set(row.optimal_player_indices)
+        assert group.loc[group.is_optimal, 'actual_points'].sum() == row.optimal_points
+
+
+def test_player_ranks_ties_reserves_and_missing_data(archive):
+    processor = ReportProcessor(archive, 1)
+    processor.bronze_player.loc[processor.bronze_player.player_id.eq('3'), 'fantasy_points_actual'] = 11
+    table = processor.silver_player.set_index('player_id')
+    assert table.loc[['1', '3'], 'rank_rb'].tolist() == [1, 1]
+    assert table.loc['2', 'rank_w_r_t'] == 3
+
+    processor = ReportProcessor(archive, 1)
+    processor.bronze_team_data.loc[processor.bronze_team_data.player_id.eq('3'), 'roster_slot'] = 'IR'
+    table = processor.silver_player.set_index('player_id')
+    assert pd.isna(table.loc['3', 'rank_rb'])
+    assert not table.loc['3', 'is_optimal']
+    assert table.loc[['1', '2'], 'is_optimal'].all()
+
+    processor = ReportProcessor(archive, 1)
+    processor.bronze_player.loc[processor.bronze_player.player_id.isin(['3', '7']), 'fantasy_points_actual'] = None
+    table = processor.silver_player
+    assert table.loc[table.team_id.eq('1') | table.team_id.isna(), 'is_optimal'].isna().all()
+    assert table.loc[table.player_id.eq('3'), 'rank_rb'].isna().all()
+    assert table.loc[table.team_id.eq('2'), 'is_optimal'].notna().all()
+
+    processor = ReportProcessor(archive, 1)
+    processor.bronze_player.drop(processor.bronze_player.index[processor.bronze_player.player_id.eq('3')], inplace=True)
+    assert processor.silver_player.loc[lambda f: f.team_id.eq('1'), 'is_optimal'].isna().all()
+
+
+def test_optimal_flags_respect_repeated_slots_and_multi_position():
+    from report_code.lineups import add_player_lineup_columns
+    players = pd.DataFrame([
+        dict(player_id=str(i), week=1, team_id=None, roster_slot=None,
+             eligible_positions=positions, actual_points=points)
+        for i, positions, points in [(1, ['RB', 'WR'], 30), (2, ['RB'], 20),
+                                     (3, ['RB'], 10), (4, ['WR'], 5)]
+    ])
+    slots = [('RB', 1), ('RB', 2), ('WR', 1), ('W/R/T', 1)]
+    table = add_player_lineup_columns(players, slots, players.iloc[:0])
+    assert table.is_optimal.all()
+    assert table.rank_rb.tolist()[:3] == [1, 2, 3]
+    incomplete = add_player_lineup_columns(players.iloc[:3], slots, players.iloc[:0])
+    assert incomplete.is_optimal.isna().all()
+
+
+def test_division_snapshot_selection(archive):
+    directory = archive / 'divisions'
+    directory.mkdir()
+    for week in (1, 2, 3):
+        pd.DataFrame([
+            dict(team_id='1', team_name='Team 1', division_id='01',
+                 division_name=f'East {week}', week=week),
+            dict(team_id='2', team_name='Team 2', division_id=None,
+                 division_name=None, week=week),
+        ]).to_csv(directory / f'divisions_week_{week}.csv.gz', index=False)
+    processor = ReportProcessor(archive)
+    table = processor.silver_divisions
+    assert table.week.tolist() == [2, 2]
+    assert table.division_id.iloc[0] == '01'
+    assert pd.isna(table.division_id.iloc[1])
+    assert table.division_name.iloc[0] == 'East 2'
+    assert len(processor.source_files['divisions']) == 1
+    assert ReportProcessor(archive, 1).silver_divisions.week.tolist() == [1, 1]
+    (directory / 'divisions_week_2.csv.gz').unlink()
+    assert ReportProcessor(archive).silver_divisions.week.tolist() == [1, 1]
+    override = ReportProcessor(archive, data_files={'divisions': directory / 'divisions_week_1.csv.gz'})
+    assert override.silver_divisions.week.tolist() == [1, 1]
+    (directory / 'divisions_week_1.csv.gz').unlink()
+    with pytest.raises(FileNotFoundError, match='No divisions files through week 2'):
+        _ = ReportProcessor(archive).silver_divisions
+
+
+def test_division_duplicate_teams_are_rejected(archive):
+    processor = ReportProcessor(archive)
+    processor.bronze_divisions = pd.DataFrame({'team_id': ['1', '1']})
+    with pytest.raises(ValueError, match='duplicate join keys'):
+        _ = processor.silver_divisions
+
+
 def test_reconciliation_and_missing_scores(archive):
     r=ReportProcessor(archive,official_scores_path=archive/'scores.csv')
     r.validate_reconciliation()
@@ -63,6 +176,45 @@ def test_reconciliation_and_missing_scores(archive):
     r.bronze_player.loc[0,'fantasy_points_actual']=None
     assert r.silver_reconciliation.iloc[0].status=='missing_player_points_or_roster'
     assert pd.isna(r.silver_season_reconciliation.iloc[0].calculated_points)
+
+
+def test_archived_official_scores_reconcile_and_respect_week(archive):
+    folder = archive / 'points recon'
+    folder.mkdir()
+    scores = pd.read_csv(archive / 'scores.csv')
+    for week, frame in scores.groupby('week'):
+        frame.to_csv(folder / f'points_recon_week_{week}.csv.gz', index=False)
+    processor = ReportProcessor(archive)
+    assert processor.bronze_points_recon.week.tolist() == [1, 1, 2, 2]
+    assert processor.bronze_points_recon.team_id.tolist() == ['1', '2', '1', '2']
+    processor.validate_reconciliation()
+    assert processor.silver_season_reconciliation.official_points.tolist() == [42, 58]
+    assert len(processor.source_files['points_recon']) == 2
+    assert ReportProcessor(archive, 1).silver_reconciliation.official_points.tolist() == [20, 28]
+
+    scores.loc[0, 'official_points'] += 1
+    scores.to_csv(archive / 'override.csv', index=False)
+    override = ReportProcessor(archive, official_scores_path=archive / 'override.csv')
+    assert override.silver_reconciliation.iloc[0].status == 'mismatch'
+    assert 'points_recon' not in override.source_files
+
+    (folder / 'points_recon_week_1.csv.gz').unlink()
+    partial = ReportProcessor(archive).silver_reconciliation
+    assert partial.query('week == 1').official_points.isna().all()
+    assert partial.query('week == 1').status.eq('unverified').all()
+    assert partial.query('week == 2').status.eq('matched').all()
+    assert ReportProcessor(archive, 1).silver_reconciliation.status.eq('unverified').all()
+
+
+def test_official_score_source_override_and_duplicate_keys(archive):
+    processor = ReportProcessor(archive, data_files={'points_recon': archive / 'scores.csv'})
+    processor.validate_reconciliation()
+    processor = ReportProcessor(archive, data_files={'points_recon': [archive / 'scores.csv'] * 2})
+    with pytest.raises(ValueError, match='duplicate join keys'):
+        _ = processor.silver_reconciliation
+    processor = ReportProcessor(archive, data_files={'points_recon': archive / 'missing.csv'})
+    with pytest.raises(FileNotFoundError):
+        _ = processor.silver_reconciliation
 
 
 def test_missing_player_and_duplicate_roster_are_detected(archive):

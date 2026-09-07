@@ -28,13 +28,14 @@ class ReportProcessor:
     """Inputs are a league/season directory (or metadata.json) and optional week.
 
     ``data_files`` overrides individual sources with a path or list of paths.
-    Official scores are optional CSVs with team_id, week, official_points.
+    Official scores load from points recon; official_scores_path overrides them.
     All weekly sources are read through current_week; static snapshots use the
     newest available snapshot at or before it. No future snapshot is substituted.
     """
 
     sources = {'draft': 'draft', 'settings': 'league_settings', 'player': 'player_data',
-               'projection': 'projection_data', 'schedule': 'schedule', 'team_data': 'team_data'}
+               'projection': 'projection_data', 'schedule': 'schedule', 'team_data': 'team_data',
+               'divisions': 'divisions', 'points_recon': 'points recon'}
 
     def __init__(self, data_path, current_week=None, *, data_files=None,
                  official_scores_path=None, tolerance=0.01, simulation_count=10000,
@@ -72,7 +73,7 @@ class ReportProcessor:
             if match and int(match[1]) > self.current_week:
                 continue
             frame = pd.read_csv(path, dtype={k: 'string' for k in
-                                ('player_id', 'team_id', 'league_id', 'game_id', 'team_key')})
+                                ('player_id', 'team_id', 'league_id', 'game_id', 'team_key', 'division_id')})
             snapshot = int(match[1]) if match else None
             if table != 'schedule':
                 if 'week' not in frame:
@@ -118,11 +119,22 @@ class ReportProcessor:
     def bronze_schedule(self): return self.read_files('schedule', latest=True)
     @cached_property
     def bronze_team_data(self): return self.read_files('team_data')
+    @cached_property
+    def bronze_divisions(self): return self.read_files('divisions', latest=True)
+    @cached_property
+    def bronze_points_recon(self): return self.read_files('points_recon')
 
     @staticmethod
     def _unique(frame, keys, name):
         if frame[keys].isna().any().any() or frame.duplicated(keys).any():
             raise ValueError(f'{name}: null or duplicate join keys {keys}')
+
+    @cached_property
+    def silver_divisions(self):
+        """Team division assignments from the latest snapshot through current_week."""
+        frame = self.bronze_divisions.copy()
+        self._unique(frame, ['team_id'], 'divisions')
+        return frame[['team_id', 'team_name', 'division_id', 'division_name', 'week']].reset_index(drop=True)
 
     @cached_property
     def silver_player(self):
@@ -154,8 +166,30 @@ class ReportProcessor:
         base['volatility_known'] = base.actual_points.notna() & base.projected_points.notna()
         from .lineups import eligibility
         position_columns = [c for c in base if 'eligible_positions' in c or c in ('primary_position', 'position', 'display_position')]
-        base['_eligibility'] = base[position_columns].apply(eligibility, axis=1)
-        return base
+        positions = base[position_columns].apply(eligibility, axis=1)
+        # Coalesce collector aliases into one public column per concept.
+        for column, aliases in {
+            'player_name': ('player_name', 'name_full'),
+            'position': ('primary_position', 'position', 'display_position'),
+            'nfl_team': ('nfl_team', 'editorial_team_abbr'),
+            'bye_week': ('bye_week', 'bye_weeks_week'),
+        }.items():
+            values = pd.Series(pd.NA, index=base.index, dtype='object')
+            for alias in aliases:
+                if alias in base:
+                    values = values.fillna(base[alias])
+            base[column] = values
+        base['bye_week'] = pd.to_numeric(base.bye_week, errors='coerce').astype('Int64')
+        base['eligible_positions'] = positions.map(sorted)
+        columns = [
+            'player_id', 'player_name', 'week', 'position', 'eligible_positions',
+            'nfl_team', 'bye_week', 'team_id', 'team_name', 'roster_slot', 'is_starting',
+            'actual_points', 'projected_points', 'draft_round', 'draft_pick', 'draft_team_id',
+            'is_stud', 'is_dud', 'volatility_known',
+        ]
+        from .lineups import add_player_lineup_columns
+        return add_player_lineup_columns(base.reindex(columns=columns), self.lineup_slots,
+                                         self.bronze_team_data)
 
     @cached_property
     def teams(self):
@@ -194,8 +228,18 @@ class ReportProcessor:
         counts = roster.groupby(['team_id', 'week']).size().rename('roster_starter_count')
         out = out.merge(counts, on=['team_id', 'week'], how='left')
         out['official_points'] = float('nan')
+        official = None
         if self.official_scores_path:
             official = pd.read_csv(self.official_scores_path, dtype={'team_id': 'string'})
+        elif 'points_recon' in self.data_files or (self.data_path / self.sources['points_recon']).is_dir():
+            try:
+                official = self.bronze_points_recon
+            except FileNotFoundError as exc:
+                # Older archives may have no snapshots through the selected week.
+                # Explicit overrides and unreadable files should still fail.
+                if 'points_recon' in self.data_files or exc.filename is not None:
+                    raise
+        if official is not None:
             self._unique(official, ['team_id', 'week'], 'official scores')
             out = out.drop(columns='official_points').merge(
                 official[['team_id', 'week', 'official_points']], on=['team_id', 'week'], how='left', validate='one_to_one')

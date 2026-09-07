@@ -44,6 +44,7 @@ data/{league_id}/{season}/
   projection_data/projection_data_week_{week}.csv.gz
   team_data/team_data_week_{week}.csv.gz
   schedule/schedule_week_{week}.csv.gz
+  divisions/divisions_week_{week}.csv.gz
   draft/draft_week_{week}.csv.gz
   league_settings/league_settings_week_{week}.csv.gz
   metadata.json
@@ -57,6 +58,7 @@ Week numbers are intentionally not zero-padded. Every practical dataset carries 
 - `projection_data` is Yahoo's individual-player projection response for the requested week. It makes an anonymous request with historical-week and projected-stat parameters; it never scrapes HTML or uses cookies. If Yahoo demands authentication, it reports an authentication/projection-unavailable result instead of creating a fake file.
 - `team_data` is a historical roster snapshot: one player in one fantasy-team slot. It requests the historical week directly and raises a clear error rather than substituting a current roster.
 - `schedule` contains fantasy-team matchup data only, not roster assignments.
+- `divisions` contains one row per fantasy team with `team_id`, `team_key`, `team_name`, `division_id`, and `division_name`. Manager contact fields are excluded. Assignments reflect current Yahoo settings and are reused within each backfill run.
 - `draft` preserves draft results in a weekly snapshot for a uniform filesystem contract.
 - `league_settings` provides readable league, roster-position, and scoring-stat rows rather than one opaque JSON blob.
 
@@ -139,13 +141,53 @@ the HTTP adapter. Completed snapshots remain on disk; retry later with
 load these changes. Larger pages and pacing reduce request volume/bursts but
 cannot guarantee Yahoo will not block requests.
 
-Within a backfill run, draft results and league settings are each fetched once
+Within a backfill run, draft results, league settings, and division assignments are each fetched once
 and reused for missing weekly snapshots, with the snapshot week updated. These
 endpoints expose the original draft/current settings, not historical weekly
 settings. The cache is discarded after each league backfill, so subsequent
-runs fetch fresh data. A new 17-week archive saves 32 requests this way. Existing
+runs fetch fresh data. Reusing these responses reduces repeated requests across weeks. Existing
 snapshots still remain untouched unless overwrite is explicitly enabled.
 
 Team rosters and reconciliation points already retrieve all teams per weekly
 request. The schedule matrix is already built once per backfill and reused;
 its underlying scoreboards still require separate weekly requests.
+
+### One-time Yahoo account authorization
+
+The refresh token is issued after account consent; it is not shown in Yahoo's
+app settings. Put your client ID and secret in the local `.env`, then run from
+`yahoo-fantasy-data` with the environment activated:
+
+```bash
+python -m yahoo_fantasy_data auth --redirect-uri 'https://localhost/callback'
+```
+
+Use the **exact redirect URI registered for your app** in place of the example.
+Open the printed link and approve access with your league account. Copy the full
+redirected browser address into the terminal prompt, even if the callback page
+cannot load. No callback server is needed. The command checks the returned state,
+exchanges the code, and saves `YAHOO_REFRESH_TOKEN` in `.env` with owner-only
+permissions. Use `--env-file /path/to/.env` to choose another configuration file.
+Tokens and authorization codes are not printed. `.env` is ignored by Git.
+
+Restart your notebook kernel after authorization. All collectors now use a shared public-first provider. If a public request fails,
+it tries the official OAuth API when credentials are configured. Public rate limits
+still stop collection rather than triggering retries through another endpoint.
+Division pulls use the same public-first request policy, without manager enrichment.
+Existing snapshots remain skipped unless overwritten. Backfill with
+`overwrite=True` refreshes all datasets, not just divisions.
+
+For notebook sessions, you can instead keep the token only in memory:
+
+```python
+from yahoo_fantasy_data.auth import authorize_in_memory
+
+settings = authorize_in_memory(settings, redirect_uri="YOUR_REGISTERED_REDIRECT_URI")
+# The existing collect/backfill calls using settings=settings now use this token.
+# If running the batch cell, assign batch_settings = settings instead of reloading it.
+```
+
+This does not write a token to `.env`. Keep using the returned settings object;
+calling `load_settings()` again does not retain the in-memory token. Sign in
+again after restarting the kernel. Saved refresh tokens normally avoid repeated
+browser sign-in; memory-only storage is a session preference, not a Yahoo requirement.
