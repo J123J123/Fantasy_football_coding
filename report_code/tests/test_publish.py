@@ -118,7 +118,7 @@ def test_default_config_local_build_without_week(archive, tmp_path, monkeypatch)
     monkeypatch.setattr(publish, 'ReportProcessor', lambda path, week: real_processor(path, week, simulation_count=10))
     monkeypatch.setattr(sys, 'argv', ['publish', '--data-dir', 'data'])
     publish.main()
-    assert (tmp_path / 'docs/One_2025_pc.html').exists()
+    assert (tmp_path / 'docs/One_2025_week3_pc.html').exists()
     assert pd.read_csv(tmp_path / 'docs/data/One/2025/silver_player.csv.gz').week.max() == 3
 
 
@@ -139,15 +139,15 @@ def test_backfill_uses_inferred_week_and_config_options(archive, tmp_path, monke
     publish.main()
     assert calls[0][0] == (2024, '9', 1, 2, True)
     assert calls[0][1]['league_nickname'] == 'One'
-    assert (tmp_path / 'docs/One_2024.html').exists()
+    assert (tmp_path / 'docs/One_2024_week2.html').exists()
 
 
 @pytest.mark.parametrize('template, expected', [
-    ('original', {'One_2025.html'}),
-    ('pc', {'One_2025_pc.html'}),
-    ('both', {'One_2025.html', 'One_2025_pc.html'}),
+    ('original', {'One_2025_week2.html'}),
+    ('pc', {'One_2025_week2_pc.html'}),
+    ('both', {'One_2025_week2.html', 'One_2025_week2_pc.html'}),
 ])
-def test_latest_outputs_and_template_override(archive, tmp_path, monkeypatch, template, expected):
+def test_weekly_reports_latest_data_and_template_override(archive, tmp_path, monkeypatch, template, expected):
     config = tmp_path / 'runs.json'
     config.write_text(json.dumps([{'league_id': '1', 'year': 2025, 'nickname': 'One', 'template': 'both'}]))
     docs = tmp_path / 'docs'
@@ -170,6 +170,14 @@ def test_latest_outputs_and_template_override(archive, tmp_path, monkeypatch, te
     for name in expected:
         assert (docs / name).read_text() != 'replace me'
     assert (docs / 'index.html').read_text() == 'unchanged dynamic index'
+    # A later report week adds HTML while replacing the same two data exports.
+    sys.argv[sys.argv.index('--week') + 1] = '3'
+    publish.main()
+    assert {p.name for p in docs.glob('One_2025*.html')} == expected | {
+        name.replace('week2', 'week3') for name in expected}
+    assert len(list(docs.rglob('*.csv.gz'))) == 2
+    assert not list((docs / 'data').rglob('week*'))
+
 
 
 def test_both_config(tmp_path):
@@ -214,8 +222,8 @@ def test_notebook_direct_public_backfill_and_gzip(archive, tmp_path, monkeypatch
     ns = {'LEAGUES': [{'nickname': 'One', 'league_id': '1', 'year': 2025, 'template': 'both'}]}
     exec(compile(''.join(notebook['cells'][1]['source']), 'notebook-cell-2', 'exec'), ns)
     assert len(calls) == 1
-    assert (tmp_path / 'docs/One_2025.html').exists()
-    assert (tmp_path / 'docs/One_2025_pc.html').exists()
+    assert (tmp_path / 'docs/One_2025_week2.html').exists()
+    assert (tmp_path / 'docs/One_2025_week2_pc.html').exists()
     for table in ('player', 'schedule'):
         path = tmp_path / f'docs/data/One/2025/silver_{table}.csv.gz'
         assert path.read_bytes()[:2] == b'\x1f\x8b'

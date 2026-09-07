@@ -141,7 +141,7 @@ def main():
         templates = report_templates(args.template or run.get('template', 'original'))
         for template in templates:
             suffix = '_pc' if template == 'pc' else ''
-            report.write_html(args.docs_dir / f'{folder}_{year}{suffix}.html', template=template)
+            report.write_html(args.docs_dir / f'{folder}_{year}_week{week}{suffix}.html', template=template)
         export_silver(report, args.docs_dir / 'data' / folder / str(year))
         print(f'Saved {name} report and silver tables', flush=True)
     print(f'Reports and data saved in {args.docs_dir}', flush=True)

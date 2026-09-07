@@ -264,9 +264,10 @@ and publish the league/year/nickname entries in the JSON run list. The permanent
 not rewrite it. Week is inferred when omitted; see the
 [root README](../README.md) for workflow setup and additional options.
 
-Publishing keeps the latest output per league/season at `docs/NICKNAME_YEAR.html`
-and/or `docs/NICKNAME_YEAR_pc.html`, with gzip CSVs in
-`docs/data/NICKNAME/YEAR/`. Exports overwrite the same paths on each run.
+Publishing saves weekly reports at `docs/NICKNAME_YEAR_weekN.html`
+and/or `docs/NICKNAME_YEAR_weekN_pc.html`, with gzip CSVs in
+`docs/data/NICKNAME/YEAR/`. Data exports overwrite the same paths on each run.
+Earlier weekly HTML reports remain available; rerunning a week replaces its HTML.
 If you stop generating a report version, delete its HTML file manually.
 Source archives are retained.
 Set `"template": "original"`, `"pc"`, or `"both"` in `report_runs.json`;

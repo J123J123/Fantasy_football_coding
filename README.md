@@ -54,10 +54,12 @@ Optional entry fields are `enabled` (default `true`), `overwrite` (default
 ```
 
 The pipeline backfills from week 1 through the resolved week, writes the selected HTML
-report versions to `docs/NICKNAME_YEAR.html` and/or `docs/NICKNAME_YEAR_pc.html`, exports `silver_player.csv.gz` and
+report versions to `docs/NICKNAME_YEAR_weekN.html` and/or `docs/NICKNAME_YEAR_weekN_pc.html`, exports `silver_player.csv.gz` and
 `silver_schedule.csv.gz` to `docs/data/NICKNAME/YEAR/`.
 The permanent `docs/index.html` fetches the public GitHub file list in JavaScript;
-no index generation or file manifest is needed. Each run overwrites these stable paths with the latest output for that league/season.
+no index generation or file manifest is needed. HTML reports are saved per week; earlier weeks remain available, and rerunning
+a week replaces its report. Data exports overwrite the same league/season paths
+each run, keeping only the latest export.
 No folder cleanup is needed. If you stop generating a report version, delete its
 HTML file manually. Source archives are retained. Player exports
 include archived weeks through the report week; schedule exports may include
