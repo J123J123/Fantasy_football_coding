@@ -16,6 +16,20 @@ Create the output directory first. Omit `--week` to use metadata `current_week`,
 falling back to `last_collected_week`. This is the archive's week, not today's
 NFL week. Input may be the league/season directory or its `metadata.json`.
 
+HTML reports use the original wording by default (`--template original`).
+Select the work-appropriate template with `--template pc`:
+
+```bash
+.venv/bin/python -m report_code yahoo-fantasy-data/data/Ferda/2025 \
+  --week 5 --html report_code/output/week5_pc.html --template pc
+```
+
+In Python, use `report.write_html("report_code/output/week5_pc.html", template="pc")`.
+The PC template uses neutral section titles, column labels, and report wording;
+calculations and JSON field names are identical. League, manager, and team names
+remain as supplied in your data. The templates live in `report_template/`;
+the existing `template_path` argument still overrides the built-in template file.
+
 ```python
 from report_code import ReportProcessor
 
@@ -230,3 +244,20 @@ those matchups are absent.
 Synthetic archives test known totals, missing scores/weeks, duplicate joins,
 projection weeks, official mismatches, flex optimization, draft ownership,
 reproducible simulation, null handling, and safe embedded HTML JSON.
+
+## Silver downloads and multi-league publishing
+
+Export just the silver player and schedule tables without calculating a report:
+
+```bash
+python -m report_code yahoo-fantasy-data/data/CFFL_A/2025 --week 17 \
+  --silver-dir docs/data/CFFL_A/2025/week17
+```
+
+This writes `silver_player.csv.gz` and `silver_schedule.csv.gz`, without DataFrame
+indexes. The exports preserve the silver tables' columns and missing values.
+`--silver-dir` may also be combined with `--html` and `--json`.
+
+Use `python -m report_code.publish --season 2025 --week 17 --backfill` to collect
+and publish all configured leagues and rebuild the searchable index. See the
+[root README](../README.md) for workflow setup and additional options.

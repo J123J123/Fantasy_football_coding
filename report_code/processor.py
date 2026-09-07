@@ -365,8 +365,13 @@ class ReportProcessor:
             Path(path).write_text(result, encoding='utf-8')
         return result
 
-    def write_html(self, output_path, template_path=None):
-        template = Path(template_path) if template_path else Path(__file__).resolve().parents[1] / 'report_template/fantasy_weekly_report_dynamic.html'
+    def write_html(self, output_path, template_path=None, *, template='original'):
+        """Export with original or PC wording; template_path overrides the built-in file."""
+        templates = {'original': 'fantasy_weekly_report_dynamic.html',
+                     'pc': 'fantasy_weekly_report_pc.html'}
+        if template not in templates:
+            raise ValueError("template must be 'original' or 'pc'")
+        template = Path(template_path) if template_path else Path(__file__).resolve().parents[1] / 'report_template' / templates[template]
         html = template.read_text(encoding='utf-8')
         pattern = r'(<script\s+id="report-data"\s+type="application/json">).*?(</script>)'
         safe_json = self.to_json().replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')

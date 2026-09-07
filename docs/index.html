@@ -1,61 +1,70 @@
----
-layout: null
-title: Fantasy Football Reports
----
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Fantasy Football Reports</title>
-  <style>
-    :root { color-scheme: light; font-family: system-ui, sans-serif; color: #223344; background: #f4f5f7; }
-    body { margin: 0; }
-    main { max-width: 850px; margin: 64px auto; padding: 0 24px; }
-    h1 { margin-bottom: 8px; font-size: clamp(1.8rem, 5vw, 2.6rem); }
-    p { color: #526170; }
-    label { display: block; margin: 28px 0 8px; font-weight: 600; }
-    input { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #b5bfca; border-radius: 8px; font: inherit; }
-    ul { list-style: none; padding: 0; margin: 20px 0; background: white; border: 1px solid #dce1e7; border-radius: 10px; overflow: hidden; }
-    li + li { border-top: 1px solid #e6eaf0; }
-    a { display: block; padding: 18px; color: #235d85; text-decoration: none; overflow-wrap: anywhere; }
-    a:hover { background: #edf5fa; text-decoration: underline; }
-    a:focus-visible, input:focus-visible { outline: 3px solid #235d85; outline-offset: -3px; }
-    #file-count, #no-results { font-size: .9rem; }
-    [hidden] { display: none !important; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fantasy Football · Reports & Data</title>
+<style>
+:root{font-family:system-ui,sans-serif;color:#e9eef5;background:#101923;color-scheme:dark}*{box-sizing:border-box}body{margin:0}main{max-width:1100px;margin:auto;padding:64px 24px}header{border-top:4px solid #8de4ba;padding:30px 0}.eyebrow,.tag{color:#8de4ba;font-size:.75rem;letter-spacing:.15em;font-weight:750}h1{font-size:clamp(2.3rem,6vw,4.4rem);letter-spacing:-.055em;margin:14px 0}header p{max-width:640px;line-height:1.7;color:#adbdcc}label{display:block;margin:28px 0 10px;font-weight:600}input{width:100%;padding:16px;border:1px solid #45576a;border-radius:10px;background:#182635;color:inherit;font:inherit}ul{padding:0;list-style:none}li{display:flex;justify-content:space-between;align-items:center;gap:24px;margin:12px 0;padding:24px;background:#1a2836;border:1px solid #304254;border-radius:14px}h2{font-size:1rem;font-weight:600;overflow-wrap:anywhere;margin:10px 0}small,#file-count,footer{color:#adbdcc}nav{display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;max-width:45%}a{color:#b2f3d3;border:1px solid #537968;padding:10px 14px;border-radius:8px;text-decoration:none;font-size:.9rem}a:hover{background:#29483d}a:focus-visible,input:focus-visible{outline:3px solid #8de4ba;outline-offset:4px}footer{border-top:1px solid #304254;padding-top:24px;margin-top:40px;line-height:1.6;font-size:.85rem}[hidden]{display:none!important}@media(max-width:650px){main{padding:28px 16px}li{align-items:flex-start;flex-direction:column}nav{max-width:100%}}
+</style>
 </head>
-<body>
-  <main>
-    <h1>Fantasy Football Reports</h1>
-    <p>Browse the reports and files in this collection.</p>
-    <label for="file-search">Find a file</label>
-    <input id="file-search" type="search" placeholder="Search league, season, or week…" aria-controls="file-list">
-    <p id="file-count" role="status"></p>
-    <ul id="file-list">
-      {% assign files = site.static_files | sort_natural: 'path' %}
-      {% for file in files %}
-      <li><a href="{{ file.path | relative_url | escape }}">{{ file.path | remove_first: '/' | escape }}</a></li>
-      {% endfor %}
-    </ul>
-    <p id="no-results" hidden>No files match your search.</p>
-  </main>
-  <script>
-    const search = document.getElementById('file-search');
-    const rows = Array.from(document.querySelectorAll('#file-list li'));
-    function filterFiles() {
-      const query = search.value.trim().toLocaleLowerCase();
-      let visible = 0;
-      rows.forEach(row => {
-        row.hidden = !row.textContent.toLocaleLowerCase().includes(query);
-        if (!row.hidden) visible++;
-      });
-      document.getElementById('file-count').textContent = `${visible} of ${rows.length} files`;
-      document.getElementById('no-results').hidden = visible !== 0;
-      document.getElementById('file-list').hidden = visible === 0;
-    }
-    search.addEventListener('input', filterFiles);
-    filterFiles();
-  </script>
-</body>
-</html>
+<body><main>
+<header><div class="eyebrow">THE LEAGUE ARCHIVE</div><h1>Every week. Every matchup.</h1><p>Explore your league’s reports and take the numbers with you. Download silver player and schedule tables for your own analysis.</p></header>
+<label for="file-search">Find your league, season, week, or table</label>
+<input id="file-search" type="search" placeholder="Try CFFL, 2025, or silver_player" aria-controls="file-list">
+<p id="file-count" role="status"></p><p id="download-status" role="status"></p>
+<ul id="file-list"><li data-kind="report"><div><span class="tag">REPORT</span><h2>CFFL_A_2025_week17.html</h2><small>241.2 KB</small></div><nav aria-label="CFFL_A_2025_week17.html"><a href="CFFL_A_2025_week17.html" >Open report</a></nav></li>
+<li data-kind="report"><div><span class="tag">REPORT</span><h2>CFFL_B_2025_week17.html</h2><small>242.1 KB</small></div><nav aria-label="CFFL_B_2025_week17.html"><a href="CFFL_B_2025_week17.html" >Open report</a></nav></li>
+<li data-kind="report"><div><span class="tag">REPORT</span><h2>Ferda_2025_week17.html</h2><small>241.0 KB</small></div><nav aria-label="Ferda_2025_week17.html"><a href="Ferda_2025_week17.html" >Open report</a></nav></li>
+<li data-kind="report"><div><span class="tag">REPORT</span><h2>PHFFL_A_2025_week17.html</h2><small>310.9 KB</small></div><nav aria-label="PHFFL_A_2025_week17.html"><a href="PHFFL_A_2025_week17.html" >Open report</a></nav></li>
+<li data-kind="report"><div><span class="tag">REPORT</span><h2>cffl_a_2025_week10.html</h2><small>176.5 KB</small></div><nav aria-label="cffl_a_2025_week10.html"><a href="cffl_a_2025_week10.html" >Open report</a></nav></li>
+<li data-kind="data"><div><span class="tag">DATA</span><h2>data/CFFL_A/2025/week17/silver_player.csv.gz</h2><small>397.9 KB</small></div><nav aria-label="data/CFFL_A/2025/week17/silver_player.csv.gz"><a href="data/CFFL_A/2025/week17/silver_player.csv.gz" download>Download</a> <a href="data/CFFL_A/2025/week17/silver_player.csv.gz" class="unzip" download="silver_player.csv">Download CSV (unzip)</a></nav></li>
+<li data-kind="data"><div><span class="tag">DATA</span><h2>data/CFFL_A/2025/week17/silver_schedule.csv.gz</h2><small>0.6 KB</small></div><nav aria-label="data/CFFL_A/2025/week17/silver_schedule.csv.gz"><a href="data/CFFL_A/2025/week17/silver_schedule.csv.gz" download>Download</a> <a href="data/CFFL_A/2025/week17/silver_schedule.csv.gz" class="unzip" download="silver_schedule.csv">Download CSV (unzip)</a></nav></li>
+<li data-kind="data"><div><span class="tag">DATA</span><h2>data/CFFL_B/2025/week17/silver_player.csv.gz</h2><small>398.6 KB</small></div><nav aria-label="data/CFFL_B/2025/week17/silver_player.csv.gz"><a href="data/CFFL_B/2025/week17/silver_player.csv.gz" download>Download</a> <a href="data/CFFL_B/2025/week17/silver_player.csv.gz" class="unzip" download="silver_player.csv">Download CSV (unzip)</a></nav></li>
+<li data-kind="data"><div><span class="tag">DATA</span><h2>data/CFFL_B/2025/week17/silver_schedule.csv.gz</h2><small>0.6 KB</small></div><nav aria-label="data/CFFL_B/2025/week17/silver_schedule.csv.gz"><a href="data/CFFL_B/2025/week17/silver_schedule.csv.gz" download>Download</a> <a href="data/CFFL_B/2025/week17/silver_schedule.csv.gz" class="unzip" download="silver_schedule.csv">Download CSV (unzip)</a></nav></li>
+<li data-kind="data"><div><span class="tag">DATA</span><h2>data/Ferda/2025/week17/silver_player.csv.gz</h2><small>395.5 KB</small></div><nav aria-label="data/Ferda/2025/week17/silver_player.csv.gz"><a href="data/Ferda/2025/week17/silver_player.csv.gz" download>Download</a> <a href="data/Ferda/2025/week17/silver_player.csv.gz" class="unzip" download="silver_player.csv">Download CSV (unzip)</a></nav></li>
+<li data-kind="data"><div><span class="tag">DATA</span><h2>data/Ferda/2025/week17/silver_schedule.csv.gz</h2><small>0.5 KB</small></div><nav aria-label="data/Ferda/2025/week17/silver_schedule.csv.gz"><a href="data/Ferda/2025/week17/silver_schedule.csv.gz" download>Download</a> <a href="data/Ferda/2025/week17/silver_schedule.csv.gz" class="unzip" download="silver_schedule.csv">Download CSV (unzip)</a></nav></li>
+<li data-kind="data"><div><span class="tag">DATA</span><h2>data/PHFFL_A/2025/week17/silver_player.csv.gz</h2><small>404.9 KB</small></div><nav aria-label="data/PHFFL_A/2025/week17/silver_player.csv.gz"><a href="data/PHFFL_A/2025/week17/silver_player.csv.gz" download>Download</a> <a href="data/PHFFL_A/2025/week17/silver_player.csv.gz" class="unzip" download="silver_player.csv">Download CSV (unzip)</a></nav></li>
+<li data-kind="data"><div><span class="tag">DATA</span><h2>data/PHFFL_A/2025/week17/silver_schedule.csv.gz</h2><small>0.7 KB</small></div><nav aria-label="data/PHFFL_A/2025/week17/silver_schedule.csv.gz"><a href="data/PHFFL_A/2025/week17/silver_schedule.csv.gz" download>Download</a> <a href="data/PHFFL_A/2025/week17/silver_schedule.csv.gz" class="unzip" download="silver_schedule.csv">Download CSV (unzip)</a></nav></li>
+<li data-kind="data"><div><span class="tag">DATA</span><h2>data/cffl_a_2025_player.csv.gz</h2><small>233.8 KB</small></div><nav aria-label="data/cffl_a_2025_player.csv.gz"><a href="data/cffl_a_2025_player.csv.gz" download>Download</a> <a href="data/cffl_a_2025_player.csv.gz" class="unzip" download="cffl_a_2025_player.csv">Download CSV (unzip)</a></nav></li></ul>
+<p id="no-results" hidden>No matching files. Try a different league or season.</p>
+<footer>Silver player tables include archived weeks through the report week. Schedule tables reflect the available schedule snapshot. Missing source values remain blank.<br>Download keeps the compressed .csv.gz file. “Download CSV (unzip)” decompresses it in your browser.</footer>
+</main>
+<script>
+const rows = [...document.querySelectorAll('#file-list li')];
+const search = document.getElementById('file-search');
+function filterFiles() {
+  const query = search.value.trim().toLowerCase();
+  rows.forEach(row => row.hidden = !row.querySelector('h2').textContent.toLowerCase().includes(query));
+  const count = rows.filter(row => !row.hidden).length;
+  document.getElementById('file-count').textContent = `${count} of ${rows.length} files`;
+  document.getElementById('no-results').hidden = count !== 0;
+}
+search.addEventListener('input', filterFiles);
+filterFiles();
+document.querySelectorAll('.unzip').forEach(link => link.addEventListener('click', async event => {
+  event.preventDefault();
+  const status = document.getElementById('download-status');
+  if (!('DecompressionStream' in window)) {
+    status.textContent = 'This browser cannot unzip files. Use Download to save the .csv.gz file and extract it locally.';
+    return;
+  }
+  status.textContent = 'Preparing CSV download…';
+  try {
+    const response = await fetch(link.href);
+    if (!response.ok) throw new Error(`Download failed (${response.status})`);
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    const compressed = new Blob([bytes]);
+    // Some hosts already remove gzip content encoding in transit.
+    const blob = bytes[0] === 31 && bytes[1] === 139
+      ? await new Response(compressed.stream().pipeThrough(new DecompressionStream('gzip'))).blob()
+      : compressed;
+    const url = URL.createObjectURL(blob);
+    const download = document.createElement('a');
+    download.href = url; download.download = link.download;
+    document.body.appendChild(download); download.click(); download.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+    status.textContent = 'CSV download ready.';
+  } catch (error) { status.textContent = `${error.message}. Try the compressed Download link.`; }
+}));
+</script></body></html>

@@ -269,6 +269,27 @@ def test_gold_calculations_and_round_trip(archive,tmp_path):
     assert '<script>bad()' not in output
 
 
+def test_html_template_selection(tmp_path, monkeypatch):
+    report = ReportProcessor.__new__(ReportProcessor)
+    payload = {'meta': {'league_name': '</script><script>bad()</script>'}}
+    monkeypatch.setattr(report, 'to_json', lambda: json.dumps(payload))
+    original = report.write_html(tmp_path/'original.html').read_text()
+    assert original == report.write_html(tmp_path/'explicit.html', template='original').read_text()
+    pc = report.write_html(tmp_path/'pc.html', template='pc').read_text()
+    assert "'Grower or Shower'" in original
+    assert "'Actual vs Expected Wins'" in pc
+    assert "'Grower or Shower'" not in pc
+    assert "'Decision efficiency ratio'" in pc
+    embedded = re.search(r'<script id="report-data" type="application/json">(.*?)</script>', pc, re.S)[1]
+    assert json.loads(embedded) == payload
+    assert '<script>bad()' not in pc
+    custom = tmp_path/'custom.html'
+    custom.write_text('<script id="report-data" type="application/json">{}</script>')
+    assert report.write_html(tmp_path/'custom-output.html', custom).read_text().startswith('<script')
+    with pytest.raises(ValueError, match='template must'):
+        report.write_html(tmp_path/'invalid.html', template='unknown')
+
+
 def test_draft_ownership_and_repeatable_simulation(archive):
     r=ReportProcessor(archive,simulation_count=100)
     r.bronze_draft.loc[r.bronze_draft.player_id.eq('1'),'team_id']='2'

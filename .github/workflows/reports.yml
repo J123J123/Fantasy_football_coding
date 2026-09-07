@@ -1,0 +1,97 @@
+name: Backfill and publish league reports
+on:
+  workflow_dispatch:
+    inputs:
+      season:
+        description: Season (must exist in league_history.json)
+        required: true
+        default: '2025'
+      week:
+        description: Last completed week
+        required: true
+        default: '17'
+      leagues:
+        description: Space-separated nicknames (blank means all leagues in season)
+        default: ''
+      overwrite:
+        description: Refresh existing snapshots
+        type: boolean
+        default: false
+      strict:
+        description: Require all team-week scores to reconcile before publishing
+        type: boolean
+        default: false
+      template:
+        description: Report wording
+        type: choice
+        options: [original, pc]
+        default: original
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+concurrency:
+  group: league-report-publishing
+  cancel-in-progress: false
+jobs:
+  build:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+          cache-dependency-path: |
+            yahoo-fantasy-data/pyproject.toml
+            report_code/requirements.txt
+      - run: python -m pip install './yahoo-fantasy-data[dev]' -r report_code/requirements.txt
+      - run: python -m pytest report_code/tests yahoo-fantasy-data/tests -m 'not integration' -q
+      - name: Collect archives and build site
+        env:
+          SEASON: ${{ inputs.season }}
+          WEEK: ${{ inputs.week }}
+          LEAGUES: ${{ inputs.leagues }}
+          OVERWRITE: ${{ inputs.overwrite }}
+          STRICT: ${{ inputs.strict }}
+          TEMPLATE: ${{ inputs.template }}
+          YAHOO_CLIENT_ID: ${{ secrets.YAHOO_CLIENT_ID }}
+          YAHOO_CLIENT_SECRET: ${{ secrets.YAHOO_CLIENT_SECRET }}
+          YAHOO_REFRESH_TOKEN: ${{ secrets.YAHOO_REFRESH_TOKEN }}
+        shell: bash
+        run: |
+          args=(--season "$SEASON" --week "$WEEK" --template "$TEMPLATE" --backfill)
+          if [[ -n "$LEAGUES" ]]; then
+            read -r -a leagues <<< "$LEAGUES"
+            args+=(--leagues "${leagues[@]}")
+          fi
+          if [[ "$OVERWRITE" == true ]]; then args+=(--overwrite); fi
+          if [[ "$STRICT" == true ]]; then args+=(--strict); fi
+          python -m report_code.publish "${args[@]}"
+      - name: Commit generated archives and docs to main
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add docs yahoo-fantasy-data/data
+          if ! git diff --cached --quiet; then
+            git commit -m 'Update league archives, reports and silver downloads'
+            git push origin HEAD:main
+          fi
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy site
+        id: deployment
+        uses: actions/deploy-pages@v4
