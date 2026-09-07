@@ -258,6 +258,7 @@ This writes `silver_player.csv.gz` and `silver_schedule.csv.gz`, without DataFra
 indexes. The exports preserve the silver tables' columns and missing values.
 `--silver-dir` may also be combined with `--html` and `--json`.
 
-Use `python -m report_code.publish --season 2025 --week 17 --backfill` to collect
-and publish all configured leagues and rebuild the searchable index. See the
+Use `python -m report_code.publish --config report_runs.json --backfill` to collect
+and publish the league/year/nickname entries in the JSON run list and rebuild the
+searchable index. Week is inferred when omitted; see the
 [root README](../README.md) for workflow setup and additional options.

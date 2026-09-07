@@ -2,30 +2,10 @@ name: Backfill and publish league reports
 on:
   workflow_dispatch:
     inputs:
-      season:
-        description: Season (must exist in league_history.json)
+      config:
+        description: Repository path to the JSON list of league runs
         required: true
-        default: '2025'
-      week:
-        description: Last completed week
-        required: true
-        default: '17'
-      leagues:
-        description: Space-separated nicknames (blank means all leagues in season)
-        default: ''
-      overwrite:
-        description: Refresh existing snapshots
-        type: boolean
-        default: false
-      strict:
-        description: Require all team-week scores to reconcile before publishing
-        type: boolean
-        default: false
-      template:
-        description: Report wording
-        type: choice
-        options: [original, pc]
-        default: original
+        default: report_runs.json
 permissions:
   contents: write
   pages: write
@@ -53,25 +33,12 @@ jobs:
       - run: python -m pytest report_code/tests yahoo-fantasy-data/tests -m 'not integration' -q
       - name: Collect archives and build site
         env:
-          SEASON: ${{ inputs.season }}
-          WEEK: ${{ inputs.week }}
-          LEAGUES: ${{ inputs.leagues }}
-          OVERWRITE: ${{ inputs.overwrite }}
-          STRICT: ${{ inputs.strict }}
-          TEMPLATE: ${{ inputs.template }}
+          RUN_CONFIG: ${{ inputs.config }}
           YAHOO_CLIENT_ID: ${{ secrets.YAHOO_CLIENT_ID }}
           YAHOO_CLIENT_SECRET: ${{ secrets.YAHOO_CLIENT_SECRET }}
           YAHOO_REFRESH_TOKEN: ${{ secrets.YAHOO_REFRESH_TOKEN }}
         shell: bash
-        run: |
-          args=(--season "$SEASON" --week "$WEEK" --template "$TEMPLATE" --backfill)
-          if [[ -n "$LEAGUES" ]]; then
-            read -r -a leagues <<< "$LEAGUES"
-            args+=(--leagues "${leagues[@]}")
-          fi
-          if [[ "$OVERWRITE" == true ]]; then args+=(--overwrite); fi
-          if [[ "$STRICT" == true ]]; then args+=(--strict); fi
-          python -m report_code.publish "${args[@]}"
+        run: python -m report_code.publish --config "$RUN_CONFIG" --backfill
       - name: Commit generated archives and docs to main
         run: |
           git config user.name 'github-actions[bot]'

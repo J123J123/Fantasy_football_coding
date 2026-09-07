@@ -9,24 +9,64 @@ Run from the repository root (Python 3.11 or newer):
 
 ```bash
 python -m pip install './yahoo-fantasy-data[dev]' -r report_code/requirements.txt
-python -m report_code.publish --season 2025 --week 17 --backfill
+python -m report_code.publish --backfill
 ```
 
-This backfills weeks 1–17 for every league with a 2025 entry in
-`yahoo-fantasy-data/league_history.json`, writes one report per league to `docs/`,
-exports `silver_player.csv.gz` and `silver_schedule.csv.gz` to
-`docs/data/LEAGUE/SEASON/week17/`, and rebuilds `docs/index.html` with links to
-all existing reports and downloads. Player exports include weeks through the
-selected week; schedule exports can include future matchups from that snapshot.
-Existing reports and downloads remain in the index.
+The default run file is `report_runs.json`, a JSON list of dictionaries:
 
-- Use `--leagues CFFL_A Ferda` to select leagues.
-- Omit `--backfill` to build entirely from local archives without Yahoo requests.
-- Use `--overwrite` with `--backfill` to refresh already collected snapshots.
-- Set `--week` to the last completed week, not an upcoming or in-progress week.
-- Use `--template pc` for work-appropriate report wording.
-- Add `--strict` to require all team-week scores to reconcile with official scores.
-  By default reports retain their data-quality annotations and missing values.
+```json
+[
+  {"league_id": "134317", "year": 2025, "nickname": "CFFL_A"},
+  {"league_id": "889216", "year": 2025, "nickname": "Ferda"}
+]
+```
+
+Each entry selects a Yahoo league ID, season year, and local folder nickname.
+Entries can use different years. The included file selects all four 2025 leagues.
+Use another file with `python -m report_code.publish --config my_runs.json --backfill`.
+Paths are relative to the working directory; run from the repository root.
+`league_history.json` remains a reference of historical IDs, but does not control
+publishing runs.
+
+Week is optional:
+
+- With `--backfill`, query Yahoo league metadata. For an active season, collect
+  through `current_week - 1`, capped at the league's `end_week`. For a finished
+  season (`is_finished`), collect through `end_week`. This deliberately waits for
+  Yahoo's week rollover rather than including an in-progress week.
+- Without `--backfill`, use each local archive's `last_collected_week`; no Yahoo
+  requests are made. This is the last archived week, not a guarantee of complete
+  or reconciled source data.
+- Before a season has completed a week, skip that run. Missing week metadata
+  produces an error rather than guessing from the calendar.
+- Add `"week": 10` to an individual entry to pin a report period, or use
+  `--week 10` to override all selected runs.
+
+Optional entry fields are `enabled` (default `true`), `overwrite` (default
+`false`), `strict` (default `false`), and `template` (`original` or `pc`, default
+`original`). For example:
+
+```json
+[
+  {"league_id": "134317", "year": 2025, "nickname": "CFFL_A", "template": "pc", "strict": true},
+  {"league_id": "801641", "year": 2024, "nickname": "CFFL_A", "week": 10, "enabled": false}
+]
+```
+
+The pipeline backfills from week 1 through the resolved week, writes one HTML
+report per run to `docs/`, exports `silver_player.csv.gz` and
+`silver_schedule.csv.gz` to `docs/data/NICKNAME/YEAR/weekN/`, and rebuilds
+`docs/index.html`. Existing reports and downloads remain listed. Player exports
+include archived weeks through the report week; schedule exports may include
+future matchups from that snapshot.
+
+- Use `--leagues CFFL_A Ferda` to filter enabled runs by nickname across years.
+- Omit `--backfill` to build entirely from local archives.
+- Use `--overwrite` with `--backfill` to refresh existing snapshots for every run.
+- Use `--template pc` to override report wording for every run.
+- Add `--strict` to require official score reconciliation for every run.
+  Otherwise each entry controls strict checking; reports retain data-quality
+  annotations and missing values by default.
 
 The pipeline stops on collector failures; successful partial archives can be
 reused on the next run. It does not commit or push when run locally.
@@ -38,9 +78,9 @@ and [collector documentation](yahoo-fantasy-data/README.md).
 
 Commit and push the local code first: Actions checks out GitHub's `main` branch,
 not uncommitted files on your computer. In **Actions → Backfill and publish league
-reports → Run workflow**, select `main`, season, last completed week, optional
-league nicknames, overwrite behavior, and report template.
-Enable the strict input if score reconciliation must pass before publishing.
+reports → Run workflow**, select `main` and the JSON configuration path
+(default `report_runs.json`). League IDs, years, nicknames, and optional settings
+come from that file; no season or week input is required in the Action.
 
 The workflow installs the checked-out collector, runs tests, backfills leagues,
 builds reports and silver downloads, commits `docs/` and the source archives to
@@ -56,8 +96,8 @@ Repository setup:
 3. If Yahoo authentication is needed, configure Actions secrets
    `YAHOO_CLIENT_ID`, `YAHOO_CLIENT_SECRET`, and `YAHOO_REFRESH_TOKEN` using the
    collector's authorization instructions. Public access is attempted first.
-4. Add season-specific league IDs to `league_history.json` before running a new
-   season. The included mapping currently ends at 2025.
+4. Update `report_runs.json` with the league IDs and years you want to run.
+   The included run file currently selects 2025.
 
 The workflow deploys Pages explicitly because [pushes made using `GITHUB_TOKEN`
 do not trigger a branch-based Pages build](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
