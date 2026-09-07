@@ -18,6 +18,8 @@ def parse_settings(payload: Any, base: dict[str, Any]) -> list[dict[str, Any]]:
         "draft_type": first_value(payload, "draft_type"), "waiver_type": first_value(payload, "waiver_type"),
         "waiver_time": first_value(payload, "waiver_time"), "trade_end_date": first_value(payload, "trade_end_date"),
         "playoff_start_week": first_value(payload, "playoff_start_week"),
+        "num_playoff_teams": first_value(payload, "num_playoff_teams"),
+        "num_playoff_byes": first_value(payload, "num_playoff_byes"),
     }
     rows.append({**base, "setting_type": "league", **top})
     for item in walk(payload):

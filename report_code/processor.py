@@ -56,7 +56,8 @@ class ReportProcessor:
             raise ValueError('tolerance must be nonnegative and simulation_count positive')
         self.simulation_count, self.random_seed = simulation_count, random_seed
         self.playoff_teams, self.playoff_byes = playoff_teams, playoff_byes
-        self.divisions = {str(k): str(v) for k, v in divisions.items()} if divisions else {}
+        self._divisions_override = ({str(k): str(v) for k, v in divisions.items()}
+                                    if divisions is not None else None)
         self.source_files = {}
         self._gold = {}
 
@@ -128,6 +129,21 @@ class ReportProcessor:
     def _unique(frame, keys, name):
         if frame[keys].isna().any().any() or frame.duplicated(keys).any():
             raise ValueError(f'{name}: null or duplicate join keys {keys}')
+
+    @cached_property
+    def divisions(self):
+        """Use archived division IDs unless the caller supplies an explicit mapping."""
+        if self._divisions_override is not None:
+            return self._divisions_override
+        try:
+            frame = self.silver_divisions
+        except FileNotFoundError:
+            return {}
+        if frame.division_id.isna().all():
+            return {}
+        if frame.division_id.isna().any():
+            raise ValueError('divisions: missing division_id for some teams')
+        return dict(zip(frame.team_id.astype(str), frame.division_id.astype(str)))
 
     @cached_property
     def silver_divisions(self):

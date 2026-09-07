@@ -36,6 +36,16 @@ def test_roster_slot_parsing_and_historical_week() -> None:
     assert provider.weeks == [10]
 
 
+def test_playoff_settings_are_preserved() -> None:
+    rows = parse_settings({"settings": {"playoff_start_week": "15",
+                                         "num_playoff_teams": "6",
+                                         "num_playoff_byes": 0}}, {"season": 2025})
+    league = next(row for row in rows if row["setting_type"] == "league")
+    assert league["playoff_start_week"] == "15"
+    assert league["num_playoff_teams"] == "6"
+    assert league["num_playoff_byes"] == 0
+
+
 def test_scoring_and_roster_settings_are_tabular() -> None:
     rows = parse_settings({"roster_positions": {"0": {"position": "QB", "count": 1}}, "stat_categories": {"0": {"stat_id": "4", "name": "Passing Yards", "value": "0.04"}}}, {"season": 2025})
     assert any(row["setting_type"] == "roster_position" and row["position"] == "QB" for row in rows)

@@ -347,3 +347,24 @@ def test_stud_dud_thresholds_and_bench_exclusion(archive):
     assert out.loc['2','duds']==1
     assert out.loc['1','dudded_on']==1
     assert out.loc['1','s2d_diff']==2
+
+
+def test_archived_divisions_feed_playoff_odds(archive):
+    folder = archive / 'divisions'
+    folder.mkdir()
+    for week in (1, 2, 3):
+        pd.DataFrame([dict(week=week, team_id=t, team_name='Team '+t,
+                           division_id=t if week == 2 else 'same', division_name='Division '+t)
+                      for t in ('1', '2')]).to_csv(folder / f'divisions_week_{week}.csv.gz', index=False)
+    r = ReportProcessor(archive, playoff_teams=2, playoff_byes=1, simulation_count=100)
+    assert r.divisions == {'1': '1', '2': '2'}
+    assert r.gold_playoff_odds.division.eq(1).all()
+    assert r.gold_playoff_odds.wildcard.eq(0).all()
+    assert r.gold_playoff_odds.bye.sum() == pytest.approx(1)
+    assert ReportProcessor(archive, divisions={}).divisions == {}
+    assert ReportProcessor(archive, divisions={'1': 'East', '2': 'East'}).divisions == {'1': 'East', '2': 'East'}
+    frame = pd.read_csv(folder / 'divisions_week_2.csv.gz')
+    frame.loc[0, 'division_id'] = float('nan')
+    frame.to_csv(folder / 'divisions_week_2.csv.gz', index=False)
+    with pytest.raises(ValueError, match='missing division_id'):
+        _ = ReportProcessor(archive).divisions

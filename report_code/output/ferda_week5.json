@@ -1,0 +1,3457 @@
+{
+  "meta": {
+    "title": "The Fantasy League Weekly Report™",
+    "league_name": "Fancy Football Ferda",
+    "season": 2025,
+    "current_week": 5,
+    "generated_at": "2026-09-06T01:50:06.261197+00:00",
+    "intro": "Season-to-date fantasy analytics. Unavailable measurements are shown as —."
+  },
+  "teams": [
+    {
+      "team_id": "1",
+      "team_name": "Dirty Mike & Da Boys",
+      "manager": "Dirty Mike & Da Boys"
+    },
+    {
+      "team_id": "10",
+      "team_name": "The Big Dogs",
+      "manager": "The Big Dogs"
+    },
+    {
+      "team_id": "11",
+      "team_name": "Kyren’s Team",
+      "manager": "Kyren’s Team"
+    },
+    {
+      "team_id": "12",
+      "team_name": "Black Swans",
+      "manager": "Black Swans"
+    },
+    {
+      "team_id": "2",
+      "team_name": "Jimmy G. Buttcheeks",
+      "manager": "Jimmy G. Buttcheeks"
+    },
+    {
+      "team_id": "3",
+      "team_name": "Cumback SZN",
+      "manager": "Cumback SZN"
+    },
+    {
+      "team_id": "4",
+      "team_name": "Draft-Truther.com",
+      "manager": "Draft-Truther.com"
+    },
+    {
+      "team_id": "5",
+      "team_name": "Backdoor Barry",
+      "manager": "Backdoor Barry"
+    },
+    {
+      "team_id": "6",
+      "team_name": "St Nick Foles",
+      "manager": "St Nick Foles"
+    },
+    {
+      "team_id": "7",
+      "team_name": "TEAM BIG DEEV",
+      "manager": "TEAM BIG DEEV"
+    },
+    {
+      "team_id": "8",
+      "team_name": "Jugs",
+      "manager": "Jugs"
+    },
+    {
+      "team_id": "9",
+      "team_name": "Stan Halen",
+      "manager": "Stan Halen"
+    }
+  ],
+  "boned_index": {
+    "description": "Percent above or below opponents’ scoring average against everyone else. Lower ranks indicate easier scoring luck.",
+    "weeks": [
+      2,
+      3,
+      4,
+      5
+    ],
+    "rows": [
+      {
+        "team_id": "1",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "10",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "11",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "12",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "2",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "3",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "4",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "5",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "6",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "7",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "8",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "9",
+        "values": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "ranks": {
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "difference": null,
+        "rank_delta": null
+      }
+    ]
+  },
+  "boned_detail": {
+    "description": "Opponent scores compared with their games against other managers through the report week.",
+    "managers": [
+      {
+        "team_id": "1",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "The Big Dogs",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "Stan Halen",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "Cumback SZN",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "Jugs",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "Kyren’s Team",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "10",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Dirty Mike & Da Boys",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "Kyren’s Team",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "Stan Halen",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "Cumback SZN",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "Jugs",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "11",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Cumback SZN",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "The Big Dogs",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "Jugs",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "Stan Halen",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "Dirty Mike & Da Boys",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "12",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Jimmy G. Buttcheeks",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "TEAM BIG DEEV",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "St Nick Foles",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "Draft-Truther.com",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "Backdoor Barry",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "2",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Black Swans",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "Backdoor Barry",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "TEAM BIG DEEV",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "St Nick Foles",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "Draft-Truther.com",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "3",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Kyren’s Team",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "Jugs",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "Dirty Mike & Da Boys",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "The Big Dogs",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "Stan Halen",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "4",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "TEAM BIG DEEV",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "St Nick Foles",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "Backdoor Barry",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "Black Swans",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "Jimmy G. Buttcheeks",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "5",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "St Nick Foles",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "Jimmy G. Buttcheeks",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "Draft-Truther.com",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "TEAM BIG DEEV",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "Black Swans",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "6",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Backdoor Barry",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "Draft-Truther.com",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "Black Swans",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "Jimmy G. Buttcheeks",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "TEAM BIG DEEV",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "7",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Draft-Truther.com",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "Black Swans",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "Jimmy G. Buttcheeks",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "Backdoor Barry",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "St Nick Foles",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "8",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Stan Halen",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "Cumback SZN",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "Kyren’s Team",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "Dirty Mike & Da Boys",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "The Big Dogs",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      },
+      {
+        "team_id": "9",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Jugs",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 2,
+            "opponent": "Dirty Mike & Da Boys",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 3,
+            "opponent": "The Big Dogs",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 4,
+            "opponent": "Kyren’s Team",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          },
+          {
+            "week": 5,
+            "opponent": "Cumback SZN",
+            "opponent_score": null,
+            "opponent_games": 4,
+            "opponent_avg": null,
+            "ratio": null
+          }
+        ],
+        "averages": {
+          "opponent_score": null,
+          "opponent_avg": null,
+          "ratio": null
+        }
+      }
+    ]
+  },
+  "freaky_friday": {
+    "description": "Wins with each other manager’s schedule. Self-opponents are replaced by the schedule owner; ties count as half a win.",
+    "schedule_swap": {
+      "matrix": {
+        "1": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "10": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "11": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "12": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "2": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "3": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "4": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "5": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "6": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "7": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "8": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "9": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        }
+      },
+      "summary": [
+        {
+          "team_id": "1",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "10",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "11",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "12",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "2",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "3",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "4",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "5",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "6",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "7",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "8",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        },
+        {
+          "team_id": "9",
+          "total": null,
+          "max": null,
+          "avg": null,
+          "min": null,
+          "rank": null
+        }
+      ]
+    },
+    "head_to_head": {
+      "matrix": {
+        "1": {
+          "1": 0.0,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "10": {
+          "1": null,
+          "10": 0.0,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "11": {
+          "1": null,
+          "10": null,
+          "11": 0.0,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "12": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": 0.0,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "2": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": 0.0,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "3": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": 0.0,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "4": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": 0.0,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "5": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": 0.0,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "6": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": 0.0,
+          "7": null,
+          "8": null,
+          "9": null
+        },
+        "7": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": 0.0,
+          "8": null,
+          "9": null
+        },
+        "8": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": 0.0,
+          "9": null
+        },
+        "9": {
+          "1": null,
+          "10": null,
+          "11": null,
+          "12": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null,
+          "6": null,
+          "7": null,
+          "8": null,
+          "9": 0.0
+        }
+      }
+    }
+  },
+  "bhole": {
+    "description": "Wins after adding the indicated points each week; average width is the mean absolute matchup margin.",
+    "deltas": [
+      -10,
+      -5,
+      -2.5,
+      0,
+      2.5,
+      5,
+      10
+    ],
+    "rows": [
+      {
+        "team_id": "1",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "10",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "11",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "12",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "2",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "3",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "4",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "5",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "6",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "7",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "8",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      },
+      {
+        "team_id": "9",
+        "wins": {
+          "-10": null,
+          "-5": null,
+          "-2.5": null,
+          "0": null,
+          "2.5": null,
+          "5": null,
+          "10": null
+        },
+        "range": null,
+        "avg_width": null
+      }
+    ]
+  },
+  "studs_duds": {
+    "description": "Starters only. Stud: more than twice projection and at least 20 points. Dud: at most 25% of projection with a projection of at least 10.",
+    "rows": [
+      {
+        "team_id": "1",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "10",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "11",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "12",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "2",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "3",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "4",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "5",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "6",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "7",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "8",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      },
+      {
+        "team_id": "9",
+        "studs": null,
+        "duds": null,
+        "studded_on": null,
+        "dudded_on": null,
+        "s2d_diff": null
+      }
+    ]
+  },
+  "grower_shower": {
+    "description": "Actual wins divided by a weighted expected-win blend. Weekly probability uses observed margin and combined historical score standard deviations (normal approximation).",
+    "rows": [
+      {
+        "team_id": "1",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "10",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "11",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "12",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "2",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "3",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "4",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "5",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "6",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "7",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "8",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      },
+      {
+        "team_id": "9",
+        "weekly_probability": {
+          "1": null,
+          "2": null,
+          "3": null,
+          "4": null,
+          "5": null
+        },
+        "expected_wins": null,
+        "actual_vs_opp_avg": null,
+        "avg_vs_opp_actual": null,
+        "avg_vs_opp_avg": null,
+        "actual_wins": null,
+        "ratio": null,
+        "rank": null
+      }
+    ],
+    "weights": {
+      "expected_wins": 0.8,
+      "actual_vs_opp_avg": 0.075,
+      "avg_vs_opp_actual": 0.075,
+      "avg_vs_opp_avg": 0.05
+    },
+    "weeks": [
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "managerial_expertise": {
+    "description": "Exact legal optimal lineups and projection-optimal decisions; IR/NA players excluded from optimization. VOBM/WOBM compare with the optimal free-agent lineup. Missing eligible-player scores make optimization unavailable.",
+    "rows": [
+      {
+        "team_id": "1",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 1,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 4,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.2,
+        "plums": null,
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "10",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 5,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "11",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 5,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "12",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 5,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "2",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 5,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "3",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 5,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "4",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 5,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "5",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 1,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 4,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.2,
+        "plums": null,
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "6",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 1,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 4,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.2,
+        "plums": null,
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "7",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 5,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "8",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 5,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      },
+      {
+        "team_id": "9",
+        "actual_points": null,
+        "optimal_points": null,
+        "efficiency": null,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 5,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": null,
+        "losses_added": null,
+        "net_added": null,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": null,
+        "vobm": null,
+        "wobl": null,
+        "wobm": null,
+        "all_studs": null,
+        "studs_benched": null,
+        "all_duds": null,
+        "duds_started": null
+      }
+    ]
+  },
+  "vobl": {
+    "description": "Value above the last player needed to fill each slot league-wide: Nth QB1, 2Nth RB2, etc. Flex uses the remaining eligible pool. Repeated actual slots are ordered by points.",
+    "positions": [
+      "DEF1",
+      "K1",
+      "QB1",
+      "RB1",
+      "RB2",
+      "TE1",
+      "W/R/T1",
+      "WR1",
+      "WR2"
+    ],
+    "rows": [
+      {
+        "team_id": "1",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "10",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "11",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "12",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "2",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "3",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "4",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "5",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "6",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "7",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "8",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      },
+      {
+        "team_id": "9",
+        "total": null,
+        "values": {
+          "DEF1": null,
+          "K1": null,
+          "QB1": null,
+          "RB1": null,
+          "RB2": null,
+          "TE1": null,
+          "W/R/T1": null,
+          "WR1": null,
+          "WR2": null
+        }
+      }
+    ]
+  },
+  "playoff_odds": {
+    "description": "Playoff qualifiers/bye counts are not archived. Supply playoff_teams and playoff_byes for a single-table league.",
+    "rows": [
+      {
+        "team_id": "1",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "10",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "11",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "12",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "2",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "3",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "4",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "5",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "6",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "7",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "8",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      },
+      {
+        "team_id": "9",
+        "make_playoffs": null,
+        "division": null,
+        "wildcard": null,
+        "bye": null,
+        "last_place": null
+      }
+    ],
+    "simulation_count": 0,
+    "unavailable_reason": "Playoff qualifiers/bye counts are not archived. Supply playoff_teams and playoff_byes for a single-table league."
+  },
+  "draft_analysis": {
+    "description": "Points credited to the current manager’s own draft rounds. Players drafted by someone else count as FA (post-draft acquisitions).",
+    "buckets": [
+      "1-5",
+      "6-10",
+      "11-16",
+      "FA"
+    ],
+    "historical": [
+      {
+        "team_id": "1",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "10",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "11",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "12",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "2",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "3",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "4",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "5",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "6",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "7",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "8",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "9",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      }
+    ],
+    "optimal": [
+      {
+        "team_id": "1",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "10",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "11",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "12",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "2",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "3",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "4",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "5",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "6",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "7",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "8",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      },
+      {
+        "team_id": "9",
+        "values": {
+          "1-5": null,
+          "6-10": null,
+          "11-16": null,
+          "FA": null
+        }
+      }
+    ]
+  },
+  "data_quality": {
+    "weekly_reconciliation": [
+      {
+        "team_id": "1",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "1",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "1",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "1",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "1",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "10",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "10",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "10",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "10",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "10",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "11",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "11",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "11",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "11",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "11",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "12",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "12",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "12",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "12",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "12",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "2",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "2",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "2",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "2",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "2",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "3",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "3",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "3",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "3",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "3",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "4",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "4",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "4",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "4",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "4",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "5",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "5",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "5",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "5",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "5",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "6",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "6",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "6",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "6",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "6",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "7",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "7",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "7",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "7",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "7",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "8",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "8",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "8",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "8",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "8",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "9",
+        "week": 1,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "9",
+        "week": 2,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "9",
+        "week": 3,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "9",
+        "week": 4,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      },
+      {
+        "team_id": "9",
+        "week": 5,
+        "calculated_points": null,
+        "starter_count": 9,
+        "missing_points": 9,
+        "roster_starter_count": 9,
+        "official_points": null,
+        "difference": null,
+        "status": "missing_player_points_or_roster"
+      }
+    ],
+    "season_reconciliation": [
+      {
+        "team_id": "1",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "10",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "11",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "12",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "2",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "3",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "4",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "5",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "6",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "7",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "8",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      },
+      {
+        "team_id": "9",
+        "calculated_points": null,
+        "official_points": null,
+        "matched_weeks": 0,
+        "issue_weeks": 5,
+        "difference": null,
+        "status": "incomplete_or_mismatch"
+      }
+    ],
+    "sources": {
+      "team_data": [
+        "yahoo-fantasy-data/data/Ferda/2025/team_data/team_data_week_1.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/team_data/team_data_week_2.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/team_data/team_data_week_3.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/team_data/team_data_week_4.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/team_data/team_data_week_5.csv.gz"
+      ],
+      "schedule": [
+        "yahoo-fantasy-data/data/Ferda/2025/schedule/schedule_week_5.csv.gz"
+      ],
+      "player": [
+        "yahoo-fantasy-data/data/Ferda/2025/player_data/player_data_week_1.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/player_data/player_data_week_2.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/player_data/player_data_week_3.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/player_data/player_data_week_4.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/player_data/player_data_week_5.csv.gz"
+      ],
+      "projection": [
+        "yahoo-fantasy-data/data/Ferda/2025/projection_data/projection_data_week_1.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/projection_data/projection_data_week_2.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/projection_data/projection_data_week_3.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/projection_data/projection_data_week_4.csv.gz",
+        "yahoo-fantasy-data/data/Ferda/2025/projection_data/projection_data_week_5.csv.gz"
+      ],
+      "draft": [
+        "yahoo-fantasy-data/data/Ferda/2025/draft/draft_week_5.csv.gz"
+      ],
+      "settings": [
+        "yahoo-fantasy-data/data/Ferda/2025/league_settings/league_settings_week_5.csv.gz"
+      ]
+    }
+  }
+}

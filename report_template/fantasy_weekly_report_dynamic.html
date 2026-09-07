@@ -41,7 +41,7 @@ tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.m
 .grid{display:grid;gap:18px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
 .card{border:1px solid var(--rule);background:#fff}.card-head{padding:10px 12px;border-bottom:1px solid var(--rule);background:#f8fafb;display:flex;justify-content:space-between;gap:12px;align-items:baseline}.card-title{font-family:Georgia,"Times New Roman",serif;font-weight:700}.card-sub{font-size:10px;color:var(--muted)}
 .matrix-wrap{width:100%;overflow:auto;border:1px solid var(--rule)}.matrix{min-width:max-content}.matrix th,.matrix td{min-width:48px;text-align:center;padding:6px 7px}.matrix th:first-child,.matrix td:first-child{min-width:125px;text-align:left}.matrix td.diag{background:var(--soft-gold);font-weight:850}.matrix td.zero{color:#a1a9b0}
-.manager-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}.manager-card{border:1px solid var(--rule)}.manager-card h4{font-family:Georgia,"Times New Roman",serif;font-size:16px;margin:0;padding:9px 11px;background:#f7f9fa;border-bottom:1px solid var(--rule)}.manager-card table{font-size:10px}.manager-card th{font-size:8px;padding:6px}.manager-card td{padding:5px 6px}
+.manager-selector{display:flex;align-items:center;gap:12px;margin-bottom:14px;font-size:13px;font-weight:700}.manager-selector select{font:inherit;color:var(--ink);background:#fff;border:1px solid var(--rule-dark);padding:8px 12px;max-width:100%}.grid-stack{grid-template-columns:minmax(0,1fr)}.grid-stack>*{min-width:0}.manager-card{border:1px solid var(--rule)}.manager-card h4{font-family:Georgia,"Times New Roman",serif;font-size:16px;margin:0;padding:9px 11px;background:#f7f9fa;border-bottom:1px solid var(--rule)}
 .metric-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:16px}.metric{border:1px solid var(--rule);padding:10px 11px}.metric b{display:block;font-size:18px;color:var(--navy)}.metric span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:750}
 .odds{border:1px solid var(--rule)}.odds-row{display:grid;grid-template-columns:130px 1fr 62px 80px;gap:10px;align-items:center;padding:7px 10px;border-bottom:1px solid #e6eaee;font-size:11px}.odds-row:last-child{border-bottom:0}.odds-track{height:8px;background:#e6ebef;position:relative}.odds-track>span{display:block;height:100%;background:var(--navy-2)}.odds-pct{font-weight:800;text-align:right}.odds-last{text-align:right;color:var(--muted)}
 .chartbox{border:1px solid var(--rule);padding:14px 14px 10px}.chart-title{font-family:Georgia,"Times New Roman",serif;font-weight:700;margin-bottom:12px}.stack-chart{height:260px;display:flex;align-items:flex-end;gap:10px;border-bottom:1px solid var(--rule-dark);padding:0 8px}.barcol{height:100%;flex:1;min-width:42px;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch}.stack{height:var(--h);display:flex;flex-direction:column-reverse}.seg{display:block}.s1{background:#355f80}.s2{background:#759066}.s3{background:#a9aa9d}.s4{background:#b67e58}.barlabel{font-size:9px;text-align:center;padding-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.legend{display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:10px;color:var(--muted)}.legend i{display:inline-block;width:9px;height:9px;margin-right:4px;vertical-align:-1px}
@@ -264,12 +264,14 @@ tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.m
 
   function renderBonedDetail(){
     const s=data.boned_detail;if(!s)return '';
-    const cards=(s.managers||[]).map(m=>{
+    const managers=s.managers||[];
+    const options=managers.map((m,i)=>`<option value="${i}">${esc(manager(m.team_id))}</option>`).join('');
+    const cards=managers.map((m,i)=>{
       const rows=(m.rows||[]).map(r=>`<tr><td>${r.week}</td><td>${esc(r.opponent)}</td><td>${n(r.opponent_score)}</td><td>${r.opponent_games ?? '—'}</td><td>${n(r.opponent_avg)}</td><td class="${ratioClass(r.ratio)}">${n(r.ratio)}</td></tr>`).join('');
       const a=m.averages||{};
-      return `<div class="manager-card"><h4>${esc(manager(m.team_id))}</h4><div class="table-wrap"><table><thead><tr><th>Week</th><th>Opponent</th><th>Opp. score</th><th>Games</th><th>Opp. avg</th><th>Ratio</th></tr></thead><tbody>${rows}<tr><td colspan="2" class="manager">Average</td><td>${n(a.opponent_score)}</td><td>—</td><td>${n(a.opponent_avg)}</td><td class="${ratioClass(a.ratio)}">${n(a.ratio)}</td></tr></tbody></table></div></div>`;
+      return `<div class="manager-card" data-manager-index="${i}"${i ? ' hidden' : ''}><h4>${esc(manager(m.team_id))}</h4><div class="table-wrap"><table><thead><tr><th>Week</th><th>Opponent</th><th>Opp. score</th><th>Games</th><th>Opp. avg</th><th>Ratio</th></tr></thead><tbody>${rows}<tr><td colspan="2" class="manager">Average</td><td>${n(a.opponent_score)}</td><td>—</td><td>${n(a.opponent_avg)}</td><td class="${ratioClass(a.ratio)}">${n(a.ratio)}</td></tr></tbody></table></div></div>`;
     }).join('');
-    return sectionShell('boned-detail','02','Luck / schedule','Boned Index by Manager by Week',s.description,`<div class="manager-grid">${cards || '<div class="empty">No manager detail supplied.</div>'}</div>`);
+    return sectionShell('boned-detail','02','Luck / schedule','Boned Index by Manager by Week',s.description,` ${managers.length ? `<div class="manager-selector"><label for="boned-manager">Manager</label><select id="boned-manager" aria-controls="boned-manager-detail">${options}</select></div>` : ''}<div id="boned-manager-detail">${cards || '<div class="empty">No manager detail supplied.</div>'}</div>`);
   }
 
   function matrixTable(matrix, diagonal=true){
@@ -280,7 +282,7 @@ tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.m
   function renderFreaky(){
     const s=data.freaky_friday;if(!s)return '';
     const summary=(s.schedule_swap?.summary||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td><td>${r.total ?? '—'}</td><td>${r.rank ?? '—'}</td><td>${r.max ?? '—'}</td><td>${n(r.avg)}</td><td>${r.min ?? '—'}</td></tr>`).join('');
-    const body=`<div class="grid grid-2"><div class="card"><div class="card-head"><span class="card-title">Played This Manager's Schedule</span><span class="card-sub">wins by schedule swap</span></div>${matrixTable(s.schedule_swap?.matrix)}</div><div class="card"><div class="card-head"><span class="card-title">Schedule Swap Summary</span><span class="card-sub">total / rank / range</span></div><div class="table-wrap"><table><thead><tr><th>Manager</th><th>Total</th><th>Rank</th><th>Max</th><th>Avg</th><th>Min</th></tr></thead><tbody>${summary}</tbody></table></div></div></div><div style="height:18px"></div><div class="card"><div class="card-head"><span class="card-title">Head to Head Wins</span><span class="card-sub">wins if this manager played that manager</span></div>${matrixTable(s.head_to_head?.matrix)}</div>`;
+    const body=`<div class="grid grid-stack"><div class="card"><div class="card-head"><span class="card-title">Played This Manager's Schedule</span><span class="card-sub">wins by schedule swap</span></div>${matrixTable(s.schedule_swap?.matrix)}</div><div class="card"><div class="card-head"><span class="card-title">Schedule Swap Summary</span><span class="card-sub">total / rank / range</span></div><div class="table-wrap"><table><thead><tr><th>Manager</th><th>Total</th><th>Rank</th><th>Max</th><th>Avg</th><th>Min</th></tr></thead><tbody>${summary}</tbody></table></div></div><div class="card"><div class="card-head"><span class="card-title">Head to Head Wins</span><span class="card-sub">wins if this manager played that manager</span></div>${matrixTable(s.head_to_head?.matrix)}</div></div>`;
     return sectionShell('freaky','03','Schedule strength','Freaky Friday',s.description,body);
   }
 
@@ -344,11 +346,16 @@ tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.m
   function renderDraft(){
     const s=data.draft_analysis;if(!s)return '';
     const buckets=s.buckets||[];
-    return sectionShell('draft','10','Draft capital',"It's Not The Size of Your Draft, It's How You Use It",s.description,`<div class="grid grid-2">${stackedChart(s.historical,buckets,'Historical Points From Rounds')}${stackedChart(s.optimal,buckets,'Optimal Points From Rounds')}</div>`);
+    return sectionShell('draft','10','Draft capital',"It's Not The Size of Your Draft, It's How You Use It",s.description,`<div class="grid grid-stack">${stackedChart(s.historical,buckets,'Historical Points From Rounds')}${stackedChart(s.optimal,buckets,'Optimal Points From Rounds')}</div>`);
   }
 
   const html=[renderBoned(),renderBonedDetail(),renderFreaky(),renderBhole(),renderStuds(),renderGrower(),renderExpertise(),renderVobl(),renderPlayoffs(),renderDraft()].filter(Boolean).join('');
   document.getElementById('sections').innerHTML=html;
+  document.getElementById('boned-manager')?.addEventListener('change',event=>{
+    document.querySelectorAll('#boned-manager-detail .manager-card').forEach(card=>{
+      card.hidden=card.dataset.managerIndex!==event.target.value;
+    });
+  });
 })();
 </script>
 </body>
