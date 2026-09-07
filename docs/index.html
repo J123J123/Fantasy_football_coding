@@ -1,0 +1,61 @@
+---
+layout: null
+title: Fantasy Football Reports
+---
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Fantasy Football Reports</title>
+  <style>
+    :root { color-scheme: light; font-family: system-ui, sans-serif; color: #223344; background: #f4f5f7; }
+    body { margin: 0; }
+    main { max-width: 850px; margin: 64px auto; padding: 0 24px; }
+    h1 { margin-bottom: 8px; font-size: clamp(1.8rem, 5vw, 2.6rem); }
+    p { color: #526170; }
+    label { display: block; margin: 28px 0 8px; font-weight: 600; }
+    input { box-sizing: border-box; width: 100%; padding: 12px; border: 1px solid #b5bfca; border-radius: 8px; font: inherit; }
+    ul { list-style: none; padding: 0; margin: 20px 0; background: white; border: 1px solid #dce1e7; border-radius: 10px; overflow: hidden; }
+    li + li { border-top: 1px solid #e6eaf0; }
+    a { display: block; padding: 18px; color: #235d85; text-decoration: none; overflow-wrap: anywhere; }
+    a:hover { background: #edf5fa; text-decoration: underline; }
+    a:focus-visible, input:focus-visible { outline: 3px solid #235d85; outline-offset: -3px; }
+    #file-count, #no-results { font-size: .9rem; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Fantasy Football Reports</h1>
+    <p>Browse the reports and files in this collection.</p>
+    <label for="file-search">Find a file</label>
+    <input id="file-search" type="search" placeholder="Search league, season, or week…" aria-controls="file-list">
+    <p id="file-count" role="status"></p>
+    <ul id="file-list">
+      {% assign files = site.static_files | sort_natural: 'path' %}
+      {% for file in files %}
+      <li><a href="{{ file.path | relative_url | escape }}">{{ file.path | remove_first: '/' | escape }}</a></li>
+      {% endfor %}
+    </ul>
+    <p id="no-results" hidden>No files match your search.</p>
+  </main>
+  <script>
+    const search = document.getElementById('file-search');
+    const rows = Array.from(document.querySelectorAll('#file-list li'));
+    function filterFiles() {
+      const query = search.value.trim().toLocaleLowerCase();
+      let visible = 0;
+      rows.forEach(row => {
+        row.hidden = !row.textContent.toLocaleLowerCase().includes(query);
+        if (!row.hidden) visible++;
+      });
+      document.getElementById('file-count').textContent = `${visible} of ${rows.length} files`;
+      document.getElementById('no-results').hidden = visible !== 0;
+      document.getElementById('file-list').hidden = visible === 0;
+    }
+    search.addEventListener('input', filterFiles);
+    filterFiles();
+  </script>
+</body>
+</html>
