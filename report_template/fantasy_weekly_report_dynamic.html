@@ -33,7 +33,11 @@ h1{font-size:42px;line-height:1.04;letter-spacing:-.025em;margin-top:4px}
 .table-wrap{width:100%;overflow:auto;border:1px solid var(--rule)}
 table{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
 th{background:#f6f8fa;color:#33404c;text-transform:uppercase;letter-spacing:.055em;font-size:9px;font-weight:850;padding:8px 9px;border-bottom:1px solid var(--rule-dark);white-space:nowrap;text-align:right}
-th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:inherit;z-index:1}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;z-index:2;box-shadow:2px 0 0 var(--rule)}
+th:first-child{background:#f6f8fa;z-index:3}
+tbody td:first-child{background:#fff}
+tbody tr:nth-child(even) td:first-child{background:#fbfcfd}
+tbody tr:hover td:first-child{background:#f3f7fa}
 td{padding:7px 9px;border-bottom:1px solid #e5e9ed;text-align:right;white-space:nowrap}
 tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.manager{font-weight:780;color:#1d2b37}.muted{color:var(--muted)}
 .pos{background:var(--soft-green)!important;color:#215a43;font-weight:760}.neg{background:var(--soft-red)!important;color:#8b3434;font-weight:760}.neutral{background:var(--soft-gray)!important}
@@ -323,6 +327,7 @@ tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.m
   }
 
   const oddsMetrics = {make_playoffs:'Playoffs', division:'Division', wildcard:'Wildcard', bye:'Bye', last_place:'Last'};
+  let selectedOddsManager = null;
   function playoffHistoryChart(metric){
     const history=data.playoff_odds?.history||[];
     if(!history.length)return '<div class="empty">No weekly odds history available.</div>';
@@ -335,6 +340,8 @@ tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.m
     let hasPoints=false;
     const lines=ids.map((id,i)=>{
       const color=colors[i%colors.length];
+      const selected=selectedOddsManager===id;
+      let labels='';
       let path='',connected=false,points='';
       history.forEach(h=>{
         const value=(h.rows||[]).find(r=>String(r.team_id)===id)?.[metric];
@@ -342,15 +349,18 @@ tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.m
         hasPoints=true;
         const px=x(Number(h.week)),py=y(Number(value));
         path+=`${connected?'L':'M'}${px},${py} `;connected=true;
-        points+=`<circle cx="${px}" cy="${py}" r="3" fill="${color}"><title>${esc(manager(id))} · Week ${Number(h.week)} · ${oddsMetrics[metric]}: ${pct(value)}</title></circle>`;
+        const tip=`${manager(id)} · Week ${Number(h.week)} · ${oddsMetrics[metric]}: ${pct(value)}`;
+        points+=`<circle cx="${px}" cy="${py}" r="5" fill="${color}" data-odds-tip="${esc(tip)}"><title>${esc(tip)}</title></circle>`;
+        if(selected)labels+=`<text x="${px}" y="${py-10}" text-anchor="middle" fill="${color}" style="paint-order:stroke;stroke:white;stroke-width:4px;pointer-events:none;font-weight:700">${pct(value)}</text>`;
       });
-      return `<path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>${points}`;
+      return `<g data-odds-manager="${esc(id)}" style="cursor:pointer;opacity:${selectedOddsManager===null||selected?1:.18}"><path d="${path}" fill="none" stroke="transparent" stroke-width="18" pointer-events="stroke"/><path d="${path}" fill="none" stroke="${color}" stroke-width="${selected?3:2}" pointer-events="none"/>${points}${labels}</g>`;
     }).join('');
     const grid=[0,.25,.5,.75,1].map(v=>`<line x1="60" x2="860" y1="${y(v)}" y2="${y(v)}" stroke="#d5d1c7"/><text x="50" y="${y(v)+4}" text-anchor="end">${v*100}%</text>`).join('');
     const ticks=weeks.map(w=>`<text x="${x(w)}" y="312" text-anchor="middle">${w}</text>`).join('');
-    const legend=ids.map((id,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(manager(id))}</span>`).join('');
+    const legend=ids.map((id,i)=>`<button type="button" data-odds-manager="${esc(id)}" aria-pressed="${selectedOddsManager===id}" style="font:inherit;padding:6px;border:1px solid ${selectedOddsManager===id?colors[i%colors.length]:'transparent'};background:white;cursor:pointer"><i style="background:${colors[i%colors.length]}"></i>${esc(manager(id))}</button>`).join('');
+    const detail=selectedOddsManager===null?'':`<h4>${esc(manager(selectedOddsManager))} — weekly percentages</h4><button type="button" data-odds-clear>Show all managers</button><div class="table-wrap"><table><thead><tr><th>Week</th>${Object.values(oddsMetrics).map(label=>`<th>${label}</th>`).join('')}</tr></thead><tbody>${history.map(h=>{const row=(h.rows||[]).find(r=>String(r.team_id)===selectedOddsManager);return `<tr><td>${Number(h.week)}</td>${Object.keys(oddsMetrics).map(key=>`<td>${pct(row?.[key])}</td>`).join('')}</tr>`;}).join('')}</tbody></table></div>`;
     const missing=history.filter(h=>h.unavailable_reason).map(h=>`Week ${Number(h.week)}: ${esc(h.unavailable_reason)}`).join('<br>');
-    return `${hasPoints?`<div style="overflow-x:auto"><svg viewBox="0 0 900 345" role="img" aria-label="${oddsMetrics[metric]} odds by week for each manager" style="width:100%;min-width:540px;font-size:12px"><title>${oddsMetrics[metric]} odds by week</title>${grid}${ticks}${lines}<text x="460" y="337" text-anchor="middle">Week</text></svg></div><div class="legend" style="flex-wrap:wrap">${legend}</div>`:'<div class="empty">No weekly odds available for this selection.</div>'}<div class="tiny-note">Each point uses data available through that week. Missing odds appear as gaps. Hover over a point for details.${missing?`<br>${missing}`:''}</div>`;
+    return `<div id="odds-tooltip" role="status" style="min-height:2.5em;font-size:12px;padding:8px 0">Hover over a line or point for percentages.</div>${hasPoints?`<div style="overflow-x:auto"><svg viewBox="0 0 900 345" role="group" aria-label="${oddsMetrics[metric]} odds by week for each manager" style="width:100%;min-width:540px;font-size:12px"><title>${oddsMetrics[metric]} odds by week</title>${grid}${ticks}${lines}<text x="460" y="337" text-anchor="middle">Week</text></svg></div><div class="legend" style="flex-wrap:wrap">${legend}</div>`:'<div class="empty">No weekly odds available for this selection.</div>'}${detail}<div class="tiny-note">Each point uses data available through that week. Missing odds appear as gaps. Hover for percentages. Click or tap a line or manager name to show all their weekly percentages; select again to clear.${missing?`<br>${missing}`:''}</div>`;
   }
 
   function renderPlayoffs(){
@@ -384,6 +394,24 @@ tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.m
   document.getElementById('sections').innerHTML=html;
   document.getElementById('playoff-metric')?.addEventListener('change',event=>{
     document.getElementById('playoff-history').innerHTML=playoffHistoryChart(event.target.value);
+  });
+  const oddsChart=document.getElementById('playoff-history');
+  oddsChart?.addEventListener('click',event=>{
+    const target=event.target.closest('[data-odds-manager]');
+    if(!target&&!event.target.closest('[data-odds-clear]'))return;
+    selectedOddsManager=target&&target.dataset.oddsManager!==selectedOddsManager?target.dataset.oddsManager:null;
+    oddsChart.innerHTML=playoffHistoryChart(document.getElementById('playoff-metric').value);
+  });
+  oddsChart?.addEventListener('pointermove',event=>{
+    const group=event.target.closest('g[data-odds-manager]');
+    if(!group)return;
+    const points=Array.from(group.querySelectorAll('circle[data-odds-tip]'));
+    const nearest=points.reduce((best,point)=>{
+      const rect=point.getBoundingClientRect();
+      const distance=Math.abs(event.clientX-(rect.left+rect.width/2));
+      return !best||distance<best.distance?{point,distance}:best;
+    },null);
+    if(nearest)document.getElementById('odds-tooltip').textContent=nearest.point.dataset.oddsTip;
   });
   document.getElementById('boned-manager')?.addEventListener('change',event=>{
     document.querySelectorAll('#boned-manager-detail .manager-card').forEach(card=>{
