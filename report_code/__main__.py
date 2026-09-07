@@ -12,8 +12,8 @@ def main():
     p.add_argument('--json',dest='json_path')
     p.add_argument('--html')
     p.add_argument('--silver-dir', help='Export silver player and schedule tables as CSV.gz')
-    p.add_argument('--template', choices=('original', 'pc'), default='original',
-                   help='HTML wording: original (default) or work-appropriate pc')
+    p.add_argument('--template', choices=('original', 'pc', 'both'), default='original',
+                   help='HTML wording: original (default), work-appropriate pc, or both')
     p.add_argument('--official-scores')
     p.add_argument('--strict',action='store_true',help='Require official score reconciliation before export')
     p.add_argument('--playoff-teams',type=int)
@@ -25,7 +25,13 @@ def main():
                            divisions=json.loads(Path(args.divisions).read_text()) if args.divisions else None)
     if args.strict: report.validate_reconciliation()
     if args.json_path: report.to_json(args.json_path)
-    if args.html: report.write_html(args.html, template=args.template)
+    if args.html:
+        from .publish import report_templates
+        for template in report_templates(args.template):
+            output = Path(args.html)
+            if args.template == 'both' and template == 'pc':
+                output = output.with_name(output.stem + '_pc' + output.suffix)
+            report.write_html(output, template=template)
     if args.silver_dir:
         from .publish import export_silver
         export_silver(report, args.silver_dir)

@@ -1,11 +1,16 @@
 """Build the report/download site from local archives, optionally backfilling first."""
 import argparse
-import html
 import json
 from pathlib import Path
-from urllib.parse import quote
 
 from . import ReportProcessor
+
+
+def report_templates(template):
+    """Expand a run's wording choice into individual HTML templates."""
+    if template not in ('original', 'pc', 'both'):
+        raise ValueError('template must be original, pc, or both')
+    return ('original', 'pc') if template == 'both' else (template,)
 
 
 def export_silver(report, directory):
@@ -16,24 +21,6 @@ def export_silver(report, directory):
         with (directory / f'silver_{name}.csv.gz').open('wb') as stream:
             getattr(report, f'silver_{name}').to_csv(
                 stream, index=False, compression={'method': 'gzip', 'mtime': 0})
-
-
-def build_index(docs):
-    docs = Path(docs)
-    rows = []
-    for path in sorted(docs.rglob('*')):
-        if not path.is_file() or path.name.startswith('.') or path == docs / 'index.html':
-            continue
-        relative = path.relative_to(docs).as_posix()
-        href = quote(relative)
-        label = html.escape(relative)
-        report = path.suffix == '.html'
-        actions = f'<a href="{href}" {"" if report else "download"}>{"Open report" if report else "Download"}</a>'
-        if path.name.endswith('.csv.gz'):
-            actions += f' <a href="{href}" class="unzip" download="{html.escape(path.name[:-3])}">Download CSV (unzip)</a>'
-        rows.append(f'<li data-kind="{"report" if report else "data"}"><div><span class="tag">{"REPORT" if report else "DATA"}</span><h2>{label}</h2><small>{path.stat().st_size / 1024:,.1f} KB</small></div><nav aria-label="{label}">{actions}</nav></li>')
-    template = Path(__file__).parents[1] / 'report_template' / 'index.html'
-    (docs / 'index.html').write_text(template.read_text().replace('<!-- FILES -->', '\n'.join(rows)), encoding='utf-8')
 
 
 def load_runs(path):
@@ -61,8 +48,7 @@ def load_runs(path):
         for option in ('enabled', 'overwrite', 'strict'):
             if option in run and type(run[option]) is not bool:
                 raise ValueError(f'{option} must be a JSON boolean')
-        if run.get('template', 'original') not in ('original', 'pc'):
-            raise ValueError('template must be original or pc')
+        report_templates(run.get('template', 'original'))
         folder = storage_league_name(run['nickname'], str(run['league_id']))
         destination = (folder, run['year'])
         if run.get('enabled', True):
@@ -111,7 +97,7 @@ def main():
     parser.add_argument('--backfill', action='store_true')
     parser.add_argument('--overwrite', action='store_true', help='Refresh snapshots for all selected runs')
     parser.add_argument('--strict', action='store_true', help='Require official score reconciliation for all runs')
-    parser.add_argument('--template', choices=['original', 'pc'], help='Override configured report wording')
+    parser.add_argument('--template', choices=['original', 'pc', 'both'], help='Override configured report wording; both writes two HTML reports')
     args = parser.parse_args()
     if args.week is not None and not 1 <= args.week <= 18:
         parser.error('--week must be between 1 and 18')
@@ -152,12 +138,13 @@ def main():
         report = ReportProcessor(data_path, week)
         if args.strict or run.get('strict', False):
             report.validate_reconciliation()
-        report.write_html(args.docs_dir / f'{folder}_{year}_week{week}.html',
-                          template=args.template or run.get('template', 'original'))
-        export_silver(report, args.docs_dir / 'data' / folder / str(year) / f'week{week}')
+        templates = report_templates(args.template or run.get('template', 'original'))
+        for template in templates:
+            suffix = '_pc' if template == 'pc' else ''
+            report.write_html(args.docs_dir / f'{folder}_{year}{suffix}.html', template=template)
+        export_silver(report, args.docs_dir / 'data' / folder / str(year))
         print(f'Saved {name} report and silver tables', flush=True)
-    build_index(args.docs_dir)
-    print(f'Updated {args.docs_dir / "index.html"}', flush=True)
+    print(f'Reports and data saved in {args.docs_dir}', flush=True)
 
 
 if __name__ == '__main__':

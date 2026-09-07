@@ -2,7 +2,7 @@
   "end_week": "17",
   "game_id": "461",
   "last_collected_week": 17,
-  "last_updated": "2026-09-07T02:30:22.015753+00:00",
+  "last_updated": "2026-09-07T22:05:09.426264+00:00",
   "league_id": "707737",
   "league_key": "461.l.707737",
   "league_name": "PHFFL",
@@ -11,7 +11,7 @@
   "sources": {
     "divisions": "skipped_existing",
     "draft": "skipped_existing",
-    "league_settings": "written",
+    "league_settings": "skipped_existing",
     "player_data": "skipped_existing",
     "points_recon": "skipped_existing",
     "projection_data": "skipped_existing",

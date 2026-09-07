@@ -251,7 +251,7 @@ Export just the silver player and schedule tables without calculating a report:
 
 ```bash
 python -m report_code yahoo-fantasy-data/data/CFFL_A/2025 --week 17 \
-  --silver-dir docs/data/CFFL_A/2025/week17
+  --silver-dir docs/data/CFFL_A/2025
 ```
 
 This writes `silver_player.csv.gz` and `silver_schedule.csv.gz`, without DataFrame
@@ -259,6 +259,18 @@ indexes. The exports preserve the silver tables' columns and missing values.
 `--silver-dir` may also be combined with `--html` and `--json`.
 
 Use `python -m report_code.publish --config report_runs.json --backfill` to collect
-and publish the league/year/nickname entries in the JSON run list and rebuild the
-searchable index. Week is inferred when omitted; see the
+and publish the league/year/nickname entries in the JSON run list. The permanent
+`docs/index.html` fetches the file list from GitHub in JavaScript; publishing does
+not rewrite it. Week is inferred when omitted; see the
 [root README](../README.md) for workflow setup and additional options.
+
+Publishing keeps the latest output per league/season at `docs/NICKNAME_YEAR.html`
+and/or `docs/NICKNAME_YEAR_pc.html`, with gzip CSVs in
+`docs/data/NICKNAME/YEAR/`. Exports overwrite the same paths on each run.
+If you stop generating a report version, delete its HTML file manually.
+Source archives are retained.
+Set `"template": "original"`, `"pc"`, or `"both"` in `report_runs.json`;
+`python -m report_code.publish --template both` overrides all selected runs.
+The single-report CLI also accepts `--template both`: with `--html report.html`
+it writes `report.html` and `report_pc.html`. With `--template pc` alone, it uses
+the exact `--html` path you supplied.

@@ -43,27 +43,32 @@ Week is optional:
   `--week 10` to override all selected runs.
 
 Optional entry fields are `enabled` (default `true`), `overwrite` (default
-`false`), `strict` (default `false`), and `template` (`original` or `pc`, default
+`false`), `strict` (default `false`), and `template` (`original`, `pc`, or `both`, default
 `original`). For example:
 
 ```json
 [
-  {"league_id": "134317", "year": 2025, "nickname": "CFFL_A", "template": "pc", "strict": true},
+  {"league_id": "134317", "year": 2025, "nickname": "CFFL_A", "template": "both", "strict": true},
   {"league_id": "801641", "year": 2024, "nickname": "CFFL_A", "week": 10, "enabled": false}
 ]
 ```
 
-The pipeline backfills from week 1 through the resolved week, writes one HTML
-report per run to `docs/`, exports `silver_player.csv.gz` and
-`silver_schedule.csv.gz` to `docs/data/NICKNAME/YEAR/weekN/`, and rebuilds
-`docs/index.html`. Existing reports and downloads remain listed. Player exports
+The pipeline backfills from week 1 through the resolved week, writes the selected HTML
+report versions to `docs/NICKNAME_YEAR.html` and/or `docs/NICKNAME_YEAR_pc.html`, exports `silver_player.csv.gz` and
+`silver_schedule.csv.gz` to `docs/data/NICKNAME/YEAR/`.
+The permanent `docs/index.html` fetches the public GitHub file list in JavaScript;
+no index generation or file manifest is needed. Each run overwrites these stable paths with the latest output for that league/season.
+No folder cleanup is needed. If you stop generating a report version, delete its
+HTML file manually. Source archives are retained. Player exports
 include archived weeks through the report week; schedule exports may include
 future matchups from that snapshot.
 
 - Use `--leagues CFFL_A Ferda` to filter enabled runs by nickname across years.
 - Omit `--backfill` to build entirely from local archives.
 - Use `--overwrite` with `--backfill` to refresh existing snapshots for every run.
-- Use `--template pc` to override report wording for every run.
+- Use `--template pc` for only PC reports, or `--template both` for original and PC
+  HTML reports for every run. Omit the flag to honor each entry's `template`;
+  omitted entry templates default to `original`. Data is exported once either way.
 - Add `--strict` to require official score reconciliation for every run.
   Otherwise each entry controls strict checking; reports retain data-quality
   annotations and missing values by default.
@@ -101,8 +106,18 @@ Repository setup:
 
 The workflow deploys Pages explicitly because [pushes made using `GITHUB_TOKEN`
 do not trigger a branch-based Pages build](https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site).
-The index is plain HTML and also works
-with a local HTTP server (`python -m http.server --directory docs`). Its CSV link
+The index uses the [GitHub Trees API](https://docs.github.com/en/rest/git/trees)
+to list HTML and CSV/CSV.gz files under `docs` on `main` in
+`J123J123/Fantasy_football_coding`. Search and download links are built in the
+browser. Push new files and deploy Pages to make them available; use **Refresh
+files** to reload the listing. The public API needs no token; network errors or
+API limits show a retry message and a link to browse GitHub.
+
+The index also opens with a local HTTP server
+(`python -m http.server --directory docs`), but its listing still comes from
+GitHub, so unpushed files are not listed. Open local HTML reports directly to
+preview them. When forking the repository, update `repository` and `branch` in
+`docs/index.html` and the GitHub browse links. Its CSV link
 uses browser gzip decompression; the compressed file remains directly downloadable
 if the browser does not support decompression. Browser decompression requires HTTP
 hosting, rather than opening the page with a `file://` URL.

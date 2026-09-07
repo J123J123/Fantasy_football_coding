@@ -23,20 +23,6 @@ def test_silver_roundtrip_and_reproducibility(archive, tmp_path):
     assert path.read_bytes() == original
 
 
-def test_index_links_escape_and_discover_files(tmp_path):
-    (tmp_path / 'data').mkdir()
-    (tmp_path / 'data' / 'a & b.csv.gz').write_bytes(b'example')
-    (tmp_path / 'report.html').write_text('example')
-    publish.build_index(tmp_path)
-    result = (tmp_path / 'index.html').read_text()
-    assert 'data/a%20%26%20b.csv.gz' in result
-    assert 'a &amp; b.csv.gz' in result
-    assert 'download="a &amp; b.csv"' in result
-    assert 'href="report.html"' in result
-    assert 'href="index.html"' not in result
-    assert '<!-- FILES -->' not in result
-
-
 def test_multiple_leagues_publish(archive, tmp_path, monkeypatch):
     history = tmp_path / 'history.json'
     history.write_text(json.dumps([{'league_id': '1', 'year': 2025, 'nickname': 'One'}, {'league_id': '2', 'year': 2024, 'nickname': 'Two'}]))
@@ -46,7 +32,7 @@ def test_multiple_leagues_publish(archive, tmp_path, monkeypatch):
     monkeypatch.setattr(sys, 'argv', ['publish', '--week', '2',
                                    '--config', str(history), '--docs-dir', str(docs)])
     publish.main()
-    assert len(list(docs.glob('*.html'))) == 3
+    assert len(list(docs.glob('*.html'))) == 2
     assert len(list(docs.rglob('*.csv.gz'))) == 4
 
 
@@ -132,8 +118,8 @@ def test_default_config_local_build_without_week(archive, tmp_path, monkeypatch)
     monkeypatch.setattr(publish, 'ReportProcessor', lambda path, week: real_processor(path, week, simulation_count=10))
     monkeypatch.setattr(sys, 'argv', ['publish', '--data-dir', 'data'])
     publish.main()
-    assert (tmp_path / 'docs/One_2025_week3.html').exists()
-    assert pd.read_csv(tmp_path / 'docs/data/One/2025/week3/silver_player.csv.gz').week.max() == 3
+    assert (tmp_path / 'docs/One_2025_pc.html').exists()
+    assert pd.read_csv(tmp_path / 'docs/data/One/2025/silver_player.csv.gz').week.max() == 3
 
 
 def test_backfill_uses_inferred_week_and_config_options(archive, tmp_path, monkeypatch):
@@ -153,4 +139,85 @@ def test_backfill_uses_inferred_week_and_config_options(archive, tmp_path, monke
     publish.main()
     assert calls[0][0] == (2024, '9', 1, 2, True)
     assert calls[0][1]['league_nickname'] == 'One'
-    assert (tmp_path / 'docs/One_2024_week2.html').exists()
+    assert (tmp_path / 'docs/One_2024.html').exists()
+
+
+@pytest.mark.parametrize('template, expected', [
+    ('original', {'One_2025.html'}),
+    ('pc', {'One_2025_pc.html'}),
+    ('both', {'One_2025.html', 'One_2025_pc.html'}),
+])
+def test_latest_outputs_and_template_override(archive, tmp_path, monkeypatch, template, expected):
+    config = tmp_path / 'runs.json'
+    config.write_text(json.dumps([{'league_id': '1', 'year': 2025, 'nickname': 'One', 'template': 'both'}]))
+    docs = tmp_path / 'docs'
+    docs.mkdir()
+    (docs / 'index.html').write_text('unchanged dynamic index')
+    real_processor = publish.ReportProcessor
+    monkeypatch.setattr(publish, 'ReportProcessor', lambda *a: real_processor(archive, 2, simulation_count=10))
+    monkeypatch.setattr(sys, 'argv', ['publish', '--week', '2', '--config', str(config),
+                                    '--docs-dir', str(docs), '--template', template])
+    publish.main()
+    assert {p.name for p in docs.glob('One_2025*.html')} == expected
+    data = docs / 'data/One/2025/silver_player.csv.gz'
+    assert pd.read_csv(data).week.max() == 2
+    data.write_bytes(b'replace me')
+    for name in expected:
+        (docs / name).write_text('replace me')
+    publish.main()
+    assert pd.read_csv(data).week.max() == 2
+    assert len(list(docs.rglob('*.csv.gz'))) == 2
+    for name in expected:
+        assert (docs / name).read_text() != 'replace me'
+    assert (docs / 'index.html').read_text() == 'unchanged dynamic index'
+
+
+def test_both_config(tmp_path):
+    config = tmp_path / 'runs.json'
+    config.write_text(json.dumps([{'league_id': '1', 'year': 2025, 'nickname': 'One', 'template': 'both'}]))
+    assert publish.load_runs(config)[0]['template'] == 'both'
+
+
+def test_single_report_cli_both(archive, tmp_path, monkeypatch):
+    from report_code.__main__ import main
+    output = tmp_path / 'report.html'
+    monkeypatch.setattr(sys, 'argv', ['report_code', str(archive), '--week', '2',
+                                    '--html', str(output), '--template', 'both'])
+    main()
+    assert output.exists()
+    assert (tmp_path / 'report_pc.html').exists()
+    assert output.read_text() != (tmp_path / 'report_pc.html').read_text()
+
+
+def test_notebook_direct_public_backfill_and_gzip(archive, tmp_path, monkeypatch):
+    from pathlib import Path
+    from yahoo_fantasy_data import config, yahoo
+    import report_code
+    notebook = json.loads((Path(__file__).parents[2] / 'Notebook_Runner.ipynb').read_text())
+    (tmp_path / 'report_code').mkdir()
+    (tmp_path / 'report_code/processor.py').touch()
+    monkeypatch.chdir(tmp_path)
+    def forbidden(*a, **kw):
+        raise AssertionError('Notebook must not load environment settings')
+    monkeypatch.setattr(config, 'load_settings', forbidden)
+    monkeypatch.setenv('YAHOO_CLIENT_ID', 'must-not-be-used')
+    calls = []
+    def backfill(**kwargs):
+        calls.append(kwargs)
+        assert not kwargs['settings'].oauth_configured
+        assert kwargs['settings'].client_id is None
+        return {1: {'player_data': 'written'}}
+    monkeypatch.setattr(yahoo, 'backfill_season', backfill)
+    monkeypatch.setattr(publish, 'resolve_week', lambda *a, **kw: 2)
+    real_processor = report_code.ReportProcessor
+    monkeypatch.setattr(report_code, 'ReportProcessor', lambda *a: real_processor(archive, 2, simulation_count=10))
+    ns = {'LEAGUES': [{'nickname': 'One', 'league_id': '1', 'year': 2025, 'template': 'both'}]}
+    exec(compile(''.join(notebook['cells'][1]['source']), 'notebook-cell-2', 'exec'), ns)
+    assert len(calls) == 1
+    assert (tmp_path / 'docs/One_2025.html').exists()
+    assert (tmp_path / 'docs/One_2025_pc.html').exists()
+    for table in ('player', 'schedule'):
+        path = tmp_path / f'docs/data/One/2025/silver_{table}.csv.gz'
+        assert path.read_bytes()[:2] == b'\x1f\x8b'
+        assert not pd.read_csv(path).empty
+    assert not list((tmp_path / 'docs').rglob('week*'))
