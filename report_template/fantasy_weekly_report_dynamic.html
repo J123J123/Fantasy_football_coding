@@ -322,13 +322,44 @@ tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.m
     return sectionShell('vobl','08','Roster value','Value Over Baseline — Expanded',s.description,`<div class="table-wrap"><table><thead><tr><th>Team</th><th>VOBL</th>${positions.map(p=>`<th>${esc(p)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`);
   }
 
+  const oddsMetrics = {make_playoffs:'Playoffs', division:'Division', wildcard:'Wildcard', bye:'Bye', last_place:'Last'};
+  function playoffHistoryChart(metric){
+    const history=data.playoff_odds?.history||[];
+    if(!history.length)return '<div class="empty">No weekly odds history available.</div>';
+    const weeks=history.map(h=>Number(h.week));
+    const first=Math.min(...weeks),last=Math.max(...weeks);
+    const x=w=>60+(w-first)/Math.max(1,last-first)*800;
+    const y=v=>290-v*250;
+    const colors=['#355f80','#9b413c','#527944','#855b99','#ab6b25','#247e80','#ad4779','#626bb0','#6d692a','#954d24','#38715b','#71534c'];
+    const ids=[...new Set(history.flatMap(h=>(h.rows||[]).map(r=>String(r.team_id))))];
+    let hasPoints=false;
+    const lines=ids.map((id,i)=>{
+      const color=colors[i%colors.length];
+      let path='',connected=false,points='';
+      history.forEach(h=>{
+        const value=(h.rows||[]).find(r=>String(r.team_id)===id)?.[metric];
+        if(value==null||!Number.isFinite(Number(value))){connected=false;return;}
+        hasPoints=true;
+        const px=x(Number(h.week)),py=y(Number(value));
+        path+=`${connected?'L':'M'}${px},${py} `;connected=true;
+        points+=`<circle cx="${px}" cy="${py}" r="3" fill="${color}"><title>${esc(manager(id))} · Week ${Number(h.week)} · ${oddsMetrics[metric]}: ${pct(value)}</title></circle>`;
+      });
+      return `<path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>${points}`;
+    }).join('');
+    const grid=[0,.25,.5,.75,1].map(v=>`<line x1="60" x2="860" y1="${y(v)}" y2="${y(v)}" stroke="#d5d1c7"/><text x="50" y="${y(v)+4}" text-anchor="end">${v*100}%</text>`).join('');
+    const ticks=weeks.map(w=>`<text x="${x(w)}" y="312" text-anchor="middle">${w}</text>`).join('');
+    const legend=ids.map((id,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(manager(id))}</span>`).join('');
+    const missing=history.filter(h=>h.unavailable_reason).map(h=>`Week ${Number(h.week)}: ${esc(h.unavailable_reason)}`).join('<br>');
+    return `${hasPoints?`<div style="overflow-x:auto"><svg viewBox="0 0 900 345" role="img" aria-label="${oddsMetrics[metric]} odds by week for each manager" style="width:100%;min-width:540px;font-size:12px"><title>${oddsMetrics[metric]} odds by week</title>${grid}${ticks}${lines}<text x="460" y="337" text-anchor="middle">Week</text></svg></div><div class="legend" style="flex-wrap:wrap">${legend}</div>`:'<div class="empty">No weekly odds available for this selection.</div>'}<div class="tiny-note">Each point uses data available through that week. Missing odds appear as gaps. Hover over a point for details.${missing?`<br>${missing}`:''}</div>`;
+  }
+
   function renderPlayoffs(){
     const s=data.playoff_odds;if(!s)return '';
     const sorted=[...(s.rows||[])].sort((a,b)=>(b.make_playoffs??0)-(a.make_playoffs??0));
     const bars=sorted.map(r=>`<div class="odds-row"><span class="manager">${esc(manager(r.team_id))}</span><span class="odds-track"><span style="width:${Math.max(0,Math.min(100,(r.make_playoffs??0)*100))}%"></span></span><span class="odds-pct">${pct(r.make_playoffs)}</span><span class="odds-last">${pct(r.last_place)} last</span></div>`).join('');
     const rows=sorted.map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td><td>${pct(r.make_playoffs)}</td><td>${pct(r.division)}</td><td>${pct(r.wildcard)}</td><td>${pct(r.bye)}</td><td>${pct(r.last_place)}</td></tr>`).join('');
     const note=s.simulation_count?`<div class="tiny-note">${Number(s.simulation_count).toLocaleString()} simulations.</div>`:'';
-    return sectionShell('playoffs','09','Season outlook','Playoff Odds',s.description,`<div class="grid grid-2"><div class="odds">${bars}</div><div class="table-wrap"><table><thead><tr><th>Manager</th><th>Playoffs</th><th>Division</th><th>Wildcard</th><th>Bye</th><th>Last</th></tr></thead><tbody>${rows}</tbody></table></div></div>${note}`);
+    return sectionShell('playoffs','09','Season outlook','Playoff Odds',s.description,`<div class="grid grid-2"><div class="odds">${bars}</div><div class="table-wrap"><table><thead><tr><th>Manager</th><th>Playoffs</th><th>Division</th><th>Wildcard</th><th>Bye</th><th>Last</th></tr></thead><tbody>${rows}</tbody></table></div></div>${note}<div class="chartbox" style="margin-top:20px"><div class="chart-title">Odds by Week</div><div class="manager-selector"><label for="playoff-metric">Outcome</label><select id="playoff-metric" aria-controls="playoff-history">${Object.entries(oddsMetrics).map(([value,label])=>`<option value="${value}">${label}</option>`).join('')}</select></div><div id="playoff-history" aria-live="polite">${playoffHistoryChart('make_playoffs')}</div></div>`);
   }
 
   function stackedChart(rows,buckets,title){
@@ -351,6 +382,9 @@ tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.m
 
   const html=[renderBoned(),renderBonedDetail(),renderFreaky(),renderBhole(),renderStuds(),renderGrower(),renderExpertise(),renderVobl(),renderPlayoffs(),renderDraft()].filter(Boolean).join('');
   document.getElementById('sections').innerHTML=html;
+  document.getElementById('playoff-metric')?.addEventListener('change',event=>{
+    document.getElementById('playoff-history').innerHTML=playoffHistoryChart(event.target.value);
+  });
   document.getElementById('boned-manager')?.addEventListener('change',event=>{
     document.querySelectorAll('#boned-manager-detail .manager-card').forEach(card=>{
       card.hidden=card.dataset.managerIndex!==event.target.value;

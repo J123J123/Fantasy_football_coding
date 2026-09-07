@@ -1,0 +1,3140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>The Fantasy League Weekly Report</title>
+<style>
+:root{
+  --ink:#18212a;--muted:#66727e;--paper:#fff;--canvas:#eceff2;--rule:#d8dee4;--rule-dark:#aeb8c2;
+  --navy:#17354f;--navy-2:#2c5574;--gold:#ab8438;--green:#2f7256;--red:#a74b4b;
+  --soft-blue:#eef4f8;--soft-gold:#f7f2e7;--soft-green:#eaf3ee;--soft-red:#f8ecec;--soft-gray:#f6f8f9;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;background:var(--canvas)}
+body{margin:0;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;font-variant-numeric:tabular-nums;line-height:1.4}
+.report{width:min(1280px,calc(100% - 28px));margin:24px auto 72px;background:var(--paper);border:1px solid #cbd2d9}
+.masthead{border-top:7px solid var(--navy);padding:32px 40px 24px;display:grid;grid-template-columns:1fr auto;gap:28px;align-items:end;border-bottom:1px solid var(--rule-dark)}
+.kicker,.section-kicker{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:850;color:var(--gold)}
+h1,h2,h3{font-family:Georgia,"Times New Roman",serif;margin:0;color:#111820}
+h1{font-size:42px;line-height:1.04;letter-spacing:-.025em;margin-top:4px}
+.meta{text-align:right;color:var(--muted);font-size:13px}.meta strong{display:block;color:var(--ink);font-size:15px}
+.intro{display:grid;grid-template-columns:1.25fr .75fr;gap:36px;padding:26px 40px 30px;border-bottom:1px solid var(--rule)}
+.intro h2{font-size:28px;margin-bottom:10px}.intro p{margin:0;color:#515d68;font-size:14px;max-width:760px}
+.issuebox{border:1px solid var(--rule);display:grid;grid-template-columns:repeat(3,1fr);align-self:start}.issuebox div{padding:13px}.issuebox div+div{border-left:1px solid var(--rule)}
+.label{font-size:9px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);font-weight:850}.big{font-size:20px;font-weight:850;color:var(--navy);margin-top:4px}
+.index{padding:22px 40px 26px;border-bottom:1px solid var(--rule);background:#fbfcfd}
+.index-title{font-weight:850;font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--navy);margin-bottom:12px}
+.index-grid{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid var(--rule-dark);border-left:1px solid var(--rule)}
+.index-grid a{text-decoration:none;color:var(--ink);padding:12px 13px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);font-size:12px;min-height:63px;display:block}
+.index-grid a span{display:block;font-family:Georgia,"Times New Roman",serif;font-size:15px;font-weight:700;margin-top:3px}.index-grid a:hover{background:var(--soft-blue)}
+.section{padding:32px 40px 36px;border-bottom:1px solid var(--rule)}
+.section-head{display:grid;grid-template-columns:minmax(280px,.8fr) 1.2fr;gap:36px;align-items:end;margin-bottom:20px}.section-head h3{font-size:27px;margin-top:4px}.deck{margin:0;color:#596570;font-size:13px}
+.table-wrap{width:100%;overflow:auto;border:1px solid var(--rule)}
+table{width:100%;border-collapse:collapse;font-size:12px;background:#fff}
+th{background:#f6f8fa;color:#33404c;text-transform:uppercase;letter-spacing:.055em;font-size:9px;font-weight:850;padding:8px 9px;border-bottom:1px solid var(--rule-dark);white-space:nowrap;text-align:right}
+th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:inherit;z-index:1}
+td{padding:7px 9px;border-bottom:1px solid #e5e9ed;text-align:right;white-space:nowrap}
+tbody tr:nth-child(even){background:#fbfcfd}tbody tr:hover{background:#f3f7fa}.manager{font-weight:780;color:#1d2b37}.muted{color:var(--muted)}
+.pos{background:var(--soft-green)!important;color:#215a43;font-weight:760}.neg{background:var(--soft-red)!important;color:#8b3434;font-weight:760}.neutral{background:var(--soft-gray)!important}
+.note{margin-top:12px;color:#66727e;font-size:11px}.tiny-note{margin-top:10px;color:#7b858e;font-size:10px}
+.grid{display:grid;gap:18px}.grid-2{grid-template-columns:repeat(2,minmax(0,1fr))}.grid-3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{border:1px solid var(--rule);background:#fff}.card-head{padding:10px 12px;border-bottom:1px solid var(--rule);background:#f8fafb;display:flex;justify-content:space-between;gap:12px;align-items:baseline}.card-title{font-family:Georgia,"Times New Roman",serif;font-weight:700}.card-sub{font-size:10px;color:var(--muted)}
+.matrix-wrap{width:100%;overflow:auto;border:1px solid var(--rule)}.matrix{min-width:max-content}.matrix th,.matrix td{min-width:48px;text-align:center;padding:6px 7px}.matrix th:first-child,.matrix td:first-child{min-width:125px;text-align:left}.matrix td.diag{background:var(--soft-gold);font-weight:850}.matrix td.zero{color:#a1a9b0}
+.manager-selector{display:flex;align-items:center;gap:12px;margin-bottom:14px;font-size:13px;font-weight:700}.manager-selector select{font:inherit;color:var(--ink);background:#fff;border:1px solid var(--rule-dark);padding:8px 12px;max-width:100%}.grid-stack{grid-template-columns:minmax(0,1fr)}.grid-stack>*{min-width:0}.manager-card{border:1px solid var(--rule)}.manager-card h4{font-family:Georgia,"Times New Roman",serif;font-size:16px;margin:0;padding:9px 11px;background:#f7f9fa;border-bottom:1px solid var(--rule)}
+.metric-strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px;margin-bottom:16px}.metric{border:1px solid var(--rule);padding:10px 11px}.metric b{display:block;font-size:18px;color:var(--navy)}.metric span{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:750}
+.odds{border:1px solid var(--rule)}.odds-row{display:grid;grid-template-columns:130px 1fr 62px 80px;gap:10px;align-items:center;padding:7px 10px;border-bottom:1px solid #e6eaee;font-size:11px}.odds-row:last-child{border-bottom:0}.odds-track{height:8px;background:#e6ebef;position:relative}.odds-track>span{display:block;height:100%;background:var(--navy-2)}.odds-pct{font-weight:800;text-align:right}.odds-last{text-align:right;color:var(--muted)}
+.chartbox{border:1px solid var(--rule);padding:14px 14px 10px}.chart-title{font-family:Georgia,"Times New Roman",serif;font-weight:700;margin-bottom:12px}.stack-chart{height:260px;display:flex;align-items:flex-end;gap:10px;border-bottom:1px solid var(--rule-dark);padding:0 8px}.barcol{height:100%;flex:1;min-width:42px;display:flex;flex-direction:column;justify-content:flex-end;align-items:stretch}.stack{height:var(--h);display:flex;flex-direction:column-reverse}.seg{display:block}.s1{background:#355f80}.s2{background:#759066}.s3{background:#a9aa9d}.s4{background:#b67e58}.barlabel{font-size:9px;text-align:center;padding-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.legend{display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:10px;color:var(--muted)}.legend i{display:inline-block;width:9px;height:9px;margin-right:4px;vertical-align:-1px}
+.empty{padding:16px;border:1px dashed var(--rule-dark);color:var(--muted);font-size:12px;background:#fbfcfd}
+.footer{display:flex;justify-content:space-between;gap:20px;padding:18px 40px 22px;font-size:10px;color:var(--muted)}
+@media(max-width:850px){.report{width:100%;margin:0;border:0}.masthead,.intro,.section-head{grid-template-columns:1fr}.masthead,.intro,.index,.section{padding-left:18px;padding-right:18px}.meta{text-align:left}.index-grid{grid-template-columns:repeat(2,1fr)}.grid-2,.grid-3{grid-template-columns:1fr}.odds-row{grid-template-columns:100px 1fr 55px}.odds-last{display:none}.stack-chart{overflow-x:auto}.footer{padding-left:18px;padding-right:18px}}
+@media print{html,body{background:#fff}.report{width:100%;margin:0;border:0}.index{display:none}.section{break-inside:avoid}.table-wrap,.matrix-wrap{overflow:visible}.footer{border-top:1px solid var(--rule)}}
+</style>
+</head>
+<body>
+<main class="report">
+  <header class="masthead">
+    <div><div class="kicker">Weekly fantasy analytics</div><h1 id="title">The Fantasy League Weekly Report™</h1></div>
+    <div class="meta"><strong id="league-name">League</strong><span id="season-week">Season · Week</span></div>
+  </header>
+
+  <section class="intro">
+    <div><h2 id="intro-title">Fantasy Football Analytics</h2><p id="intro-copy">A reusable report template driven entirely by embedded JSON.</p></div>
+    <div class="issuebox"><div><div class="label">League</div><div class="big" id="issue-league">—</div></div><div><div class="label">Through</div><div class="big" id="issue-week">—</div></div><div><div class="label">Teams</div><div class="big" id="issue-teams">—</div></div></div>
+  </section>
+
+  <nav class="index"><div class="index-title">Report index</div><div class="index-grid" id="report-index"></div></nav>
+
+  <div id="sections"></div>
+
+  <footer class="footer"><span><strong>Template:</strong> self-contained HTML driven by JSON.</span><span id="footer-generated"></span></footer>
+</main>
+
+<!--
+  POPULATION POINT:
+  Replace ONLY the JSON inside the script tag below.
+  The JavaScript renderer beneath it should not need to change week to week.
+-->
+<script id="report-data" type="application/json">
+{
+  "meta": {
+    "title": "The Fantasy League Weekly Report™",
+    "league_name": "Conarroe Fantasy A League",
+    "season": 2025,
+    "current_week": 2,
+    "generated_at": "2026-09-07T04:23:02.398960+00:00",
+    "intro": "Season-to-date fantasy analytics. Unavailable measurements are shown as —."
+  },
+  "teams": [
+    {
+      "team_id": "1",
+      "team_name": "Kline is Mine",
+      "manager": "Kline is Mine"
+    },
+    {
+      "team_id": "10",
+      "team_name": "Team Bows",
+      "manager": "Team Bows"
+    },
+    {
+      "team_id": "11",
+      "team_name": "The Show",
+      "manager": "The Show"
+    },
+    {
+      "team_id": "12",
+      "team_name": "Coach",
+      "manager": "Coach"
+    },
+    {
+      "team_id": "2",
+      "team_name": "Barry Mash",
+      "manager": "Barry Mash"
+    },
+    {
+      "team_id": "3",
+      "team_name": "Bill Cosby's Sleepers",
+      "manager": "Bill Cosby's Sleepers"
+    },
+    {
+      "team_id": "4",
+      "team_name": "Should Be In C League",
+      "manager": "Should Be In C League"
+    },
+    {
+      "team_id": "5",
+      "team_name": "Five Star Man",
+      "manager": "Five Star Man"
+    },
+    {
+      "team_id": "6",
+      "team_name": "Gruesome Twosome",
+      "manager": "Gruesome Twosome"
+    },
+    {
+      "team_id": "7",
+      "team_name": "Lonesome Onesome",
+      "manager": "Lonesome Onesome"
+    },
+    {
+      "team_id": "8",
+      "team_name": "Master of Coin",
+      "manager": "Master of Coin"
+    },
+    {
+      "team_id": "9",
+      "team_name": "RVIII",
+      "manager": "RVIII"
+    }
+  ],
+  "boned_index": {
+    "description": "Percent above or below opponents’ scoring average against everyone else. Lower ranks indicate easier scoring luck.",
+    "weeks": [
+      2
+    ],
+    "rows": [
+      {
+        "team_id": "1",
+        "values": {
+          "2": -6.0807483998
+        },
+        "ranks": {
+          "2": 4.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "10",
+        "values": {
+          "2": -3.8532287734
+        },
+        "ranks": {
+          "2": 5.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "11",
+        "values": {
+          "2": -1.317233809
+        },
+        "ranks": {
+          "2": 6.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "12",
+        "values": {
+          "2": 12.3907455013
+        },
+        "ranks": {
+          "2": 10.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "2",
+        "values": {
+          "2": 4.0076528044
+        },
+        "ranks": {
+          "2": 8.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "3",
+        "values": {
+          "2": 1.3348164627
+        },
+        "ranks": {
+          "2": 7.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "4",
+        "values": {
+          "2": 27.8065183652
+        },
+        "ranks": {
+          "2": 11.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "5",
+        "values": {
+          "2": -24.0023882973
+        },
+        "ranks": {
+          "2": 1.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "6",
+        "values": {
+          "2": 6.4744429882
+        },
+        "ranks": {
+          "2": 9.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "7",
+        "values": {
+          "2": 31.5830823622
+        },
+        "ranks": {
+          "2": 12.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "8",
+        "values": {
+          "2": -11.0247026532
+        },
+        "ranks": {
+          "2": 3.0
+        },
+        "difference": null,
+        "rank_delta": null
+      },
+      {
+        "team_id": "9",
+        "values": {
+          "2": -21.756729407
+        },
+        "ranks": {
+          "2": 2.0
+        },
+        "difference": null,
+        "rank_delta": null
+      }
+    ]
+  },
+  "boned_detail": {
+    "description": "Opponent scores compared with their games against other managers through the report week.",
+    "managers": [
+      {
+        "team_id": "1",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Coach",
+            "opponent_score": 108.36,
+            "opponent_games": 1,
+            "opponent_avg": 135.3,
+            "ratio": 0.800886918
+          },
+          {
+            "week": 2,
+            "opponent": "Master of Coin",
+            "opponent_score": 120.54,
+            "opponent_games": 1,
+            "opponent_avg": 108.42,
+            "ratio": 1.1117874931
+          }
+        ],
+        "averages": {
+          "opponent_score": 114.45,
+          "opponent_avg": 121.86,
+          "ratio": 0.939192516
+        }
+      },
+      {
+        "team_id": "10",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "The Show",
+            "opponent_score": 102.62,
+            "opponent_games": 1,
+            "opponent_avg": 92.9,
+            "ratio": 1.1046286329
+          },
+          {
+            "week": 2,
+            "opponent": "Bill Cosby's Sleepers",
+            "opponent_score": 96.0,
+            "opponent_games": 1,
+            "opponent_avg": 113.68,
+            "ratio": 0.8444757213
+          }
+        ],
+        "averages": {
+          "opponent_score": 99.31,
+          "opponent_avg": 103.29,
+          "ratio": 0.9614677123
+        }
+      },
+      {
+        "team_id": "11",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Team Bows",
+            "opponent_score": 65.24,
+            "opponent_games": 1,
+            "opponent_avg": 104.84,
+            "ratio": 0.6222815719
+          },
+          {
+            "week": 2,
+            "opponent": "Barry Mash",
+            "opponent_score": 132.54,
+            "opponent_games": 1,
+            "opponent_avg": 95.58,
+            "ratio": 1.3866917765
+          }
+        ],
+        "averages": {
+          "opponent_score": 98.89,
+          "opponent_avg": 100.21,
+          "ratio": 0.9868276619
+        }
+      },
+      {
+        "team_id": "12",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Kline is Mine",
+            "opponent_score": 96.68,
+            "opponent_games": 1,
+            "opponent_avg": 103.08,
+            "ratio": 0.9379123011
+          },
+          {
+            "week": 2,
+            "opponent": "Gruesome Twosome",
+            "opponent_score": 121.92,
+            "opponent_games": 1,
+            "opponent_avg": 91.42,
+            "ratio": 1.3336250273
+          }
+        ],
+        "averages": {
+          "opponent_score": 109.3,
+          "opponent_avg": 97.25,
+          "ratio": 1.123907455
+        }
+      },
+      {
+        "team_id": "2",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Bill Cosby's Sleepers",
+            "opponent_score": 113.68,
+            "opponent_games": 1,
+            "opponent_avg": 96.0,
+            "ratio": 1.1841666667
+          },
+          {
+            "week": 2,
+            "opponent": "The Show",
+            "opponent_score": 92.9,
+            "opponent_games": 1,
+            "opponent_avg": 102.62,
+            "ratio": 0.9052816215
+          }
+        ],
+        "averages": {
+          "opponent_score": 103.29,
+          "opponent_avg": 99.31,
+          "ratio": 1.040076528
+        }
+      },
+      {
+        "team_id": "3",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Barry Mash",
+            "opponent_score": 95.58,
+            "opponent_games": 1,
+            "opponent_avg": 132.54,
+            "ratio": 0.7211407877
+          },
+          {
+            "week": 2,
+            "opponent": "Team Bows",
+            "opponent_score": 104.84,
+            "opponent_games": 1,
+            "opponent_avg": 65.24,
+            "ratio": 1.6069895769
+          }
+        ],
+        "averages": {
+          "opponent_score": 100.21,
+          "opponent_avg": 98.89,
+          "ratio": 1.0133481646
+        }
+      },
+      {
+        "team_id": "4",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Lonesome Onesome",
+            "opponent_score": 115.46,
+            "opponent_games": 1,
+            "opponent_avg": 73.02,
+            "ratio": 1.5812106272
+          },
+          {
+            "week": 2,
+            "opponent": "Five Star Man",
+            "opponent_score": 82.18,
+            "opponent_games": 1,
+            "opponent_avg": 81.62,
+            "ratio": 1.0068610635
+          }
+        ],
+        "averages": {
+          "opponent_score": 98.82,
+          "opponent_avg": 77.32,
+          "ratio": 1.2780651837
+        }
+      },
+      {
+        "team_id": "5",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "RVIII",
+            "opponent_score": 63.6,
+            "opponent_games": 1,
+            "opponent_avg": 118.56,
+            "ratio": 0.536437247
+          },
+          {
+            "week": 2,
+            "opponent": "Should Be In C League",
+            "opponent_score": 89.14,
+            "opponent_games": 1,
+            "opponent_avg": 82.42,
+            "ratio": 1.0815336083
+          }
+        ],
+        "averages": {
+          "opponent_score": 76.37,
+          "opponent_avg": 100.49,
+          "ratio": 0.759976117
+        }
+      },
+      {
+        "team_id": "6",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Master of Coin",
+            "opponent_score": 108.42,
+            "opponent_games": 1,
+            "opponent_avg": 120.54,
+            "ratio": 0.8994524639
+          },
+          {
+            "week": 2,
+            "opponent": "Coach",
+            "opponent_score": 135.3,
+            "opponent_games": 1,
+            "opponent_avg": 108.36,
+            "ratio": 1.2486157254
+          }
+        ],
+        "averages": {
+          "opponent_score": 121.86,
+          "opponent_avg": 114.45,
+          "ratio": 1.0647444299
+        }
+      },
+      {
+        "team_id": "7",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Should Be In C League",
+            "opponent_score": 82.42,
+            "opponent_games": 1,
+            "opponent_avg": 89.14,
+            "ratio": 0.9246129684
+          },
+          {
+            "week": 2,
+            "opponent": "RVIII",
+            "opponent_score": 118.56,
+            "opponent_games": 1,
+            "opponent_avg": 63.6,
+            "ratio": 1.8641509434
+          }
+        ],
+        "averages": {
+          "opponent_score": 100.49,
+          "opponent_avg": 76.37,
+          "ratio": 1.3158308236
+        }
+      },
+      {
+        "team_id": "8",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Gruesome Twosome",
+            "opponent_score": 91.42,
+            "opponent_games": 1,
+            "opponent_avg": 121.92,
+            "ratio": 0.749835958
+          },
+          {
+            "week": 2,
+            "opponent": "Kline is Mine",
+            "opponent_score": 103.08,
+            "opponent_games": 1,
+            "opponent_avg": 96.68,
+            "ratio": 1.0661977658
+          }
+        ],
+        "averages": {
+          "opponent_score": 97.25,
+          "opponent_avg": 109.3,
+          "ratio": 0.8897529735
+        }
+      },
+      {
+        "team_id": "9",
+        "rows": [
+          {
+            "week": 1,
+            "opponent": "Five Star Man",
+            "opponent_score": 81.62,
+            "opponent_games": 1,
+            "opponent_avg": 82.18,
+            "ratio": 0.9931856899
+          },
+          {
+            "week": 2,
+            "opponent": "Lonesome Onesome",
+            "opponent_score": 73.02,
+            "opponent_games": 1,
+            "opponent_avg": 115.46,
+            "ratio": 0.6324268145
+          }
+        ],
+        "averages": {
+          "opponent_score": 77.32,
+          "opponent_avg": 98.82,
+          "ratio": 0.7824327059
+        }
+      }
+    ]
+  },
+  "freaky_friday": {
+    "description": "Wins with each other manager’s schedule. Self-opponents are replaced by the schedule owner; ties count as half a win.",
+    "schedule_swap": {
+      "matrix": {
+        "1": {
+          "1": 0.0,
+          "10": 1.0,
+          "11": 1.0,
+          "12": 0.0,
+          "2": 1.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 2.0,
+          "6": 0.0,
+          "7": 1.0,
+          "8": 1.0,
+          "9": 2.0
+        },
+        "10": {
+          "1": 0.0,
+          "10": 1.0,
+          "11": 0.0,
+          "12": 0.0,
+          "2": 1.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 2.0,
+          "6": 0.0,
+          "7": 0.0,
+          "8": 1.0,
+          "9": 1.0
+        },
+        "11": {
+          "1": 0.0,
+          "10": 1.0,
+          "11": 1.0,
+          "12": 1.0,
+          "2": 0.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 2.0,
+          "6": 0.0,
+          "7": 1.0,
+          "8": 1.0,
+          "9": 2.0
+        },
+        "12": {
+          "1": 2.0,
+          "10": 2.0,
+          "11": 2.0,
+          "12": 2.0,
+          "2": 1.0,
+          "3": 2.0,
+          "4": 1.0,
+          "5": 2.0,
+          "6": 1.0,
+          "7": 2.0,
+          "8": 2.0,
+          "9": 2.0
+        },
+        "2": {
+          "1": 1.0,
+          "10": 1.0,
+          "11": 2.0,
+          "12": 1.0,
+          "2": 1.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 2.0,
+          "6": 0.0,
+          "7": 2.0,
+          "8": 2.0,
+          "9": 2.0
+        },
+        "3": {
+          "1": 1.0,
+          "10": 1.0,
+          "11": 1.0,
+          "12": 1.0,
+          "2": 2.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 2.0,
+          "6": 1.0,
+          "7": 1.0,
+          "8": 1.0,
+          "9": 2.0
+        },
+        "4": {
+          "1": 0.0,
+          "10": 0.0,
+          "11": 1.0,
+          "12": 0.0,
+          "2": 0.0,
+          "3": 0.0,
+          "4": 1.0,
+          "5": 2.0,
+          "6": 0.0,
+          "7": 0.0,
+          "8": 0.0,
+          "9": 2.0
+        },
+        "5": {
+          "1": 0.0,
+          "10": 0.0,
+          "11": 1.0,
+          "12": 0.0,
+          "2": 0.0,
+          "3": 0.0,
+          "4": 0.0,
+          "5": 1.0,
+          "6": 0.0,
+          "7": 0.0,
+          "8": 0.0,
+          "9": 2.0
+        },
+        "6": {
+          "1": 1.0,
+          "10": 1.0,
+          "11": 1.0,
+          "12": 0.0,
+          "2": 1.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 2.0,
+          "6": 0.0,
+          "7": 2.0,
+          "8": 1.0,
+          "9": 2.0
+        },
+        "7": {
+          "1": 1.0,
+          "10": 1.0,
+          "11": 1.0,
+          "12": 1.0,
+          "2": 1.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 1.0,
+          "6": 1.0,
+          "7": 1.0,
+          "8": 1.0,
+          "9": 1.0
+        },
+        "8": {
+          "1": 2.0,
+          "10": 2.0,
+          "11": 1.0,
+          "12": 1.0,
+          "2": 1.0,
+          "3": 2.0,
+          "4": 1.0,
+          "5": 2.0,
+          "6": 1.0,
+          "7": 2.0,
+          "8": 2.0,
+          "9": 2.0
+        },
+        "9": {
+          "1": 0.0,
+          "10": 1.0,
+          "11": 0.0,
+          "12": 0.0,
+          "2": 1.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 1.0,
+          "6": 0.0,
+          "7": 1.0,
+          "8": 1.0,
+          "9": 1.0
+        }
+      },
+      "summary": [
+        {
+          "team_id": "1",
+          "total": 11.0,
+          "max": 2.0,
+          "avg": 0.9166666667,
+          "min": 0.0,
+          "rank": 7.0
+        },
+        {
+          "team_id": "10",
+          "total": 8.0,
+          "max": 2.0,
+          "avg": 0.6666666667,
+          "min": 0.0,
+          "rank": 9.0
+        },
+        {
+          "team_id": "11",
+          "total": 11.0,
+          "max": 2.0,
+          "avg": 0.9166666667,
+          "min": 0.0,
+          "rank": 7.0
+        },
+        {
+          "team_id": "12",
+          "total": 21.0,
+          "max": 2.0,
+          "avg": 1.75,
+          "min": 1.0,
+          "rank": 1.0
+        },
+        {
+          "team_id": "2",
+          "total": 16.0,
+          "max": 2.0,
+          "avg": 1.3333333333,
+          "min": 0.0,
+          "rank": 3.0
+        },
+        {
+          "team_id": "3",
+          "total": 15.0,
+          "max": 2.0,
+          "avg": 1.25,
+          "min": 1.0,
+          "rank": 4.0
+        },
+        {
+          "team_id": "4",
+          "total": 6.0,
+          "max": 2.0,
+          "avg": 0.5,
+          "min": 0.0,
+          "rank": 11.0
+        },
+        {
+          "team_id": "5",
+          "total": 4.0,
+          "max": 2.0,
+          "avg": 0.3333333333,
+          "min": 0.0,
+          "rank": 12.0
+        },
+        {
+          "team_id": "6",
+          "total": 13.0,
+          "max": 2.0,
+          "avg": 1.0833333333,
+          "min": 0.0,
+          "rank": 5.0
+        },
+        {
+          "team_id": "7",
+          "total": 12.0,
+          "max": 1.0,
+          "avg": 1.0,
+          "min": 1.0,
+          "rank": 6.0
+        },
+        {
+          "team_id": "8",
+          "total": 19.0,
+          "max": 2.0,
+          "avg": 1.5833333333,
+          "min": 1.0,
+          "rank": 2.0
+        },
+        {
+          "team_id": "9",
+          "total": 8.0,
+          "max": 1.0,
+          "avg": 0.6666666667,
+          "min": 0.0,
+          "rank": 9.0
+        }
+      ]
+    },
+    "head_to_head": {
+      "matrix": {
+        "1": {
+          "1": 0.0,
+          "10": 1.0,
+          "11": 1.0,
+          "12": 0.0,
+          "2": 1.0,
+          "3": 1.0,
+          "4": 2.0,
+          "5": 2.0,
+          "6": 1.0,
+          "7": 1.0,
+          "8": 0.0,
+          "9": 1.0
+        },
+        "10": {
+          "1": 1.0,
+          "10": 0.0,
+          "11": 1.0,
+          "12": 0.0,
+          "2": 0.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 1.0,
+          "6": 0.0,
+          "7": 1.0,
+          "8": 0.0,
+          "9": 1.0
+        },
+        "11": {
+          "1": 1.0,
+          "10": 1.0,
+          "11": 0.0,
+          "12": 0.0,
+          "2": 1.0,
+          "3": 0.0,
+          "4": 2.0,
+          "5": 2.0,
+          "6": 1.0,
+          "7": 1.0,
+          "8": 0.0,
+          "9": 1.0
+        },
+        "12": {
+          "1": 2.0,
+          "10": 2.0,
+          "11": 2.0,
+          "12": 0.0,
+          "2": 2.0,
+          "3": 1.0,
+          "4": 2.0,
+          "5": 2.0,
+          "6": 2.0,
+          "7": 1.0,
+          "8": 1.0,
+          "9": 2.0
+        },
+        "2": {
+          "1": 1.0,
+          "10": 2.0,
+          "11": 1.0,
+          "12": 0.0,
+          "2": 0.0,
+          "3": 1.0,
+          "4": 2.0,
+          "5": 2.0,
+          "6": 2.0,
+          "7": 1.0,
+          "8": 1.0,
+          "9": 2.0
+        },
+        "3": {
+          "1": 1.0,
+          "10": 1.0,
+          "11": 2.0,
+          "12": 1.0,
+          "2": 1.0,
+          "3": 0.0,
+          "4": 2.0,
+          "5": 2.0,
+          "6": 1.0,
+          "7": 1.0,
+          "8": 1.0,
+          "9": 1.0
+        },
+        "4": {
+          "1": 0.0,
+          "10": 1.0,
+          "11": 0.0,
+          "12": 0.0,
+          "2": 0.0,
+          "3": 0.0,
+          "4": 0.0,
+          "5": 2.0,
+          "6": 0.0,
+          "7": 1.0,
+          "8": 0.0,
+          "9": 1.0
+        },
+        "5": {
+          "1": 0.0,
+          "10": 1.0,
+          "11": 0.0,
+          "12": 0.0,
+          "2": 0.0,
+          "3": 0.0,
+          "4": 0.0,
+          "5": 0.0,
+          "6": 0.0,
+          "7": 1.0,
+          "8": 0.0,
+          "9": 1.0
+        },
+        "6": {
+          "1": 1.0,
+          "10": 2.0,
+          "11": 1.0,
+          "12": 0.0,
+          "2": 0.0,
+          "3": 1.0,
+          "4": 2.0,
+          "5": 2.0,
+          "6": 0.0,
+          "7": 1.0,
+          "8": 1.0,
+          "9": 2.0
+        },
+        "7": {
+          "1": 1.0,
+          "10": 1.0,
+          "11": 1.0,
+          "12": 1.0,
+          "2": 1.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 1.0,
+          "6": 1.0,
+          "7": 0.0,
+          "8": 1.0,
+          "9": 1.0
+        },
+        "8": {
+          "1": 2.0,
+          "10": 2.0,
+          "11": 2.0,
+          "12": 1.0,
+          "2": 1.0,
+          "3": 1.0,
+          "4": 2.0,
+          "5": 2.0,
+          "6": 1.0,
+          "7": 1.0,
+          "8": 0.0,
+          "9": 2.0
+        },
+        "9": {
+          "1": 1.0,
+          "10": 1.0,
+          "11": 1.0,
+          "12": 0.0,
+          "2": 0.0,
+          "3": 1.0,
+          "4": 1.0,
+          "5": 1.0,
+          "6": 0.0,
+          "7": 1.0,
+          "8": 0.0,
+          "9": 0.0
+        }
+      }
+    }
+  },
+  "bhole": {
+    "description": "Wins after adding the indicated points each week; average width is the mean absolute matchup margin.",
+    "deltas": [
+      -10,
+      -5,
+      -2.5,
+      0,
+      2.5,
+      5,
+      10
+    ],
+    "rows": [
+      {
+        "team_id": "1",
+        "wins": {
+          "-10": 0.0,
+          "-5": 0.0,
+          "-2.5": 0.0,
+          "0": 0.0,
+          "2.5": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "range": 0.0,
+        "avg_width": 14.57
+      },
+      {
+        "team_id": "10",
+        "wins": {
+          "-10": 0.0,
+          "-5": 1.0,
+          "-2.5": 1.0,
+          "0": 1.0,
+          "2.5": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "range": 1.0,
+        "avg_width": 23.11
+      },
+      {
+        "team_id": "11",
+        "wins": {
+          "-10": 1.0,
+          "-5": 1.0,
+          "-2.5": 1.0,
+          "0": 1.0,
+          "2.5": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "range": 0.0,
+        "avg_width": 38.51
+      },
+      {
+        "team_id": "12",
+        "wins": {
+          "-10": 2.0,
+          "-5": 2.0,
+          "-2.5": 2.0,
+          "0": 2.0,
+          "2.5": 2.0,
+          "5": 2.0,
+          "10": 2.0
+        },
+        "range": 0.0,
+        "avg_width": 12.53
+      },
+      {
+        "team_id": "2",
+        "wins": {
+          "-10": 1.0,
+          "-5": 1.0,
+          "-2.5": 1.0,
+          "0": 1.0,
+          "2.5": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "range": 0.0,
+        "avg_width": 28.87
+      },
+      {
+        "team_id": "3",
+        "wins": {
+          "-10": 1.0,
+          "-5": 1.0,
+          "-2.5": 1.0,
+          "0": 1.0,
+          "2.5": 1.0,
+          "5": 1.0,
+          "10": 2.0
+        },
+        "range": 1.0,
+        "avg_width": 13.47
+      },
+      {
+        "team_id": "4",
+        "wins": {
+          "-10": 0.0,
+          "-5": 1.0,
+          "-2.5": 1.0,
+          "0": 1.0,
+          "2.5": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "range": 1.0,
+        "avg_width": 20.0
+      },
+      {
+        "team_id": "5",
+        "wins": {
+          "-10": 1.0,
+          "-5": 1.0,
+          "-2.5": 1.0,
+          "0": 1.0,
+          "2.5": 1.0,
+          "5": 1.0,
+          "10": 2.0
+        },
+        "range": 1.0,
+        "avg_width": 12.49
+      },
+      {
+        "team_id": "6",
+        "wins": {
+          "-10": 0.0,
+          "-5": 0.0,
+          "-2.5": 0.0,
+          "0": 0.0,
+          "2.5": 0.0,
+          "5": 0.0,
+          "10": 0.0
+        },
+        "range": 0.0,
+        "avg_width": 15.19
+      },
+      {
+        "team_id": "7",
+        "wins": {
+          "-10": 1.0,
+          "-5": 1.0,
+          "-2.5": 1.0,
+          "0": 1.0,
+          "2.5": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "range": 0.0,
+        "avg_width": 39.29
+      },
+      {
+        "team_id": "8",
+        "wins": {
+          "-10": 2.0,
+          "-5": 2.0,
+          "-2.5": 2.0,
+          "0": 2.0,
+          "2.5": 2.0,
+          "5": 2.0,
+          "10": 2.0
+        },
+        "range": 0.0,
+        "avg_width": 17.23
+      },
+      {
+        "team_id": "9",
+        "wins": {
+          "-10": 1.0,
+          "-5": 1.0,
+          "-2.5": 1.0,
+          "0": 1.0,
+          "2.5": 1.0,
+          "5": 1.0,
+          "10": 1.0
+        },
+        "range": 0.0,
+        "avg_width": 31.78
+      }
+    ]
+  },
+  "studs_duds": {
+    "description": "Starters only. Stud: more than twice projection and at least 20 points. Dud: at most 25% of projection with a projection of at least 10.",
+    "rows": [
+      {
+        "team_id": "1",
+        "studs": 1.0,
+        "duds": 0.0,
+        "studded_on": 2.0,
+        "dudded_on": 1.0,
+        "s2d_diff": 0.0
+      },
+      {
+        "team_id": "10",
+        "studs": 1.0,
+        "duds": 0.0,
+        "studded_on": 0.0,
+        "dudded_on": 0.0,
+        "s2d_diff": 1.0
+      },
+      {
+        "team_id": "11",
+        "studs": 0.0,
+        "duds": 0.0,
+        "studded_on": 0.0,
+        "dudded_on": 0.0,
+        "s2d_diff": 0.0
+      },
+      {
+        "team_id": "12",
+        "studs": 1.0,
+        "duds": 0.0,
+        "studded_on": 1.0,
+        "dudded_on": 1.0,
+        "s2d_diff": 1.0
+      },
+      {
+        "team_id": "2",
+        "studs": 0.0,
+        "duds": 0.0,
+        "studded_on": 1.0,
+        "dudded_on": 0.0,
+        "s2d_diff": -1.0
+      },
+      {
+        "team_id": "3",
+        "studs": 1.0,
+        "duds": 0.0,
+        "studded_on": 1.0,
+        "dudded_on": 0.0,
+        "s2d_diff": 0.0
+      },
+      {
+        "team_id": "4",
+        "studs": 0.0,
+        "duds": 1.0,
+        "studded_on": 0.0,
+        "dudded_on": 0.0,
+        "s2d_diff": -1.0
+      },
+      {
+        "team_id": "5",
+        "studs": 0.0,
+        "duds": 1.0,
+        "studded_on": 0.0,
+        "dudded_on": 3.0,
+        "s2d_diff": 2.0
+      },
+      {
+        "team_id": "6",
+        "studs": 1.0,
+        "duds": 1.0,
+        "studded_on": 1.0,
+        "dudded_on": 0.0,
+        "s2d_diff": -1.0
+      },
+      {
+        "team_id": "7",
+        "studs": 0.0,
+        "duds": 1.0,
+        "studded_on": 0.0,
+        "dudded_on": 0.0,
+        "s2d_diff": -1.0
+      },
+      {
+        "team_id": "8",
+        "studs": 2.0,
+        "duds": 1.0,
+        "studded_on": 1.0,
+        "dudded_on": 0.0,
+        "s2d_diff": 0.0
+      },
+      {
+        "team_id": "9",
+        "studs": 0.0,
+        "duds": 2.0,
+        "studded_on": 0.0,
+        "dudded_on": 2.0,
+        "s2d_diff": 0.0
+      }
+    ]
+  },
+  "grower_shower": {
+    "description": "Actual wins divided by a weighted expected-win blend. Weekly probability uses observed margin and combined historical score standard deviations (normal approximation).",
+    "rows": [
+      {
+        "team_id": "1",
+        "weekly_probability": {
+          "1": 0.2754077953,
+          "2": 0.0358073882
+        },
+        "expected_wins": 0.3112151835,
+        "actual_vs_opp_avg": 0.0,
+        "avg_vs_opp_actual": 0.0,
+        "avg_vs_opp_avg": 0.0,
+        "actual_wins": 0.0,
+        "ratio": 0.0,
+        "rank": 11.0
+      },
+      {
+        "team_id": "10",
+        "weekly_probability": {
+          "1": 0.0974104433,
+          "2": 0.6134307673
+        },
+        "expected_wins": 0.7108412106,
+        "actual_vs_opp_avg": 0.5,
+        "avg_vs_opp_actual": 0.0,
+        "avg_vs_opp_avg": 0.0,
+        "actual_wins": 1.0,
+        "ratio": 1.6496941501,
+        "rank": 1.0
+      },
+      {
+        "team_id": "11",
+        "weekly_probability": {
+          "1": 0.9025895567,
+          "2": 0.0712042122
+        },
+        "expected_wins": 0.9737937689,
+        "actual_vs_opp_avg": 1.0,
+        "avg_vs_opp_actual": 1.0,
+        "avg_vs_opp_avg": 1.0,
+        "actual_wins": 1.0,
+        "ratio": 1.0214139276,
+        "rank": 5.0
+      },
+      {
+        "team_id": "12",
+        "weekly_probability": {
+          "1": 0.7245922047,
+          "2": 0.6790289845
+        },
+        "expected_wins": 1.4036211893,
+        "actual_vs_opp_avg": 2.0,
+        "avg_vs_opp_actual": 1.0,
+        "avg_vs_opp_avg": 2.0,
+        "actual_wins": 2.0,
+        "ratio": 1.3813137724,
+        "rank": 3.0
+      },
+      {
+        "team_id": "2",
+        "weekly_probability": {
+          "1": 0.2660625738,
+          "2": 0.9287957878
+        },
+        "expected_wins": 1.1948583616,
+        "actual_vs_opp_avg": 1.0,
+        "avg_vs_opp_actual": 2.0,
+        "avg_vs_opp_avg": 2.0,
+        "actual_wins": 1.0,
+        "ratio": 0.7807091824,
+        "rank": 10.0
+      },
+      {
+        "team_id": "3",
+        "weekly_probability": {
+          "1": 0.7339374262,
+          "2": 0.3865692327
+        },
+        "expected_wins": 1.1205066589,
+        "actual_vs_opp_avg": 1.0,
+        "avg_vs_opp_actual": 1.5,
+        "avg_vs_opp_avg": 1.0,
+        "actual_wins": 1.0,
+        "ratio": 0.8819078419,
+        "rank": 8.0
+      },
+      {
+        "team_id": "4",
+        "weekly_probability": {
+          "1": 0.1384227568,
+          "2": 0.927808462
+        },
+        "expected_wins": 1.0662312187,
+        "actual_vs_opp_avg": 1.0,
+        "avg_vs_opp_actual": 1.0,
+        "avg_vs_opp_avg": 1.0,
+        "actual_wins": 1.0,
+        "ratio": 0.9496811671,
+        "rank": 6.0
+      },
+      {
+        "team_id": "5",
+        "weekly_probability": {
+          "1": 0.6785546592,
+          "2": 0.072191538
+        },
+        "expected_wins": 0.7507461973,
+        "actual_vs_opp_avg": 0.0,
+        "avg_vs_opp_actual": 1.0,
+        "avg_vs_opp_avg": 0.0,
+        "actual_wins": 1.0,
+        "ratio": 1.4801724437,
+        "rank": 2.0
+      },
+      {
+        "team_id": "6",
+        "weekly_probability": {
+          "1": 0.2319217771,
+          "2": 0.3209710155
+        },
+        "expected_wins": 0.5528927925,
+        "actual_vs_opp_avg": 1.0,
+        "avg_vs_opp_actual": 0.0,
+        "avg_vs_opp_avg": 0.0,
+        "actual_wins": 0.0,
+        "ratio": 0.0,
+        "rank": 11.0
+      },
+      {
+        "team_id": "7",
+        "weekly_probability": {
+          "1": 0.8615772432,
+          "2": 0.1768381913
+        },
+        "expected_wins": 1.0384154345,
+        "actual_vs_opp_avg": 1.0,
+        "avg_vs_opp_actual": 1.0,
+        "avg_vs_opp_avg": 2.0,
+        "actual_wins": 1.0,
+        "ratio": 0.9252984814,
+        "rank": 7.0
+      },
+      {
+        "team_id": "8",
+        "weekly_probability": {
+          "1": 0.7680782229,
+          "2": 0.9641926118
+        },
+        "expected_wins": 1.7322708347,
+        "actual_vs_opp_avg": 2.0,
+        "avg_vs_opp_actual": 2.0,
+        "avg_vs_opp_avg": 2.0,
+        "actual_wins": 2.0,
+        "ratio": 1.1199357897,
+        "rank": 4.0
+      },
+      {
+        "team_id": "9",
+        "weekly_probability": {
+          "1": 0.3214453408,
+          "2": 0.8231618087
+        },
+        "expected_wins": 1.1446071495,
+        "actual_vs_opp_avg": 1.0,
+        "avg_vs_opp_actual": 2.0,
+        "avg_vs_opp_avg": 1.0,
+        "actual_wins": 1.0,
+        "ratio": 0.8398521823,
+        "rank": 9.0
+      }
+    ],
+    "weights": {
+      "expected_wins": 0.8,
+      "actual_vs_opp_avg": 0.075,
+      "avg_vs_opp_actual": 0.075,
+      "avg_vs_opp_avg": 0.05
+    },
+    "weeks": [
+      1,
+      2
+    ]
+  },
+  "managerial_expertise": {
+    "description": "Exact legal optimal lineups and projection-optimal decisions; IR/NA players excluded from optimization. VOBM/WOBM compare with the optimal free-agent lineup. Missing eligible-player scores make optimization unavailable.",
+    "rows": [
+      {
+        "team_id": "1",
+        "actual_points": 199.76,
+        "optimal_points": 237.92,
+        "efficiency": 0.8396099529,
+        "using_yahoo_games": 1,
+        "using_yahoo_efficiency": 0.8078369906,
+        "not_using_yahoo_games": 1,
+        "not_using_yahoo_efficiency": 0.8763596809,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 0.5,
+        "plums": "108%",
+        "vobl": -22.0,
+        "vobm": -88.42,
+        "wobl": 0.0,
+        "wobm": 0.0,
+        "all_studs": 1,
+        "studs_benched": 0,
+        "all_duds": 0,
+        "duds_started": 0
+      },
+      {
+        "team_id": "10",
+        "actual_points": 170.08,
+        "optimal_points": 202.86,
+        "efficiency": 0.8384107266,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 2,
+        "not_using_yahoo_efficiency": 0.8384107266,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": -51.68,
+        "vobm": -118.1,
+        "wobl": 0.0,
+        "wobm": 0.0,
+        "all_studs": 1,
+        "studs_benched": 0,
+        "all_duds": 0,
+        "duds_started": 0
+      },
+      {
+        "team_id": "11",
+        "actual_points": 195.52,
+        "optimal_points": 235.62,
+        "efficiency": 0.8298107122,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 2,
+        "not_using_yahoo_efficiency": 0.8298107122,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": -26.24,
+        "vobm": -92.66,
+        "wobl": 0.0,
+        "wobm": 0.0,
+        "all_studs": 0,
+        "studs_benched": 0,
+        "all_duds": 0,
+        "duds_started": 0
+      },
+      {
+        "team_id": "12",
+        "actual_points": 243.66,
+        "optimal_points": 279.96,
+        "efficiency": 0.8703386198,
+        "using_yahoo_games": 1,
+        "using_yahoo_efficiency": 0.9501404494,
+        "not_using_yahoo_games": 1,
+        "not_using_yahoo_efficiency": 0.787728991,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 0.5,
+        "plums": "83%",
+        "vobl": 21.9,
+        "vobm": -44.52,
+        "wobl": 1.0,
+        "wobm": 0.0,
+        "all_studs": 2,
+        "studs_benched": 1,
+        "all_duds": 0,
+        "duds_started": 0
+      },
+      {
+        "team_id": "2",
+        "actual_points": 228.12,
+        "optimal_points": 250.16,
+        "efficiency": 0.9118963863,
+        "using_yahoo_games": 1,
+        "using_yahoo_efficiency": 0.8962672437,
+        "not_using_yahoo_games": 1,
+        "not_using_yahoo_efficiency": 0.9344935471,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 0.5,
+        "plums": "104%",
+        "vobl": 6.36,
+        "vobm": -60.06,
+        "wobl": 1.0,
+        "wobm": 0.0,
+        "all_studs": 0,
+        "studs_benched": 0,
+        "all_duds": 0,
+        "duds_started": 0
+      },
+      {
+        "team_id": "3",
+        "actual_points": 209.68,
+        "optimal_points": 240.28,
+        "efficiency": 0.8726485767,
+        "using_yahoo_games": 1,
+        "using_yahoo_efficiency": 0.8510638298,
+        "not_using_yahoo_games": 1,
+        "not_using_yahoo_efficiency": 0.8917477251,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 0.5,
+        "plums": "105%",
+        "vobl": -12.08,
+        "vobm": -78.5,
+        "wobl": 1.0,
+        "wobm": 0.0,
+        "all_studs": 1,
+        "studs_benched": 0,
+        "all_duds": 0,
+        "duds_started": 0
+      },
+      {
+        "team_id": "4",
+        "actual_points": 171.56,
+        "optimal_points": 201.16,
+        "efficiency": 0.85285345,
+        "using_yahoo_games": 1,
+        "using_yahoo_efficiency": 0.8787460568,
+        "not_using_yahoo_games": 1,
+        "not_using_yahoo_efficiency": 0.8265142399,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 0.5,
+        "plums": "94%",
+        "vobl": -50.2,
+        "vobm": -116.62,
+        "wobl": 0.0,
+        "wobm": 0.0,
+        "all_studs": 0,
+        "studs_benched": 0,
+        "all_duds": 2,
+        "duds_started": 1
+      },
+      {
+        "team_id": "5",
+        "actual_points": 163.8,
+        "optimal_points": 193.2,
+        "efficiency": 0.847826087,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 2,
+        "not_using_yahoo_efficiency": 0.847826087,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": -57.96,
+        "vobm": -124.38,
+        "wobl": 0.0,
+        "wobm": 0.0,
+        "all_studs": 0,
+        "studs_benched": 0,
+        "all_duds": 1,
+        "duds_started": 1
+      },
+      {
+        "team_id": "6",
+        "actual_points": 213.34,
+        "optimal_points": 252.08,
+        "efficiency": 0.846318629,
+        "using_yahoo_games": 1,
+        "using_yahoo_efficiency": 0.8521107073,
+        "not_using_yahoo_games": 1,
+        "not_using_yahoo_efficiency": 0.8387155963,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 0.5,
+        "plums": "98%",
+        "vobl": -8.42,
+        "vobm": -74.84,
+        "wobl": 1.0,
+        "wobm": 0.0,
+        "all_studs": 2,
+        "studs_benched": 1,
+        "all_duds": 1,
+        "duds_started": 1
+      },
+      {
+        "team_id": "7",
+        "actual_points": 188.48,
+        "optimal_points": 254.48,
+        "efficiency": 0.7406475951,
+        "using_yahoo_games": 2,
+        "using_yahoo_efficiency": 0.7406475951,
+        "not_using_yahoo_games": 0,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 1.0,
+        "plums": null,
+        "vobl": -33.28,
+        "vobm": -99.7,
+        "wobl": 1.0,
+        "wobm": 0.0,
+        "all_studs": 1,
+        "studs_benched": 1,
+        "all_duds": 2,
+        "duds_started": 1
+      },
+      {
+        "team_id": "8",
+        "actual_points": 228.96,
+        "optimal_points": 266.16,
+        "efficiency": 0.8602344454,
+        "using_yahoo_games": 0,
+        "using_yahoo_efficiency": null,
+        "not_using_yahoo_games": 2,
+        "not_using_yahoo_efficiency": 0.8602344454,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 0.0,
+        "plums": "All Balls",
+        "vobl": 7.2,
+        "vobm": -59.22,
+        "wobl": 1.0,
+        "wobm": 0.0,
+        "all_studs": 2,
+        "studs_benched": 0,
+        "all_duds": 3,
+        "duds_started": 1
+      },
+      {
+        "team_id": "9",
+        "actual_points": 182.16,
+        "optimal_points": 225.16,
+        "efficiency": 0.8090246936,
+        "using_yahoo_games": 2,
+        "using_yahoo_efficiency": 0.8090246936,
+        "not_using_yahoo_games": 0,
+        "not_using_yahoo_efficiency": null,
+        "wins_added": 0,
+        "losses_added": 0,
+        "net_added": 0,
+        "sheep_pct": 1.0,
+        "plums": null,
+        "vobl": -39.6,
+        "vobm": -106.02,
+        "wobl": 1.0,
+        "wobm": 0.0,
+        "all_studs": 0,
+        "studs_benched": 0,
+        "all_duds": 3,
+        "duds_started": 2
+      }
+    ]
+  },
+  "vobl": {
+    "description": "Value above the last player needed to fill each slot league-wide: Nth QB1, 2Nth RB2, etc. Flex uses the remaining eligible pool. Repeated actual slots are ordered by points.",
+    "positions": [
+      "DEF1",
+      "K1",
+      "QB1",
+      "RB1",
+      "RB2",
+      "TE1",
+      "W/R/T1",
+      "WR1",
+      "WR2"
+    ],
+    "rows": [
+      {
+        "team_id": "1",
+        "total": -22.0,
+        "values": {
+          "DEF1": 1.0,
+          "K1": -8.0,
+          "QB1": -8.4,
+          "RB1": 2.7,
+          "RB2": -3.5,
+          "TE1": 12.8,
+          "W/R/T1": 1.8,
+          "WR1": -7.9,
+          "WR2": -12.5
+        }
+      },
+      {
+        "team_id": "10",
+        "total": -51.68,
+        "values": {
+          "DEF1": -8.0,
+          "K1": 5.0,
+          "QB1": -15.38,
+          "RB1": -13.2,
+          "RB2": -10.0,
+          "TE1": -12.2,
+          "W/R/T1": -2.5,
+          "WR1": 10.5,
+          "WR2": -5.9
+        }
+      },
+      {
+        "team_id": "11",
+        "total": -26.24,
+        "values": {
+          "DEF1": -1.0,
+          "K1": 3.0,
+          "QB1": -2.64,
+          "RB1": 0.6,
+          "RB2": -7.5,
+          "TE1": -12.8,
+          "W/R/T1": -1.4,
+          "WR1": -0.5,
+          "WR2": -4.0
+        }
+      },
+      {
+        "team_id": "12",
+        "total": 21.9,
+        "values": {
+          "DEF1": -7.0,
+          "K1": 0.0,
+          "QB1": 13.2,
+          "RB1": 9.6,
+          "RB2": 9.5,
+          "TE1": -4.2,
+          "W/R/T1": 3.3,
+          "WR1": 10.3,
+          "WR2": -12.8
+        }
+      },
+      {
+        "team_id": "2",
+        "total": 6.36,
+        "values": {
+          "DEF1": 4.0,
+          "K1": 4.0,
+          "QB1": -6.64,
+          "RB1": 9.7,
+          "RB2": 4.8,
+          "TE1": -8.0,
+          "W/R/T1": 22.6,
+          "WR1": -10.9,
+          "WR2": -13.2
+        }
+      },
+      {
+        "team_id": "3",
+        "total": -12.08,
+        "values": {
+          "DEF1": -7.0,
+          "K1": 6.0,
+          "QB1": 0.02,
+          "RB1": -9.7,
+          "RB2": -10.3,
+          "TE1": 3.8,
+          "W/R/T1": 16.9,
+          "WR1": 1.0,
+          "WR2": -12.8
+        }
+      },
+      {
+        "team_id": "4",
+        "total": -50.2,
+        "values": {
+          "DEF1": -4.0,
+          "K1": -9.0,
+          "QB1": -12.5,
+          "RB1": 8.3,
+          "RB2": -13.0,
+          "TE1": -0.4,
+          "W/R/T1": -6.2,
+          "WR1": -1.5,
+          "WR2": -11.9
+        }
+      },
+      {
+        "team_id": "5",
+        "total": -57.96,
+        "values": {
+          "DEF1": -2.0,
+          "K1": -13.0,
+          "QB1": 5.64,
+          "RB1": -1.6,
+          "RB2": -1.6,
+          "TE1": 1.0,
+          "W/R/T1": -12.3,
+          "WR1": -16.0,
+          "WR2": -18.1
+        }
+      },
+      {
+        "team_id": "6",
+        "total": -8.42,
+        "values": {
+          "DEF1": -3.0,
+          "K1": -3.0,
+          "QB1": -17.42,
+          "RB1": 7.1,
+          "RB2": 2.6,
+          "TE1": 3.8,
+          "W/R/T1": -2.2,
+          "WR1": 12.1,
+          "WR2": -8.4
+        }
+      },
+      {
+        "team_id": "7",
+        "total": -33.28,
+        "values": {
+          "DEF1": 7.0,
+          "K1": -2.0,
+          "QB1": 8.12,
+          "RB1": 5.7,
+          "RB2": -16.3,
+          "TE1": -2.5,
+          "W/R/T1": -5.2,
+          "WR1": -8.4,
+          "WR2": -19.7
+        }
+      },
+      {
+        "team_id": "8",
+        "total": 7.2,
+        "values": {
+          "DEF1": 3.0,
+          "K1": 13.0,
+          "QB1": -26.6,
+          "RB1": 14.6,
+          "RB2": 9.9,
+          "TE1": 1.6,
+          "W/R/T1": -2.9,
+          "WR1": 1.7,
+          "WR2": -7.1
+        }
+      },
+      {
+        "team_id": "9",
+        "total": -39.6,
+        "values": {
+          "DEF1": -5.0,
+          "K1": -4.0,
+          "QB1": 2.4,
+          "RB1": -0.2,
+          "RB2": -4.8,
+          "TE1": -15.6,
+          "W/R/T1": -5.2,
+          "WR1": 5.9,
+          "WR2": -13.1
+        }
+      }
+    ]
+  },
+  "playoff_odds": {
+    "description": "Normal-score Monte Carlo through the regular season. Scoring means and sample standard deviations blend team and league-wide scores with team weight min(week, 10)/10; week 10 onward uses team statistics only. Standard deviation is raised to exponents 0.25 through 2.50 in steps of 0.25, with 1,000 seasons per exponent. Simulated scores are capped at 60 and 200. Wins, then points for, then random tie-break. Configured division winners qualify and receive the first seeds; remaining places are wildcards.",
+    "rows": [
+      {
+        "team_id": "1",
+        "make_playoffs": 0.2463,
+        "division": 0.0425,
+        "wildcard": 0.2038,
+        "bye": 0.0284,
+        "last_place": 0.1549
+      },
+      {
+        "team_id": "10",
+        "make_playoffs": 0.3501,
+        "division": 0.1585,
+        "wildcard": 0.1916,
+        "bye": 0.1004,
+        "last_place": 0.1236
+      },
+      {
+        "team_id": "11",
+        "make_playoffs": 0.4331,
+        "division": 0.1774,
+        "wildcard": 0.2557,
+        "bye": 0.1175,
+        "last_place": 0.0576
+      },
+      {
+        "team_id": "12",
+        "make_playoffs": 0.8452,
+        "division": 0.5506,
+        "wildcard": 0.2946,
+        "bye": 0.4873,
+        "last_place": 0.0082
+      },
+      {
+        "team_id": "2",
+        "make_playoffs": 0.675,
+        "division": 0.4338,
+        "wildcard": 0.2412,
+        "bye": 0.3492,
+        "last_place": 0.0369
+      },
+      {
+        "team_id": "3",
+        "make_playoffs": 0.5855,
+        "division": 0.2303,
+        "wildcard": 0.3552,
+        "bye": 0.1597,
+        "last_place": 0.0466
+      },
+      {
+        "team_id": "4",
+        "make_playoffs": 0.3522,
+        "division": 0.1918,
+        "wildcard": 0.1604,
+        "bye": 0.0924,
+        "last_place": 0.1125
+      },
+      {
+        "team_id": "5",
+        "make_playoffs": 0.3158,
+        "division": 0.1657,
+        "wildcard": 0.1501,
+        "bye": 0.0815,
+        "last_place": 0.1938
+      },
+      {
+        "team_id": "6",
+        "make_playoffs": 0.3913,
+        "division": 0.0498,
+        "wildcard": 0.3415,
+        "bye": 0.0353,
+        "last_place": 0.1258
+      },
+      {
+        "team_id": "7",
+        "make_playoffs": 0.5308,
+        "division": 0.3555,
+        "wildcard": 0.1753,
+        "bye": 0.1262,
+        "last_place": 0.0626
+      },
+      {
+        "team_id": "8",
+        "make_playoffs": 0.8135,
+        "division": 0.3571,
+        "wildcard": 0.4564,
+        "bye": 0.299,
+        "last_place": 0.0131
+      },
+      {
+        "team_id": "9",
+        "make_playoffs": 0.4612,
+        "division": 0.287,
+        "wildcard": 0.1742,
+        "bye": 0.1231,
+        "last_place": 0.0644
+      }
+    ],
+    "simulation_count": 10000,
+    "standard_deviation_exponents": [
+      0.25,
+      0.5,
+      0.75,
+      1.0,
+      1.25,
+      1.5,
+      1.75,
+      2.0,
+      2.25,
+      2.5
+    ],
+    "simulations_per_exponent": 1000,
+    "score_min": 60.0,
+    "score_max": 200.0,
+    "history": [
+      {
+        "week": 1,
+        "rows": [
+          {
+            "team_id": "1",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "10",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "11",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "12",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "2",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "3",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "4",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "5",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "6",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "7",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "8",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          },
+          {
+            "team_id": "9",
+            "make_playoffs": null,
+            "division": null,
+            "wildcard": null,
+            "bye": null,
+            "last_place": null
+          }
+        ],
+        "unavailable_reason": "At least two complete scored games per team are required."
+      },
+      {
+        "week": 2,
+        "rows": [
+          {
+            "team_id": "1",
+            "make_playoffs": 0.2463,
+            "division": 0.0425,
+            "wildcard": 0.2038,
+            "bye": 0.0284,
+            "last_place": 0.1549
+          },
+          {
+            "team_id": "10",
+            "make_playoffs": 0.3501,
+            "division": 0.1585,
+            "wildcard": 0.1916,
+            "bye": 0.1004,
+            "last_place": 0.1236
+          },
+          {
+            "team_id": "11",
+            "make_playoffs": 0.4331,
+            "division": 0.1774,
+            "wildcard": 0.2557,
+            "bye": 0.1175,
+            "last_place": 0.0576
+          },
+          {
+            "team_id": "12",
+            "make_playoffs": 0.8452,
+            "division": 0.5506,
+            "wildcard": 0.2946,
+            "bye": 0.4873,
+            "last_place": 0.0082
+          },
+          {
+            "team_id": "2",
+            "make_playoffs": 0.675,
+            "division": 0.4338,
+            "wildcard": 0.2412,
+            "bye": 0.3492,
+            "last_place": 0.0369
+          },
+          {
+            "team_id": "3",
+            "make_playoffs": 0.5855,
+            "division": 0.2303,
+            "wildcard": 0.3552,
+            "bye": 0.1597,
+            "last_place": 0.0466
+          },
+          {
+            "team_id": "4",
+            "make_playoffs": 0.3522,
+            "division": 0.1918,
+            "wildcard": 0.1604,
+            "bye": 0.0924,
+            "last_place": 0.1125
+          },
+          {
+            "team_id": "5",
+            "make_playoffs": 0.3158,
+            "division": 0.1657,
+            "wildcard": 0.1501,
+            "bye": 0.0815,
+            "last_place": 0.1938
+          },
+          {
+            "team_id": "6",
+            "make_playoffs": 0.3913,
+            "division": 0.0498,
+            "wildcard": 0.3415,
+            "bye": 0.0353,
+            "last_place": 0.1258
+          },
+          {
+            "team_id": "7",
+            "make_playoffs": 0.5308,
+            "division": 0.3555,
+            "wildcard": 0.1753,
+            "bye": 0.1262,
+            "last_place": 0.0626
+          },
+          {
+            "team_id": "8",
+            "make_playoffs": 0.8135,
+            "division": 0.3571,
+            "wildcard": 0.4564,
+            "bye": 0.299,
+            "last_place": 0.0131
+          },
+          {
+            "team_id": "9",
+            "make_playoffs": 0.4612,
+            "division": 0.287,
+            "wildcard": 0.1742,
+            "bye": 0.1231,
+            "last_place": 0.0644
+          }
+        ],
+        "unavailable_reason": null
+      }
+    ],
+    "unavailable_reason": null
+  },
+  "draft_analysis": {
+    "description": "Points credited to the current manager’s own draft rounds. Players drafted by someone else count as FA (post-draft acquisitions).",
+    "buckets": [
+      "1-5",
+      "6-10",
+      "11-16",
+      "FA"
+    ],
+    "historical": [
+      {
+        "team_id": "1",
+        "values": {
+          "1-5": 67.8,
+          "6-10": 85.18,
+          "11-16": 33.78,
+          "FA": 13.0
+        }
+      },
+      {
+        "team_id": "10",
+        "values": {
+          "1-5": 105.7,
+          "6-10": 32.38,
+          "11-16": 7.0,
+          "FA": 25.0
+        }
+      },
+      {
+        "team_id": "11",
+        "values": {
+          "1-5": 136.12,
+          "6-10": 36.4,
+          "11-16": 23.0,
+          "FA": 0.0
+        }
+      },
+      {
+        "team_id": "12",
+        "values": {
+          "1-5": 147.36,
+          "6-10": 35.7,
+          "11-16": 52.6,
+          "FA": 8.0
+        }
+      },
+      {
+        "team_id": "2",
+        "values": {
+          "1-5": 131.72,
+          "6-10": 46.1,
+          "11-16": 24.0,
+          "FA": 26.3
+        }
+      },
+      {
+        "team_id": "3",
+        "values": {
+          "1-5": 84.4,
+          "6-10": 48.8,
+          "11-16": 76.48,
+          "FA": 0.0
+        }
+      },
+      {
+        "team_id": "4",
+        "values": {
+          "1-5": 67.8,
+          "6-10": 46.3,
+          "11-16": 57.46,
+          "FA": 0.0
+        }
+      },
+      {
+        "team_id": "5",
+        "values": {
+          "1-5": 75.3,
+          "6-10": 40.9,
+          "11-16": 27.6,
+          "FA": 20.0
+        }
+      },
+      {
+        "team_id": "6",
+        "values": {
+          "1-5": 106.7,
+          "6-10": 52.6,
+          "11-16": 54.04,
+          "FA": 0.0
+        }
+      },
+      {
+        "team_id": "7",
+        "values": {
+          "1-5": 130.48,
+          "6-10": 18.0,
+          "11-16": 4.0,
+          "FA": 36.0
+        }
+      },
+      {
+        "team_id": "8",
+        "values": {
+          "1-5": 125.86,
+          "6-10": 52.1,
+          "11-16": 51.0,
+          "FA": 0.0
+        }
+      },
+      {
+        "team_id": "9",
+        "values": {
+          "1-5": 95.5,
+          "6-10": 60.66,
+          "11-16": 26.0,
+          "FA": 0.0
+        }
+      }
+    ],
+    "optimal": [
+      {
+        "team_id": "1",
+        "values": {
+          "1-5": 84.4,
+          "6-10": 89.0,
+          "11-16": 51.52,
+          "FA": 13.0
+        }
+      },
+      {
+        "team_id": "10",
+        "values": {
+          "1-5": 90.0,
+          "6-10": 55.44,
+          "11-16": 32.42,
+          "FA": 25.0
+        }
+      },
+      {
+        "team_id": "11",
+        "values": {
+          "1-5": 121.92,
+          "6-10": 48.2,
+          "11-16": 65.5,
+          "FA": 0.0
+        }
+      },
+      {
+        "team_id": "12",
+        "values": {
+          "1-5": 136.36,
+          "6-10": 37.6,
+          "11-16": 98.0,
+          "FA": 8.0
+        }
+      },
+      {
+        "team_id": "2",
+        "values": {
+          "1-5": 120.68,
+          "6-10": 58.3,
+          "11-16": 44.88,
+          "FA": 26.3
+        }
+      },
+      {
+        "team_id": "3",
+        "values": {
+          "1-5": 73.4,
+          "6-10": 78.4,
+          "11-16": 88.48,
+          "FA": 0.0
+        }
+      },
+      {
+        "team_id": "4",
+        "values": {
+          "1-5": 56.4,
+          "6-10": 77.9,
+          "11-16": 66.86,
+          "FA": 0.0
+        }
+      },
+      {
+        "team_id": "5",
+        "values": {
+          "1-5": 76.4,
+          "6-10": 69.2,
+          "11-16": 27.6,
+          "FA": 20.0
+        }
+      },
+      {
+        "team_id": "6",
+        "values": {
+          "1-5": 136.2,
+          "6-10": 86.88,
+          "11-16": 29.0,
+          "FA": 0.0
+        }
+      },
+      {
+        "team_id": "7",
+        "values": {
+          "1-5": 121.08,
+          "6-10": 39.9,
+          "11-16": 49.4,
+          "FA": 44.1
+        }
+      },
+      {
+        "team_id": "8",
+        "values": {
+          "1-5": 108.06,
+          "6-10": 52.1,
+          "11-16": 106.0,
+          "FA": 0.0
+        }
+      },
+      {
+        "team_id": "9",
+        "values": {
+          "1-5": 87.1,
+          "6-10": 89.16,
+          "11-16": 48.9,
+          "FA": 0.0
+        }
+      }
+    ]
+  },
+  "data_quality": {
+    "weekly_reconciliation": [
+      {
+        "team_id": "1",
+        "week": 1,
+        "calculated_points": 96.68,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 96.68,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "1",
+        "week": 2,
+        "calculated_points": 103.08,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 103.08,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "10",
+        "week": 1,
+        "calculated_points": 65.24,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 65.24,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "10",
+        "week": 2,
+        "calculated_points": 104.84,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 104.84,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "11",
+        "week": 1,
+        "calculated_points": 102.62,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 102.62,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "11",
+        "week": 2,
+        "calculated_points": 92.9,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 92.9,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "12",
+        "week": 1,
+        "calculated_points": 108.36,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 108.36,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "12",
+        "week": 2,
+        "calculated_points": 135.3,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 135.3,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "2",
+        "week": 1,
+        "calculated_points": 95.58,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 95.58,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "2",
+        "week": 2,
+        "calculated_points": 132.54,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 132.54,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "3",
+        "week": 1,
+        "calculated_points": 113.68,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 113.68,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "3",
+        "week": 2,
+        "calculated_points": 96.0,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 96.0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "4",
+        "week": 1,
+        "calculated_points": 82.42,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 82.42,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "4",
+        "week": 2,
+        "calculated_points": 89.14,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 89.14,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "5",
+        "week": 1,
+        "calculated_points": 81.62,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 81.62,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "5",
+        "week": 2,
+        "calculated_points": 82.18,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 82.18,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "6",
+        "week": 1,
+        "calculated_points": 91.42,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 91.42,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "6",
+        "week": 2,
+        "calculated_points": 121.92,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 121.92,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "7",
+        "week": 1,
+        "calculated_points": 115.46,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 115.46,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "7",
+        "week": 2,
+        "calculated_points": 73.02,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 73.02,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "8",
+        "week": 1,
+        "calculated_points": 108.42,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 108.42,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "8",
+        "week": 2,
+        "calculated_points": 120.54,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 120.54,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "9",
+        "week": 1,
+        "calculated_points": 63.6,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 63.6,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "9",
+        "week": 2,
+        "calculated_points": 118.56,
+        "starter_count": 9,
+        "missing_points": 0,
+        "roster_starter_count": 9,
+        "official_points": 118.56,
+        "difference": 0.0,
+        "status": "matched"
+      }
+    ],
+    "season_reconciliation": [
+      {
+        "team_id": "1",
+        "calculated_points": 199.76,
+        "official_points": 199.76,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "10",
+        "calculated_points": 170.08,
+        "official_points": 170.08,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "11",
+        "calculated_points": 195.52,
+        "official_points": 195.52,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "12",
+        "calculated_points": 243.66,
+        "official_points": 243.66,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "2",
+        "calculated_points": 228.12,
+        "official_points": 228.12,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "3",
+        "calculated_points": 209.68,
+        "official_points": 209.68,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "4",
+        "calculated_points": 171.56,
+        "official_points": 171.56,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "5",
+        "calculated_points": 163.8,
+        "official_points": 163.8,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "6",
+        "calculated_points": 213.34,
+        "official_points": 213.34,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "7",
+        "calculated_points": 188.48,
+        "official_points": 188.48,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "8",
+        "calculated_points": 228.96,
+        "official_points": 228.96,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      },
+      {
+        "team_id": "9",
+        "calculated_points": 182.16,
+        "official_points": 182.16,
+        "matched_weeks": 2,
+        "issue_weeks": 0,
+        "difference": 0.0,
+        "status": "matched"
+      }
+    ],
+    "sources": {
+      "team_data": [
+        "yahoo-fantasy-data/data/CFFL_A/2025/team_data/team_data_week_1.csv.gz",
+        "yahoo-fantasy-data/data/CFFL_A/2025/team_data/team_data_week_2.csv.gz"
+      ],
+      "schedule": [
+        "yahoo-fantasy-data/data/CFFL_A/2025/schedule/schedule_week_2.csv.gz"
+      ],
+      "player": [
+        "yahoo-fantasy-data/data/CFFL_A/2025/player_data/player_data_week_1.csv.gz",
+        "yahoo-fantasy-data/data/CFFL_A/2025/player_data/player_data_week_2.csv.gz"
+      ],
+      "projection": [
+        "yahoo-fantasy-data/data/CFFL_A/2025/projection_data/projection_data_week_1.csv.gz",
+        "yahoo-fantasy-data/data/CFFL_A/2025/projection_data/projection_data_week_2.csv.gz"
+      ],
+      "draft": [
+        "yahoo-fantasy-data/data/CFFL_A/2025/draft/draft_week_2.csv.gz"
+      ],
+      "settings": [
+        "yahoo-fantasy-data/data/CFFL_A/2025/league_settings/league_settings_week_2.csv.gz"
+      ],
+      "points_recon": [
+        "yahoo-fantasy-data/data/CFFL_A/2025/points recon/points_recon_week_1.csv.gz",
+        "yahoo-fantasy-data/data/CFFL_A/2025/points recon/points_recon_week_2.csv.gz"
+      ],
+      "divisions": [
+        "yahoo-fantasy-data/data/CFFL_A/2025/divisions/divisions_week_2.csv.gz"
+      ]
+    }
+  }
+}
+</script>
+
+<script>
+(() => {
+  const data = JSON.parse(document.getElementById('report-data').textContent);
+  const teamMap = new Map((data.teams || []).map(t => [String(t.team_id), t]));
+  const manager = id => teamMap.get(String(id))?.manager ?? String(id);
+  const esc = value => String(value ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));
+  const n = (value, digits=2) => value == null || value === '' ? '—' : Number(value).toFixed(digits);
+  const pct = value => value == null || value === '' ? '—' : `${(Number(value)*100).toFixed(1)}%`;
+  const pctPoint = value => value == null || value === '' ? '—' : `${Number(value).toFixed(1)}%`;
+  const signClass = value => Number(value) > 10 ? 'pos' : Number(value) < -10 ? 'neg' : '';
+  const ratioClass = value => Number(value) >= 1.1 ? 'pos' : Number(value) <= .9 ? 'neg' : '';
+  const sectionDefs = [
+    ['boned','01','Luck / schedule','Boned Index'],
+    ['boned-detail','02','Luck / schedule','Boned Index by Manager by Week'],
+    ['freaky','03','Schedule strength','Freaky Friday'],
+    ['bhole','04','Close games','Between High Over Low Evaluation'],
+    ['studs','05','Player volatility','Studs to Duds Analysis'],
+    ['grower','06','Expected wins','Grower or Shower'],
+    ['expertise','07','Lineup management','Managerial Expertise'],
+    ['vobl','08','Roster value','Value Over Baseline — Expanded'],
+    ['playoffs','09','Season outlook','Playoff Odds'],
+    ['draft','10','Draft capital',"It's Not The Size of Your Draft, It's How You Use It"]
+  ];
+
+  document.title = `${data.meta?.title || 'Fantasy Report'} — ${data.meta?.league_name || ''}`;
+  document.getElementById('title').textContent = data.meta?.title || 'The Fantasy League Weekly Report™';
+  document.getElementById('league-name').textContent = data.meta?.league_name || 'League';
+  document.getElementById('season-week').textContent = `${data.meta?.season ?? ''} · Through Week ${data.meta?.current_week ?? ''}`;
+  document.getElementById('intro-title').textContent = `${data.meta?.season ?? ''} Fantasy Football Analytics`;
+  document.getElementById('intro-copy').textContent = data.meta?.intro || '';
+  document.getElementById('issue-league').textContent = data.meta?.league_name || '—';
+  document.getElementById('issue-week').textContent = `Week ${data.meta?.current_week ?? '—'}`;
+  document.getElementById('issue-teams').textContent = (data.teams || []).length;
+  document.getElementById('footer-generated').textContent = data.meta?.generated_at ? `Generated ${data.meta.generated_at}` : '';
+  document.getElementById('report-index').innerHTML = sectionDefs.map(([id,num,kicker,title]) => `<a href="#${id}"><small>${num} · ${esc(kicker)}</small><span>${esc(title)}</span></a>`).join('');
+
+  const sectionShell = (id,num,kicker,title,description,body) => `
+    <section class="section" id="${id}">
+      <div class="section-head"><div><div class="section-kicker">${num} · ${esc(kicker)}</div><h3>${esc(title)}</h3></div><p class="deck">${esc(description || '')}</p></div>
+      ${body || '<div class="empty">No data supplied for this section.</div>'}
+    </section>`;
+
+  function renderBoned(){
+    const s=data.boned_index;if(!s)return '';
+    const weeks=s.weeks || [];
+    const head=['<th>Manager</th>',...weeks.flatMap(w=>[`<th>Week ${w}</th>`,`<th>Rank</th>`]),'<th>Difference</th><th>Rank Δ</th>'].join('');
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td>${weeks.map(w=>`<td class="${signClass(r.values?.[w])}">${pctPoint(r.values?.[w])}</td><td>${r.ranks?.[w] ?? '—'}</td>`).join('')}<td class="${signClass(r.difference)}">${pctPoint(r.difference)}</td><td>${r.rank_delta ?? '—'}</td></tr>`).join('');
+    return sectionShell('boned','01','Luck / schedule','Boned Index',s.description,`<div class="table-wrap"><table><thead><tr>${head}</tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderBonedDetail(){
+    const s=data.boned_detail;if(!s)return '';
+    const managers=s.managers||[];
+    const options=managers.map((m,i)=>`<option value="${i}">${esc(manager(m.team_id))}</option>`).join('');
+    const cards=managers.map((m,i)=>{
+      const rows=(m.rows||[]).map(r=>`<tr><td>${r.week}</td><td>${esc(r.opponent)}</td><td>${n(r.opponent_score)}</td><td>${r.opponent_games ?? '—'}</td><td>${n(r.opponent_avg)}</td><td class="${ratioClass(r.ratio)}">${n(r.ratio)}</td></tr>`).join('');
+      const a=m.averages||{};
+      return `<div class="manager-card" data-manager-index="${i}"${i ? ' hidden' : ''}><h4>${esc(manager(m.team_id))}</h4><div class="table-wrap"><table><thead><tr><th>Week</th><th>Opponent</th><th>Opp. score</th><th>Games</th><th>Opp. avg</th><th>Ratio</th></tr></thead><tbody>${rows}<tr><td colspan="2" class="manager">Average</td><td>${n(a.opponent_score)}</td><td>—</td><td>${n(a.opponent_avg)}</td><td class="${ratioClass(a.ratio)}">${n(a.ratio)}</td></tr></tbody></table></div></div>`;
+    }).join('');
+    return sectionShell('boned-detail','02','Luck / schedule','Boned Index by Manager by Week',s.description,` ${managers.length ? `<div class="manager-selector"><label for="boned-manager">Manager</label><select id="boned-manager" aria-controls="boned-manager-detail">${options}</select></div>` : ''}<div id="boned-manager-detail">${cards || '<div class="empty">No manager detail supplied.</div>'}</div>`);
+  }
+
+  function matrixTable(matrix, diagonal=true){
+    const teams=data.teams||[];
+    return `<div class="matrix-wrap"><table class="matrix"><thead><tr><th>Manager</th>${teams.map(t=>`<th>${esc(t.manager)}</th>`).join('')}</tr></thead><tbody>${teams.map(row=>`<tr><td class="manager">${esc(row.manager)}</td>${teams.map(col=>{const v=matrix?.[row.team_id]?.[col.team_id];const cls=diagonal&&row.team_id===col.team_id?'diag':Number(v)===0?'zero':'';return `<td class="${cls}">${v ?? '—'}</td>`}).join('')}</tr>`).join('')}</tbody></table></div>`;
+  }
+
+  function renderFreaky(){
+    const s=data.freaky_friday;if(!s)return '';
+    const summary=(s.schedule_swap?.summary||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td><td>${r.total ?? '—'}</td><td>${r.rank ?? '—'}</td><td>${r.max ?? '—'}</td><td>${n(r.avg)}</td><td>${r.min ?? '—'}</td></tr>`).join('');
+    const body=`<div class="grid grid-stack"><div class="card"><div class="card-head"><span class="card-title">Played This Manager's Schedule</span><span class="card-sub">wins by schedule swap</span></div>${matrixTable(s.schedule_swap?.matrix)}</div><div class="card"><div class="card-head"><span class="card-title">Schedule Swap Summary</span><span class="card-sub">total / rank / range</span></div><div class="table-wrap"><table><thead><tr><th>Manager</th><th>Total</th><th>Rank</th><th>Max</th><th>Avg</th><th>Min</th></tr></thead><tbody>${summary}</tbody></table></div></div><div class="card"><div class="card-head"><span class="card-title">Head to Head Wins</span><span class="card-sub">wins if this manager played that manager</span></div>${matrixTable(s.head_to_head?.matrix)}</div></div>`;
+    return sectionShell('freaky','03','Schedule strength','Freaky Friday',s.description,body);
+  }
+
+  function renderBhole(){
+    const s=data.bhole;if(!s)return '';
+    const d=s.deltas||[];
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td>${d.map(x=>`<td>${r.wins?.[x] ?? '—'}</td>`).join('')}<td>${r.range ?? '—'}</td><td>${n(r.avg_width,1)}</td></tr>`).join('');
+    return sectionShell('bhole','04','Close games','Between High Over Low Evaluation',s.description,`<div class="table-wrap"><table><thead><tr><th>Team</th>${d.map(x=>`<th>${Number(x)>0?'+':''}${x}</th>`).join('')}<th>Range</th><th>Avg width</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderStuds(){
+    const s=data.studs_duds;if(!s)return '';
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td><td>${r.studs ?? '—'}</td><td>${r.studded_on ?? '—'}</td><td>${r.duds ?? '—'}</td><td>${r.dudded_on ?? '—'}</td><td class="${Number(r.s2d_diff)>0?'pos':Number(r.s2d_diff)<0?'neg':''}">${r.s2d_diff ?? '—'}</td></tr>`).join('');
+    return sectionShell('studs','05','Player volatility','Studs to Duds Analysis',s.description,`<div class="table-wrap"><table><thead><tr><th>Team</th><th>Studs</th><th>Stud-ed on</th><th>Duds</th><th>Dud-ed on</th><th>S2D diff</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderGrower(){
+    const s=data.grower_shower;if(!s)return '';
+    const weeks=s.weeks||[];
+    const weights=s.weights||{};
+    const weightStrip=`<div class="metric-strip"><div class="metric"><b>${pct(weights.expected_wins)}</b><span>Expected wins weight</span></div><div class="metric"><b>${pct(weights.actual_vs_opp_avg)}</b><span>Actual vs opp avg</span></div><div class="metric"><b>${pct(weights.avg_vs_opp_actual)}</b><span>Avg vs opp actual</span></div><div class="metric"><b>${pct(weights.avg_vs_opp_avg)}</b><span>Avg vs opp avg</span></div></div>`;
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td>${weeks.map(w=>`<td>${n(r.weekly_probability?.[w],2)}</td>`).join('')}<td>${n(r.expected_wins,2)}</td><td>${r.actual_vs_opp_avg ?? '—'}</td><td>${r.avg_vs_opp_actual ?? '—'}</td><td>${r.avg_vs_opp_avg ?? '—'}</td><td>${r.actual_wins ?? '—'}</td><td class="${ratioClass(r.ratio)}">${n(r.ratio,2)}</td><td>${r.rank ?? '—'}</td></tr>`).join('');
+    return sectionShell('grower','06','Expected wins','Grower or Shower',s.description,`${weightStrip}<div class="table-wrap"><table><thead><tr><th>Team</th>${weeks.map(w=>`<th>W${w}</th>`).join('')}<th>Exp wins</th><th>Act vs opp avg</th><th>Avg vs opp act</th><th>Avg vs opp avg</th><th>Actual wins</th><th>G/S ratio</th><th>Rank</th></tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderExpertise(){
+    const s=data.managerial_expertise;if(!s)return '';
+    const cols=[['actual_points','Actual pts',v=>n(v)],['optimal_points','Optimal pts',v=>n(v)],['efficiency','Efficiency',pct],['using_yahoo_games','Yahoo games',v=>v??'—'],['using_yahoo_efficiency','Yahoo eff.',pct],['not_using_yahoo_games','Non-Yahoo games',v=>v??'—'],['not_using_yahoo_efficiency','Non-Yahoo eff.',pct],['wins_added','Wins +',v=>v??'—'],['losses_added','Losses +',v=>v??'—'],['net_added','Net',v=>v??'—'],['sheep_pct','% Sheep',pct],['plums','Plums',v=>v??'—'],['vobl','VOBL',v=>n(v)],['vobm','VOBM',v=>n(v,1)],['wobl','WOBL',v=>v??'—'],['wobm','WOBM',v=>v??'—'],['all_studs','Studs',v=>v??'—'],['studs_benched','Studs benched',v=>v??'—'],['all_duds','Duds',v=>v??'—'],['duds_started','Duds started',v=>v??'—']];
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td>${cols.map(([k,,f])=>`<td>${esc(f(r[k]))}</td>`).join('')}</tr>`).join('');
+    return sectionShell('expertise','07','Lineup management','Managerial Expertise',s.description,`<div class="table-wrap"><table><thead><tr><th>Team</th>${cols.map(([,h])=>`<th>${esc(h)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  function renderVobl(){
+    const s=data.vobl;if(!s)return '';
+    const positions=s.positions||[];
+    const rows=(s.rows||[]).map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td><td class="${signClass(r.total)}">${n(r.total)}</td>${positions.map(p=>`<td class="${signClass(r.values?.[p])}">${n(r.values?.[p])}</td>`).join('')}</tr>`).join('');
+    return sectionShell('vobl','08','Roster value','Value Over Baseline — Expanded',s.description,`<div class="table-wrap"><table><thead><tr><th>Team</th><th>VOBL</th>${positions.map(p=>`<th>${esc(p)}</th>`).join('')}</tr></thead><tbody>${rows}</tbody></table></div>`);
+  }
+
+  const oddsMetrics = {make_playoffs:'Playoffs', division:'Division', wildcard:'Wildcard', bye:'Bye', last_place:'Last'};
+  function playoffHistoryChart(metric){
+    const history=data.playoff_odds?.history||[];
+    if(!history.length)return '<div class="empty">No weekly odds history available.</div>';
+    const weeks=history.map(h=>Number(h.week));
+    const first=Math.min(...weeks),last=Math.max(...weeks);
+    const x=w=>60+(w-first)/Math.max(1,last-first)*800;
+    const y=v=>290-v*250;
+    const colors=['#355f80','#9b413c','#527944','#855b99','#ab6b25','#247e80','#ad4779','#626bb0','#6d692a','#954d24','#38715b','#71534c'];
+    const ids=[...new Set(history.flatMap(h=>(h.rows||[]).map(r=>String(r.team_id))))];
+    let hasPoints=false;
+    const lines=ids.map((id,i)=>{
+      const color=colors[i%colors.length];
+      let path='',connected=false,points='';
+      history.forEach(h=>{
+        const value=(h.rows||[]).find(r=>String(r.team_id)===id)?.[metric];
+        if(value==null||!Number.isFinite(Number(value))){connected=false;return;}
+        hasPoints=true;
+        const px=x(Number(h.week)),py=y(Number(value));
+        path+=`${connected?'L':'M'}${px},${py} `;connected=true;
+        points+=`<circle cx="${px}" cy="${py}" r="3" fill="${color}"><title>${esc(manager(id))} · Week ${Number(h.week)} · ${oddsMetrics[metric]}: ${pct(value)}</title></circle>`;
+      });
+      return `<path d="${path}" fill="none" stroke="${color}" stroke-width="2"/>${points}`;
+    }).join('');
+    const grid=[0,.25,.5,.75,1].map(v=>`<line x1="60" x2="860" y1="${y(v)}" y2="${y(v)}" stroke="#d5d1c7"/><text x="50" y="${y(v)+4}" text-anchor="end">${v*100}%</text>`).join('');
+    const ticks=weeks.map(w=>`<text x="${x(w)}" y="312" text-anchor="middle">${w}</text>`).join('');
+    const legend=ids.map((id,i)=>`<span><i style="background:${colors[i%colors.length]}"></i>${esc(manager(id))}</span>`).join('');
+    const missing=history.filter(h=>h.unavailable_reason).map(h=>`Week ${Number(h.week)}: ${esc(h.unavailable_reason)}`).join('<br>');
+    return `${hasPoints?`<div style="overflow-x:auto"><svg viewBox="0 0 900 345" role="img" aria-label="${oddsMetrics[metric]} odds by week for each manager" style="width:100%;min-width:540px;font-size:12px"><title>${oddsMetrics[metric]} odds by week</title>${grid}${ticks}${lines}<text x="460" y="337" text-anchor="middle">Week</text></svg></div><div class="legend" style="flex-wrap:wrap">${legend}</div>`:'<div class="empty">No weekly odds available for this selection.</div>'}<div class="tiny-note">Each point uses data available through that week. Missing odds appear as gaps. Hover over a point for details.${missing?`<br>${missing}`:''}</div>`;
+  }
+
+  function renderPlayoffs(){
+    const s=data.playoff_odds;if(!s)return '';
+    const sorted=[...(s.rows||[])].sort((a,b)=>(b.make_playoffs??0)-(a.make_playoffs??0));
+    const bars=sorted.map(r=>`<div class="odds-row"><span class="manager">${esc(manager(r.team_id))}</span><span class="odds-track"><span style="width:${Math.max(0,Math.min(100,(r.make_playoffs??0)*100))}%"></span></span><span class="odds-pct">${pct(r.make_playoffs)}</span><span class="odds-last">${pct(r.last_place)} last</span></div>`).join('');
+    const rows=sorted.map(r=>`<tr><td class="manager">${esc(manager(r.team_id))}</td><td>${pct(r.make_playoffs)}</td><td>${pct(r.division)}</td><td>${pct(r.wildcard)}</td><td>${pct(r.bye)}</td><td>${pct(r.last_place)}</td></tr>`).join('');
+    const note=s.simulation_count?`<div class="tiny-note">${Number(s.simulation_count).toLocaleString()} simulations.</div>`:'';
+    return sectionShell('playoffs','09','Season outlook','Playoff Odds',s.description,`<div class="grid grid-2"><div class="odds">${bars}</div><div class="table-wrap"><table><thead><tr><th>Manager</th><th>Playoffs</th><th>Division</th><th>Wildcard</th><th>Bye</th><th>Last</th></tr></thead><tbody>${rows}</tbody></table></div></div>${note}<div class="chartbox" style="margin-top:20px"><div class="chart-title">Odds by Week</div><div class="manager-selector"><label for="playoff-metric">Outcome</label><select id="playoff-metric" aria-controls="playoff-history">${Object.entries(oddsMetrics).map(([value,label])=>`<option value="${value}">${label}</option>`).join('')}</select></div><div id="playoff-history" aria-live="polite">${playoffHistoryChart('make_playoffs')}</div></div>`);
+  }
+
+  function stackedChart(rows,buckets,title){
+    const totals=(rows||[]).map(r=>buckets.reduce((a,b)=>a+Number(r.values?.[b]||0),0));
+    const max=Math.max(1,...totals);
+    const bars=(rows||[]).map((r,i)=>{
+      const total=totals[i]||0;const h=Math.max(2,total/max*100);
+      const segs=buckets.map((b,j)=>{const v=Number(r.values?.[b]||0);const pctH=total? v/total*100:0;return `<span class="seg s${j+1}" title="${esc(b)}: ${n(v)}" style="height:${pctH}%"></span>`}).join('');
+      return `<div class="barcol"><div class="stack" style="--h:${h}%">${segs}</div><div class="barlabel" title="${esc(manager(r.team_id))}">${esc(manager(r.team_id))}</div></div>`;
+    }).join('');
+    const legend=buckets.map((b,j)=>`<span><i class="s${j+1}"></i>${esc(b)}</span>`).join('');
+    return `<div class="chartbox"><div class="chart-title">${esc(title)}</div><div class="stack-chart">${bars}</div><div class="legend">${legend}</div></div>`;
+  }
+
+  function renderDraft(){
+    const s=data.draft_analysis;if(!s)return '';
+    const buckets=s.buckets||[];
+    return sectionShell('draft','10','Draft capital',"It's Not The Size of Your Draft, It's How You Use It",s.description,`<div class="grid grid-stack">${stackedChart(s.historical,buckets,'Historical Points From Rounds')}${stackedChart(s.optimal,buckets,'Optimal Points From Rounds')}</div>`);
+  }
+
+  const html=[renderBoned(),renderBonedDetail(),renderFreaky(),renderBhole(),renderStuds(),renderGrower(),renderExpertise(),renderVobl(),renderPlayoffs(),renderDraft()].filter(Boolean).join('');
+  document.getElementById('sections').innerHTML=html;
+  document.getElementById('playoff-metric')?.addEventListener('change',event=>{
+    document.getElementById('playoff-history').innerHTML=playoffHistoryChart(event.target.value);
+  });
+  document.getElementById('boned-manager')?.addEventListener('change',event=>{
+    document.querySelectorAll('#boned-manager-detail .manager-card').forEach(card=>{
+      card.hidden=card.dataset.managerIndex!==event.target.value;
+    });
+  });
+})();
+</script>
+</body>
+</html>

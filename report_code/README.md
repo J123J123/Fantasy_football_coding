@@ -165,10 +165,48 @@ Python implementation where the sample does not fully specify a formula.
 
 ## Playoff simulation
 
-Supply `playoff_teams=6, playoff_byes=2` (or the equivalent CLI flags) if these
-settings are absent from the snapshot. Defaults are read only when archived;
-otherwise the section explains why odds are unavailable. `simulation_count`
-defaults to 10,000 and `random_seed` to 42.
+`ReportProcessor(data_path, current_week)` reads the playoff qualifier count and
+start week from league settings. Byes are derived from the standard bracket
+lookup in `playoff_odds.PLAYOFF_ROUNDS` (1–16 qualifiers), using
+`2 ** rounds - qualifiers`: 4 teams / 2 rounds gives 0 byes, 6 teams / 3 rounds
+gives 2, 8 teams / 3 rounds gives 0, and 12 teams / 4 rounds gives 4.
+Rounds assume one matchup per week. The archived bye field is not required.
+Optional `playoff_byes` and `playoff_teams` constructor arguments (or equivalent
+CLI flags) override these defaults; an explicit zero bye count is respected.
+Counts outside the lookup require a `playoff_byes` override.
+`simulation_count`
+defaults to 10,000 (1,000 seasons for each of ten standard-deviation exponents)
+and `random_seed` to 42. A custom `simulation_count` must be a positive multiple
+of 10 so each exponent receives equal weight.
+
+For scoring distributions, the team weight is
+`min(current_week, playoff_blend_weeks) / playoff_blend_weeks`. The optional
+constructor argument `playoff_blend_weeks` defaults to 10; override it to change how long
+league-wide information contributes. Historical odds use the same configured window.
+Both the mean and sample standard deviation are weighted averages of the
+manager's statistic and the league-wide statistic, with the remaining weight
+on the league. League statistics pool all completed regular-season team-week
+scores through the report week; the league standard deviation is calculated
+over those individual scores, not over team averages. Both standard deviations
+use `ddof=1`. Week 2 uses 20% team and 80% league information;
+week 10 onward uses only team statistics with the default window. These parameters stay fixed while
+simulating future weeks, and each historical outlook uses its own report week.
+
+After blending, each simulation group uses `blended_std ** exponent`, with
+exponents 0.25, 0.50, …, 2.50. Each simulated season retains its group's exponent
+for every team and remaining week. All groups contribute equally to the final
+odds. Draws use the blended mean and transformed standard deviation, then clamp
+to `[60, 200]` (values outside the range become the nearest endpoint, rather
+than being redrawn). Existing actual scores are not capped. Clipping can create
+exact ties at the endpoints; these still count as half a win.
+
+
+The HTML section also includes an odds-by-week line chart with a dropdown for
+Playoffs, Division, Wildcard, Bye, and Last. `playoff_odds.history` in the JSON
+contains each week's independently calculated outlook using only snapshots
+available through that week. Missing snapshots or insufficient scoring history
+produce gaps with explanations. History is cached on the processor; the first
+export takes longer because it calculates every week through `current_week`.
 
 Standings use wins, then season points, then a seeded random tie-break.
 For divisions, pass `divisions={"1": "East", "2": "West", ...}` covering every

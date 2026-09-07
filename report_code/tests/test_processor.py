@@ -368,3 +368,132 @@ def test_archived_divisions_feed_playoff_odds(archive):
     frame.to_csv(folder / 'divisions_week_2.csv.gz', index=False)
     with pytest.raises(ValueError, match='missing division_id'):
         _ = ReportProcessor(archive).divisions
+
+
+@pytest.mark.parametrize('qualifiers, expected_byes', [(4, 0), (6, 2), (8, 0), (12, 4)])
+@pytest.mark.parametrize('override', [None, 0, 1])
+def test_playoff_byes_derived_from_bracket(qualifiers, expected_byes, override):
+    from types import SimpleNamespace
+    from report_code.playoff_odds import build
+
+    teams = [str(i) for i in range(12)]
+    processor = SimpleNamespace(
+        teams=pd.DataFrame({'team_id': teams}),
+        bronze_settings=pd.DataFrame([{'num_playoff_teams': qualifiers,
+                                      'playoff_start_week': 3}]),
+        playoff_teams=None, playoff_byes=override, divisions={},
+        silver_team_week=pd.DataFrame([
+            {'team_id': team, 'week': week, 'actual_points': 100 + i + week, 'win': float(i >= 6)}
+            for i, team in enumerate(teams) for week in (1, 2)
+        ]),
+        silver_schedule=pd.DataFrame(columns=['team_id', 'week', 'opponent_id']),
+        current_week=2, simulation_count=100, random_seed=42, playoff_blend_weeks=6,
+    )
+    odds = build(processor)
+    assert not odds.attrs.get('unavailable_reason')
+    assert odds.make_playoffs.sum() == pytest.approx(qualifiers)
+    assert odds.bye.sum() == pytest.approx(expected_byes if override is None else override)
+
+
+def test_processor_infers_byes_without_archived_bye_count(archive):
+    report = ReportProcessor(archive, 2)
+    report.bronze_settings.drop(columns='num_playoff_byes', inplace=True)
+    assert report.gold_playoff_odds.make_playoffs.notna().all()
+    assert report.gold_playoff_odds.bye.eq(0).all()
+
+
+def test_playoff_history_uses_each_weeks_snapshots(archive):
+    report = ReportProcessor(archive, 3, simulation_count=100, playoff_byes=0)
+    history = report.playoff_odds_history
+    assert [entry['week'] for entry in history] == [1, 2, 3]
+    assert history[0]['unavailable_reason']
+    expected = ReportProcessor(archive, 2, simulation_count=100, playoff_byes=0)
+    assert history[1]['rows'] == json.loads(expected.gold_playoff_odds.to_json(orient='records'))
+    assert history[2]['rows'] == json.loads(report.gold_playoff_odds.to_json(orient='records'))
+    # A new week-three score must not change the week-two outlook.
+    path = archive / 'player_data/player_data_week_3.csv.gz'
+    players = pd.read_csv(path)
+    players['fantasy_points_actual'] += 1000
+    players.to_csv(path, index=False)
+    changed = ReportProcessor(archive, 3, simulation_count=100, playoff_byes=0)
+    assert changed.playoff_odds_history[1] == history[1]
+    assert report.playoff_odds_history is history
+
+
+def test_playoff_history_retains_missing_weeks(archive):
+    (archive / 'league_settings/league_settings_week_1.csv.gz').unlink()
+    report = ReportProcessor(archive, 2, simulation_count=100)
+    assert report.playoff_odds_history[0]['rows'] == []
+    assert report.playoff_odds_history[0]['unavailable_reason']
+    assert report.playoff_odds_history[1]['unavailable_reason'] is None
+
+
+@pytest.mark.parametrize('week, weight', [(2, 1/3), (3, 1/2), (5, 5/6), (6, 1), (10, 1)])
+def test_playoff_score_parameters_blend_pooled_scores(week, weight):
+    import numpy as np
+    from report_code.playoff_odds import score_parameters
+
+    games = pd.DataFrame({'team_id': ['a', 'a', 'b', 'b'],
+                          'actual_points': [80., 80., 100., 140.]})
+    stats = score_parameters(games, ['b', 'a'], week, blend_weeks=6)
+    pooled_std = np.std([80., 80., 100., 140.], ddof=1)
+    assert stats.index.tolist() == ['b', 'a']
+    assert stats.loc['a', 'mean'] == pytest.approx(weight*80 + (1-weight)*100)
+    assert stats.loc['b', 'mean'] == pytest.approx(weight*120 + (1-weight)*100)
+    assert stats.loc['a', 'std'] == pytest.approx((1-weight)*pooled_std)
+    assert stats.loc['b', 'std'] == pytest.approx(weight*np.std([100., 140.], ddof=1) + (1-weight)*pooled_std)
+
+
+@pytest.mark.parametrize('window', [6, 8, 10])
+def test_configurable_playoff_blending_and_history(archive, window):
+    from report_code.playoff_odds import score_parameters
+    report = ReportProcessor(archive, 3, playoff_blend_weeks=window, simulation_count=100)
+    games = report.silver_team_week
+    stats = score_parameters(games, report.teams.team_id, 2, window)
+    means = games.groupby('team_id').actual_points.mean()
+    assert stats.loc['1', 'mean'] == pytest.approx(2/window*means['1'] + (1-2/window)*games.actual_points.mean())
+    expected = ReportProcessor(archive, 2, playoff_blend_weeks=window, simulation_count=100)
+    assert report.playoff_odds_history[1]['rows'] == json.loads(expected.gold_playoff_odds.to_json(orient='records'))
+
+
+@pytest.mark.parametrize('window', [0, -1, 2.5, True, None])
+def test_invalid_playoff_blend_window(archive, window):
+    with pytest.raises(ValueError, match='playoff_blend_weeks'):
+        ReportProcessor(archive, playoff_blend_weeks=window)
+
+
+def test_exponent_sweep_has_1000_seasons_per_exponent():
+    import numpy as np
+    from report_code.playoff_odds import simulation_scales
+    scales = simulation_scales([16., 25.], 10000)
+    assert scales.shape == (10000, 2)
+    for i in range(10):
+        exponent = (i + 1) * .25
+        np.testing.assert_allclose(scales[i*1000:(i+1)*1000, 0], 16**exponent)
+        np.testing.assert_allclose(scales[i*1000:(i+1)*1000, 1], 25**exponent)
+
+
+def test_simulated_scores_clip_both_bounds_without_changing_interior():
+    import numpy as np
+    from report_code.playoff_odds import simulated_scores
+    class FixedDraws:
+        def normal(self, means, scales):
+            return np.array([[-1000., 60., 115., 200., 9000.]])
+    np.testing.assert_array_equal(simulated_scores(FixedDraws(), None, None),
+                                  [[60., 60., 115., 200., 200.]])
+
+
+@pytest.mark.parametrize('count', [1, 99, 100.0, True])
+def test_simulations_require_equal_exponent_groups(archive, count):
+    with pytest.raises(ValueError, match='multiple of 10'):
+        ReportProcessor(archive, simulation_count=count)
+
+
+def test_default_playoff_roll_in_is_ten_weeks(archive):
+    from report_code.playoff_odds import score_parameters
+    report = ReportProcessor(archive, 2)
+    assert report.playoff_blend_weeks == 10
+    games = report.silver_team_week
+    stats = score_parameters(games, report.teams.team_id, 2)
+    team_mean = games.loc[games.team_id.eq('1'), 'actual_points'].mean()
+    assert stats.loc['1', 'mean'] == pytest.approx(.2*team_mean + .8*games.actual_points.mean())

@@ -39,7 +39,8 @@ class ReportProcessor:
 
     def __init__(self, data_path, current_week=None, *, data_files=None,
                  official_scores_path=None, tolerance=0.01, simulation_count=10000,
-                 random_seed=42, playoff_teams=None, playoff_byes=None, divisions=None):
+                 random_seed=42, playoff_teams=None, playoff_byes=None, divisions=None,
+                 playoff_blend_weeks=10):
         path = Path(data_path)
         self.data_path = path.parent if path.is_file() else path
         metadata_path = path if path.is_file() else path / 'metadata.json'
@@ -54,8 +55,13 @@ class ReportProcessor:
         self.tolerance = tolerance
         if tolerance < 0 or simulation_count < 1:
             raise ValueError('tolerance must be nonnegative and simulation_count positive')
+        if isinstance(simulation_count, bool) or not isinstance(simulation_count, int) or simulation_count % 10:
+            raise ValueError('simulation_count must be a positive multiple of 10 for equal exponent groups')
         self.simulation_count, self.random_seed = simulation_count, random_seed
         self.playoff_teams, self.playoff_byes = playoff_teams, playoff_byes
+        if isinstance(playoff_blend_weeks, bool) or not isinstance(playoff_blend_weeks, int) or playoff_blend_weeks < 1:
+            raise ValueError('playoff_blend_weeks must be a positive integer')
+        self.playoff_blend_weeks = playoff_blend_weeks
         self._divisions_override = ({str(k): str(v) for k, v in divisions.items()}
                                     if divisions is not None else None)
         self.source_files = {}
@@ -315,6 +321,28 @@ class ReportProcessor:
     @property
     def gold_tables(self):
         return {name: self._gold_table(name) for name in REPORTS}
+
+    @cached_property
+    def playoff_odds_history(self):
+        """Recalculate each outlook using only snapshots available that week."""
+        history = []
+        for week in range(1, self.current_week + 1):
+            snapshot = self if week == self.current_week else type(self)(
+                self.data_path, week, data_files=self.data_files,
+                official_scores_path=self.official_scores_path, tolerance=self.tolerance,
+                simulation_count=self.simulation_count, random_seed=self.random_seed,
+                playoff_teams=self.playoff_teams, playoff_byes=self.playoff_byes,
+                playoff_blend_weeks=self.playoff_blend_weeks,
+                divisions=self._divisions_override,
+            )
+            try:
+                table = snapshot.gold_playoff_odds
+                history.append({'week': week, 'rows': records(table),
+                                'unavailable_reason': table.attrs.get('unavailable_reason')})
+            except FileNotFoundError:
+                history.append({'week': week, 'rows': [],
+                                'unavailable_reason': 'Required archived snapshots are missing for this week.'})
+        return history
 
     def to_dict(self):
         data = {'meta': {'title': 'The Fantasy League Weekly Report™',
