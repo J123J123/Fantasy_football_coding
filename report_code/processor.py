@@ -67,6 +67,21 @@ class ReportProcessor:
         self.source_files = {}
         self._gold = {}
 
+    @cached_property
+    def team_nicknames(self):
+        """Optional display names; a bad file or entry never blocks reporting."""
+        try:
+            mapping = json.loads((self.data_path / 'team_nicknames.json').read_text(encoding='utf-8'))
+        except (OSError, ValueError):
+            return {}
+        if not isinstance(mapping, dict):
+            return {}
+        return {team_id: nickname.strip() for team_id, nickname in mapping.items()
+                if isinstance(nickname, str) and nickname.strip()}
+
+    def _team_display_names(self, frame):
+        return frame.team_id.astype('string').map(self.team_nicknames).fillna(frame.team_name)
+
     def read_files(self, table, *, latest=False):
         """Read CSV/CSV.GZ paths, validate snapshot weeks, concatenate once."""
         source = self.data_files.get(table, self.data_path / self.sources.get(table, table))
@@ -156,6 +171,7 @@ class ReportProcessor:
         """Team division assignments from the latest snapshot through current_week."""
         frame = self.bronze_divisions.copy()
         self._unique(frame, ['team_id'], 'divisions')
+        frame['team_name'] = self._team_display_names(frame)
         return frame[['team_id', 'team_name', 'division_id', 'division_name', 'week']].reset_index(drop=True)
 
     @cached_property
@@ -173,6 +189,7 @@ class ReportProcessor:
         # Roster ownership belongs to that week, never to the draft snapshot.
         for c in ('team_id', 'team_name', 'roster_slot', 'is_starting'):
             base[c] = base.get(f'team_{c}', pd.Series(index=base.index, dtype='object'))
+        base['team_name'] = self._team_display_names(base)
         base['is_starting'] = base.is_starting.astype(str).str.lower().isin(['true', '1'])
         base['actual_points'] = pd.to_numeric(base.get('fantasy_points_actual'), errors='coerce')
         base['projected_points'] = pd.to_numeric(base.get('projection_projected_points'), errors='coerce')
@@ -220,6 +237,7 @@ class ReportProcessor:
         schedule_ids = self.bronze_schedule.team_key.astype('string').str.rsplit('.t.').str[-1]
         t = pd.DataFrame({'team_id': schedule_ids}).drop_duplicates().merge(t, on='team_id', how='outer', validate='one_to_one')
         t['team_name'] = t.team_name.fillna(t.team_id.map(lambda value: f'Team {value}'))
+        t['team_name'] = self._team_display_names(t)
         t['manager'] = t.team_name  # Collector does not archive manager names.
         return t.sort_values('team_id').reset_index(drop=True)
 

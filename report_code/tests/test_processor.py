@@ -39,6 +39,41 @@ def archive(tmp_path):
     return tmp_path
 
 
+def test_team_nicknames_override_display_names(archive):
+    (archive/'team_nicknames.json').write_text(json.dumps({'1': ' Joe ', '99': 'Unused'}))
+    processor = ReportProcessor(archive/'metadata.json')
+    teams = processor.teams.set_index('team_id')
+    assert teams.loc['1', ['team_name', 'manager']].tolist() == ['Joe', 'Joe']
+    assert teams.loc['2', 'team_name'] == 'Team 2'
+    players = processor.silver_player
+    assert players.loc[players.team_id.eq('1'), 'team_name'].eq('Joe').all()
+    assert players.loc[players.team_id.isna(), 'team_name'].isna().all()
+    assert processor.bronze_team_data.query("team_id == '1'").team_name.eq('Team 1').all()
+    processor.bronze_divisions = pd.DataFrame([
+        dict(team_id='1', team_name='Team 1', division_id='1', division_name='East', week=2)])
+    assert processor.silver_divisions.iloc[0].team_name == 'Joe'
+
+
+@pytest.mark.parametrize('contents', [None, '{bad', '[]', 'null', '42',
+    '{"1": null, "2": "  "}', '{"1": 12, "2": {}}', b'\xff'])
+def test_team_nicknames_fallback(archive, contents):
+    path = archive/'team_nicknames.json'
+    if isinstance(contents, bytes):
+        path.write_bytes(contents)
+    elif contents is not None:
+        path.write_text(contents)
+    assert ReportProcessor(archive).teams.team_name.tolist() == ['Team 1', 'Team 2']
+
+
+def test_team_nicknames_invalid_entry_and_unreadable_file(archive):
+    path = archive/'team_nicknames.json'
+    path.write_text('{"1": "Joe", "2": false}')
+    assert ReportProcessor(archive).teams.team_name.tolist() == ['Joe', 'Team 2']
+    path.unlink()
+    path.mkdir()
+    assert ReportProcessor(archive).teams.team_name.tolist() == ['Team 1', 'Team 2']
+
+
 def test_metadata_week_snapshot_selection_and_joins(archive):
     r=ReportProcessor(archive)
     assert r.current_week==2

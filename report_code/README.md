@@ -16,6 +16,25 @@ Create the output directory first. Omit `--week` to use metadata `current_week`,
 falling back to `last_collected_week`. This is the archive's week, not today's
 NFL week. Input may be the league/season directory or its `metadata.json`.
 
+To use stable nicknames instead of Yahoo team names, add `team_nicknames.json`
+beside `metadata.json` in the league/year folder (for example,
+`yahoo-fantasy-data/data/Ferda/2025/team_nicknames.json`):
+
+```json
+{
+  "1": "Joe",
+  "2": "Sam"
+}
+```
+
+Keys are team IDs, not full Yahoo team keys. Nicknames replace team and manager
+display names in reports and team names in silver player/division tables.
+Partial mappings are supported: missing IDs, blank nicknames, and non-string
+values keep the existing name. Unknown IDs are ignored. Missing, unreadable,
+malformed, or non-object JSON files leave all names unchanged. Surrounding
+nickname whitespace is trimmed. Archived source data is unchanged; create a new
+processor or rerun the report after editing the file.
+
 HTML reports use the original wording by default (`--template original`).
 Select the work-appropriate template with `--template pc`:
 
