@@ -261,7 +261,9 @@ indexes. The exports preserve the silver tables' columns and missing values.
 Use `python -m report_code.publish --config report_runs.json --backfill` to collect
 and publish the league/year/nickname entries in the JSON run list. The permanent
 `docs/index.html` fetches the file list from GitHub in JavaScript; publishing does
-not rewrite it. Week is inferred when omitted; see the
+not rewrite it. When week is omitted, publishing uses `min(current_week, playoff_start_week - 1)`
+from Yahoo metadata/settings (with backfill) or the local archive (without it).
+This includes the current week but caps the report at regular-season play. See the
 [root README](../README.md) for workflow setup and additional options.
 
 Publishing saves weekly reports at `docs/NICKNAME_YEAR_weekN.html`

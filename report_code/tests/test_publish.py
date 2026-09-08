@@ -60,11 +60,14 @@ def test_single_league_silver_only_cli(archive, tmp_path, monkeypatch, capsys):
 
 
 @pytest.mark.parametrize('payload, expected', [
-    ({'current_week': '5', 'end_week': '17'}, 4),
-    ({'current_week': '17', 'end_week': '17', 'is_finished': '1'}, 17),
-    ({'current_week': '1', 'end_week': '17'}, 0),
-    ({'current_week': '0', 'end_week': '17'}, 0),
-    ({'current_week': '19', 'end_week': '17'}, 17),
+    ({'current_week': '5', 'playoff_start_week': '15'}, 5),
+    ({'current_week': '17', 'playoff_start_week': '15', 'is_finished': '1'}, 14),
+    ({'current_week': '14', 'playoff_start_week': '15'}, 14),
+    ({'current_week': '15', 'playoff_start_week': '15'}, 14),
+    ({'current_week': '1', 'playoff_start_week': '15'}, 1),
+    ({'current_week': '0'}, 0),
+    ({'current_week': '19', 'playoff_start_week': '16'}, 15),
+    ({'current_week': '19', 'uses_playoff': '0', 'end_week': '18'}, 18),
 ])
 def test_infer_remote_week(payload, expected, tmp_path, monkeypatch):
     from yahoo_fantasy_data import yahoo
@@ -75,8 +78,8 @@ def test_infer_remote_week(payload, expected, tmp_path, monkeypatch):
 
 def test_local_inference_and_explicit_week(archive):
     run = {'year': 2025, 'league_id': '1', 'nickname': 'One'}
-    # Last collected week wins over the archive's stale current_week.
-    assert publish.resolve_week(run, archive, backfill=False, settings=None) == 3
+    # Use metadata current_week, not last_collected_week.
+    assert publish.resolve_week(run, archive, backfill=False, settings=None) == 2
     assert publish.resolve_week({**run, 'week': 1}, archive, backfill=True, settings=None) == 1
 
 
@@ -118,8 +121,8 @@ def test_default_config_local_build_without_week(archive, tmp_path, monkeypatch)
     monkeypatch.setattr(publish, 'ReportProcessor', lambda path, week: real_processor(path, week, simulation_count=10))
     monkeypatch.setattr(sys, 'argv', ['publish', '--data-dir', 'data'])
     publish.main()
-    assert (tmp_path / 'docs/One_2025_week3_pc.html').exists()
-    assert pd.read_csv(tmp_path / 'docs/data/One/2025/silver_player.csv.gz').week.max() == 3
+    assert (tmp_path / 'docs/One_2025_week2_pc.html').exists()
+    assert pd.read_csv(tmp_path / 'docs/data/One/2025/silver_player.csv.gz').week.max() == 2
 
 
 def test_backfill_uses_inferred_week_and_config_options(archive, tmp_path, monkeypatch):
@@ -127,7 +130,7 @@ def test_backfill_uses_inferred_week_and_config_options(archive, tmp_path, monke
     run = {'league_id': '9', 'year': 2024, 'nickname': 'One', 'overwrite': True}
     config = tmp_path / 'runs.json'
     config.write_text(json.dumps([run]))
-    monkeypatch.setattr(yahoo, 'league_metadata', lambda *a: ({'current_week': 3, 'end_week': 17}, None, None, None, None))
+    monkeypatch.setattr(yahoo, 'league_metadata', lambda *a: ({'current_week': 3, 'end_week': 17, 'playoff_start_week': 15}, None, None, None, None))
     calls = []
     def backfill(*args, **kwargs):
         calls.append((args, kwargs))
@@ -137,9 +140,9 @@ def test_backfill_uses_inferred_week_and_config_options(archive, tmp_path, monke
     monkeypatch.setattr(publish, 'ReportProcessor', lambda path, week: real_processor(archive, week, simulation_count=10))
     monkeypatch.setattr(sys, 'argv', ['publish', '--config', str(config), '--backfill', '--docs-dir', str(tmp_path / 'docs')])
     publish.main()
-    assert calls[0][0] == (2024, '9', 1, 2, True)
+    assert calls[0][0] == (2024, '9', 1, 3, True)
     assert calls[0][1]['league_nickname'] == 'One'
-    assert (tmp_path / 'docs/One_2024_week2.html').exists()
+    assert (tmp_path / 'docs/One_2024_week3.html').exists()
 
 
 @pytest.mark.parametrize('template, expected', [
@@ -229,3 +232,51 @@ def test_notebook_direct_public_backfill_and_gzip(archive, tmp_path, monkeypatch
         assert path.read_bytes()[:2] == b'\x1f\x8b'
         assert not pd.read_csv(path).empty
     assert not list((tmp_path / 'docs').rglob('week*'))
+
+
+def test_remote_week_reads_playoff_settings(tmp_path, monkeypatch):
+    from unittest.mock import Mock
+    from yahoo_fantasy_data import yahoo
+    provider = Mock()
+    provider.settings.return_value = {'settings': {'playoff_start_week': '15'}}
+    monkeypatch.setattr(yahoo, 'league_metadata', lambda *a: (
+        {'current_week': 17, 'end_week': 17}, None, provider, '461', '461.l.1'))
+    assert publish.resolve_week({'year': 2025, 'league_id': '1', 'nickname': 'One'},
+                                tmp_path, backfill=True, settings=None) == 14
+    provider.settings.assert_called_once_with('461.l.1')
+
+
+def test_local_week_caps_playoffs_and_requires_metadata(archive):
+    path = archive / 'metadata.json'
+    metadata = json.loads(path.read_text())
+    metadata['current_week'] = 5
+    path.write_text(json.dumps(metadata))
+    run = {'year': 2025, 'league_id': '1', 'nickname': 'One'}
+    assert publish.resolve_week(run, archive, backfill=False, settings=None) == 3
+    del metadata['current_week']
+    path.write_text(json.dumps(metadata))
+    with pytest.raises(ValueError, match='current_week metadata is missing'):
+        publish.resolve_week(run, archive, backfill=False, settings=None)
+
+
+def test_missing_playoff_cutoff_fails(tmp_path, monkeypatch):
+    from unittest.mock import Mock
+    from yahoo_fantasy_data import yahoo
+    provider = Mock()
+    provider.settings.return_value = {}
+    monkeypatch.setattr(yahoo, 'league_metadata', lambda *a: (
+        {'current_week': 17, 'end_week': 17}, None, provider, '461', '461.l.1'))
+    with pytest.raises(ValueError, match='playoff_start_week'):
+        publish.resolve_week({'year': 2025, 'league_id': '1', 'nickname': 'One'},
+                             tmp_path, backfill=True, settings=None)
+
+
+def test_collector_persists_current_week(tmp_path):
+    from yahoo_fantasy_data.config import Settings
+    from yahoo_fantasy_data.yahoo import update_metadata
+    settings = Settings(data_dir=tmp_path)
+    update_metadata(settings, 2025, '1', '461', '461.l.1',
+                    {'current_week': '17', 'end_week': '17'}, 14, {})
+    metadata = json.loads((tmp_path / '1/2025/metadata.json').read_text())
+    assert metadata['current_week'] == '17'
+    assert metadata['last_collected_week'] == 14

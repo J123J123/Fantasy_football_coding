@@ -59,32 +59,56 @@ def load_runs(path):
 
 
 def resolve_week(run, data_path, *, backfill, settings):
+    """Default to metadata's current week, capped at the regular-season end."""
     if run.get('week') is not None:
         return run['week']
-    if not backfill:
-        metadata = json.loads((data_path / 'metadata.json').read_text())
-        week = metadata.get('last_collected_week')
-        if week is None:
-            raise ValueError(f'{data_path}: last_collected_week is missing; configure week explicitly')
-        week = int(week)
-    else:
+    from yahoo_fantasy_data.utils import first_value
+    if backfill:
         from yahoo_fantasy_data.yahoo import league_metadata
-        from yahoo_fantasy_data.utils import first_value
-        payload, *_ = league_metadata(run['year'], str(run['league_id']), settings)
-        end = first_value(payload, 'end_week')
-        finished = str(first_value(payload, 'is_finished', '0')).lower() in ('1', 'true')
-        current = first_value(payload, 'current_week')
-        if finished and end is not None:
-            week = int(end)
-        elif not finished and current is not None:
-            week = max(0, int(current) - 1)
-            if end is not None:
-                week = min(week, int(end))
+        metadata, _, provider, _, key = league_metadata(run['year'], str(run['league_id']), settings)
+    else:
+        metadata = json.loads((Path(data_path) / 'metadata.json').read_text())
+    current = first_value(metadata, 'current_week')
+    if current is None:
+        raise ValueError(f"{run['nickname']}: current_week metadata is missing; refresh with backfill or configure week explicitly")
+    current = int(current)
+    if current < 0:
+        raise ValueError('current_week must be nonnegative')
+    if current == 0:
+        return 0
+
+    playoff_start = first_value(metadata, 'playoff_start_week')
+    use_playoff = first_value(metadata, 'uses_playoff')
+    if playoff_start is None and str(use_playoff).lower() not in ('0', 'false'):
+        if backfill:
+            league_settings = provider.settings(key)
+            playoff_start = first_value(league_settings, 'playoff_start_week')
+            use_playoff = first_value(league_settings, 'uses_playoff')
         else:
-            raise ValueError(f"{run['nickname']}: Yahoo week metadata is missing; configure week explicitly")
-    if not 0 <= week <= 18:
-        raise ValueError(f'Inferred week {week} is outside 0–18')
-    return week
+            import pandas as pd
+            snapshots = list((Path(data_path) / 'league_settings').glob('league_settings_week_*.csv.gz'))
+            if snapshots:
+                latest = max(snapshots, key=lambda path: int(path.name.split('_week_')[1].split('.')[0]))
+                frame = pd.read_csv(latest)
+                for column in ('playoff_start_week', 'uses_playoff'):
+                    if column in frame and not frame[column].dropna().empty:
+                        value = int(frame[column].dropna().iloc[0])
+                        if column == 'playoff_start_week':
+                            playoff_start = value
+                        else:
+                            use_playoff = value
+    if str(use_playoff).lower() in ('0', 'false'):
+        end = first_value(metadata, 'end_week')
+        if end is None:
+            raise ValueError('end_week is missing for a league without playoffs')
+        regular_end = int(end)
+    elif playoff_start is not None and 2 <= int(playoff_start) <= 19:
+        regular_end = int(playoff_start) - 1
+    else:
+        raise ValueError(f"{run['nickname']}: playoff_start_week is missing or invalid; cannot determine the regular-season end")
+    if not 1 <= regular_end <= 18:
+        raise ValueError('Regular-season end must be between 1 and 18')
+    return min(current, regular_end)
 
 
 def main():
@@ -123,7 +147,7 @@ def main():
         week = args.week if args.week is not None else resolve_week(
             run, data_path, backfill=args.backfill, settings=settings)
         if week == 0:
-            print(f'Skipping {name}, {year}: no completed weeks yet', flush=True)
+            print(f'Skipping {name}, {year}: season has not started', flush=True)
             continue
         print(f'Building {name}, {year}, week {week}', flush=True)
         if args.backfill:
