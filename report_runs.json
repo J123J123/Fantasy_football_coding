@@ -1,25 +1,31 @@
 [
   {
-    "league_id": "707737",
-    "year": 2025,
+    "league_id": "1500072",
+    "year": 2026,
     "nickname": "PHFFL_A",
-    "template": "original"
+    "template": "pc"
   },
   {
-    "league_id": "134317",
-    "year": 2025,
+    "league_id": "",
+    "year": 2026,
+    "nickname": "PHFFL_B",
+    "template": "pc"
+  },
+  {
+    "league_id": "526206",
+    "year": 2026,
     "nickname": "CFFL_A",
     "template": "original"
   },
   {
-    "league_id": "918145",
-    "year": 2025,
+    "league_id": "857540",
+    "year": 2026,
     "nickname": "CFFL_B",
     "template": "original"
   },
   {
-    "league_id": "889216",
-    "year": 2025,
+    "league_id": "236541",
+    "year": 2026,
     "nickname": "Ferda",
     "template": "original"
   }
