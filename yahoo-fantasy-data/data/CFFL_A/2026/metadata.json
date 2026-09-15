@@ -3,21 +3,21 @@
   "end_week": "17",
   "game_id": "470",
   "last_collected_week": 2,
-  "last_updated": "2026-09-15T15:05:24.678620+00:00",
+  "last_updated": "2026-09-15T16:14:10.014531+00:00",
   "league_id": "526206",
   "league_key": "470.l.526206",
   "league_name": "Conarroe Fantasy A League",
   "league_type": "public",
   "season": 2026,
   "sources": {
-    "divisions": "written",
-    "draft": "written",
-    "league_settings": "written",
-    "player_data": "written",
-    "points_recon": "written",
-    "projection_data": "written",
-    "schedule": "written",
-    "team_data": "written"
+    "divisions": "skipped_existing",
+    "draft": "skipped_existing",
+    "league_settings": "skipped_existing",
+    "player_data": "skipped_existing",
+    "points_recon": "skipped_existing",
+    "projection_data": "skipped_existing",
+    "schedule": "skipped_existing",
+    "team_data": "skipped_existing"
   },
   "start_week": "1"
 }
