@@ -209,7 +209,7 @@ def collect_week(season: int, league_id: str, week: int, overwrite: bool = False
     return statuses
 
 
-def backfill_season(season: int, league_id: str, start_week: int = 1, end_week: int | None = None, overwrite: bool = False, *, settings: Settings | None = None, league_nickname: str | None = None) -> dict[int, dict[str, str]]:
+def backfill_season(season: int, league_id: str, start_week: int = 1, end_week: int | None = None, overwrite: bool = False, *, settings: Settings | None = None, league_nickname: str | None = None, refresh_latest: bool = False) -> dict[int, dict[str, str]]:
     active_settings = settings or load_settings()
     if league_nickname is not None:
         active_settings = replace(active_settings, league_nickname=league_nickname)
@@ -219,20 +219,20 @@ def backfill_season(season: int, league_id: str, start_week: int = 1, end_week: 
         raise ValueError("end_week must not precede start_week")
     from .collectors.schedule import get_schedule_matrix
     schedule_matrix: pd.DataFrame | None = None
-    schedule_missing = overwrite or any(
+    schedule_missing = overwrite or refresh_latest or any(
         not _snapshot_path(active_settings, league_id, season, "schedule", week).exists()
         for week in range(start_week, resolved_end + 1)
     )
     if schedule_missing:
         schedule_matrix = get_schedule_matrix(
-            season, str(league_id), start_week, resolved_end,
+            season, str(league_id), start_week, int(first_value(payload, "end_week", resolved_end)),
             settings=active_settings, game_id=game_id, provider=public,
         )
     context = (payload, public, game_id, key)
     static_frames: dict[str, pd.DataFrame] = {}
     return {
         week: collect_week(
-            season, league_id, week, overwrite, settings=active_settings,
+            season, league_id, week, overwrite or (refresh_latest and week == resolved_end), settings=active_settings,
             league_nickname=league_nickname, _metadata_context=context,
             _schedule_matrix=schedule_matrix, _static_frames=static_frames,
         )

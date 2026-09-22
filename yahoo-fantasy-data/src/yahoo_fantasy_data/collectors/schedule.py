@@ -15,11 +15,12 @@ def get_schedule(season: int, league_id: str, week: int, *, settings: Settings |
     payload = provider.scoreboard(key, week)
     records: list[dict[str, Any]] = []
     # Yahoo omits matchup_id in its public scoreboard response. Matchups are
-    # identifiable by their week/status/winner fields, and the full team rows
+    # identifiable by their week/status fields (teams may be in a numbered
+    # wrapper), and the full team rows
     # contain team_id plus the weekly actual and projected point objects.
     matchups = (
         item for item in walk(payload)
-        if "week" in item and "winner_team_key" in item
+        if "week" in item and "status" in item
     )
     for matchup_number, matchup in enumerate(matchups, start=1):
         teams = [

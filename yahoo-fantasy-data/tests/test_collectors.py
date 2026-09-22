@@ -201,3 +201,22 @@ def test_divisions_exclude_manager_contacts():
     assert 'manager_name' not in frame.columns
     assert 'manager_email' not in frame.columns
     assert len(frame) == 3
+
+
+def test_schedule_keeps_unplayed_matchups_without_a_winner():
+    from yahoo_fantasy_data.collectors.schedule import get_schedule_matrix
+
+    class ScheduleProvider:
+        def scoreboard(self, key, week):
+            matchup = {'week': week, 'status': 'postevent' if week == 1 else 'preevent',
+                       'is_playoffs': int(week == 4),
+                       '0': {'teams': [{'team_key': f'{key}.t.{i}', 'team_id': str(i)}
+                                      for i in (1, 2)]}}
+            if week == 1:
+                matchup['winner_team_key'] = f'{key}.t.1'
+            return {'scoreboard': {'week': week, 'matchups': [{'matchup': matchup}]}}
+
+    matrix = get_schedule_matrix(2026, '1', 2, 4, game_id='470', provider=ScheduleProvider())
+    assert list(matrix.columns) == ['team_key', 'week_1', 'week_2', 'week_3']
+    assert matrix.set_index('team_key').loc['470.l.1.t.1', 'week_2'] == '470.l.1.t.2'
+    assert matrix.set_index('team_key').loc['470.l.1.t.2', 'week_3'] == '470.l.1.t.1'

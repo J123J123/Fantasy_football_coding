@@ -70,6 +70,10 @@ future matchups from that snapshot.
 - Use `--leagues CFFL_A Ferda` to filter enabled runs by nickname across years.
 - Omit `--backfill` to build entirely from local archives.
 - Use `--overwrite` with `--backfill` to refresh existing snapshots for every run.
+- Publishing with `--backfill` always refreshes the report's final week, so an
+  earlier snapshot taken before games finished cannot leave stale scores in the
+  report. Older weeks are reused unless `--overwrite` is supplied. Schedule
+  snapshots include future regular-season opponents for the odds chart.
 - Use `--template pc` for only PC reports, or `--template both` for original and PC
   HTML reports for every run. Omit the flag to honor each entry's `template`;
   omitted entry templates default to `original`. Data is exported once either way.

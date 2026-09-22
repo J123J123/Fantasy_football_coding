@@ -155,7 +155,8 @@ def main():
         if args.backfill:
             statuses = backfill_season(year, str(run['league_id']), 1, week,
                                        args.overwrite or run.get('overwrite', False),
-                                       settings=settings, league_nickname=name)
+                                       settings=settings, league_nickname=name,
+                                       refresh_latest=True)
             failures = {week: results for week, results in statuses.items()
                         if any(value.startswith('failed:') or value == 'authentication_required'
                                for value in results.values())}

@@ -99,3 +99,29 @@ def test_backfill_reuses_static_endpoints_only_within_one_run(tmp_path, monkeypa
     yahoo.backfill_season(2025, '2', 1, 3, settings=settings)
     assert calls['get_divisions'] == calls['get_draft_data'] == calls['get_league_settings'] == 2
     assert pd.read_csv(_snapshot_path(settings, '2', 2025, 'draft', 3)).league_id.tolist() == [2]
+
+
+def test_backfill_refreshes_latest_week_and_collects_future_schedule(tmp_path, monkeypatch):
+    from yahoo_fantasy_data import yahoo
+    from yahoo_fantasy_data.collectors import schedule
+
+    settings = Settings(data_dir=tmp_path, request_delay=0)
+    monkeypatch.setattr(yahoo, 'league_metadata', lambda season, league, active:
+                        ({'end_week': 17}, active, object(), '470', '470.l.1'))
+    for week in (1, 2):
+        write_snapshot(pd.DataFrame({'team_key': ['470.l.1.t.1']}),
+                       _snapshot_path(settings, '1', 2026, 'schedule', week), False)
+    schedule_calls = []
+    def matrix(season, league, snapshot_week, end_week, **kwargs):
+        schedule_calls.append((snapshot_week, end_week))
+        return pd.DataFrame({'team_key': ['470.l.1.t.1'], 'week_14': ['470.l.1.t.2']})
+    monkeypatch.setattr(schedule, 'get_schedule_matrix', matrix)
+    collected = []
+    def collect(season, league, week, overwrite, **kwargs):
+        collected.append((week, overwrite))
+        assert 'week_14' in kwargs['_schedule_matrix']
+        return {'player_data': 'written' if overwrite else 'skipped_existing'}
+    monkeypatch.setattr(yahoo, 'collect_week', collect)
+    yahoo.backfill_season(2026, '1', 1, 2, settings=settings, refresh_latest=True)
+    assert collected == [(1, False), (2, True)]
+    assert schedule_calls == [(1, 17)]

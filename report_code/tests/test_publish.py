@@ -145,6 +145,7 @@ def test_backfill_uses_inferred_week_and_config_options(archive, tmp_path, monke
     publish.main()
     assert calls[0][0] == (2024, '9', 1, 2, True)
     assert calls[0][1]['league_nickname'] == 'One'
+    assert calls[0][1]['refresh_latest'] is True
     assert (tmp_path / 'docs/One_2024_week2.html').exists()
 
 
