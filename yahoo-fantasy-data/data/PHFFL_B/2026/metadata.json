@@ -1,9 +1,10 @@
 {
-  "current_week": 2,
+  "current_week": 3,
   "end_week": "17",
   "game_id": "470",
+  "is_finished": null,
   "last_collected_week": 2,
-  "last_updated": "2026-09-15T16:14:08.054194+00:00",
+  "last_updated": "2026-09-22T14:02:48.023514+00:00",
   "league_id": "1500113",
   "league_key": "470.l.1500113",
   "league_name": "PHFFL P Division",
