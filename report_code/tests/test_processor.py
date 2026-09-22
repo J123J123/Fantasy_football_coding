@@ -553,3 +553,66 @@ def test_default_playoff_roll_in_is_ten_weeks(archive):
     stats = score_parameters(games, report.teams.team_id, 2)
     team_mean = games.loc[games.team_id.eq('1'), 'actual_points'].mean()
     assert stats.loc['1', 'mean'] == pytest.approx(.2*team_mean + .8*games.actual_points.mean())
+
+
+def test_baseline_representatives_and_market_totals(archive):
+    from report_code.vobl import build, payload
+    report = ReportProcessor(archive, 1)
+    table = build(report)
+    data = payload(report, table)
+    weekly = {r['position']: r for r in data['weekly_baselines']}
+    assert {r['week'] for r in data['weekly_baselines']} == {1}
+    assert weekly['RB1']['baseline_player_id'] == '4'
+    assert weekly['RB1']['baseline_points'] == 13
+    assert weekly['W/R/T1']['baseline_player_id'] == '1'
+    assert weekly['RB1']['market_player_id'] == '7'
+    assert weekly['W/R/T1']['market_player_id'] == '8'
+    expertise = report.gold_managerial_expertise.set_index('team_id')
+    for row in table.itertuples():
+        assert row.total == expertise.loc[row.team_id, 'vobl']
+        assert row.market_total == expertise.loc[row.team_id, 'vobm']
+    report = ReportProcessor(archive, 1)
+    report.bronze_player.loc[report.bronze_player.player_id.eq('7'), 'fantasy_points_actual'] = None
+    data = payload(report, build(report))
+    assert all(r['market_points'] is None for r in data['weekly_baselines'])
+    assert all(r['market_total'] is None for r in data['rows'])
+
+
+def test_standings_records_divisions_and_missing_scores(archive):
+    from report_code.standings import payload
+    report = ReportProcessor(archive, 2, divisions={'1': 'East', '2': 'East'})
+    games = report.silver_team_week
+    games.loc[games.week.eq(2), ['actual_points', 'opponent_points']] = 20
+    games.loc[games.week.eq(2), 'win'] = .5
+    data = payload(report)
+    assert data['has_divisions']
+    assert [r['team_id'] for r in data['rows']] == ['2', '1']
+    first = data['rows'][0]
+    assert (first['wins'], first['losses'], first['ties']) == (1, 0, 1)
+    assert (first['division_wins'], first['division_losses'], first['division_ties']) == (1, 0, 1)
+    assert first['points_for'] == 48
+    assert first['points_against'] == 40
+    assert first['win_pct'] == .75
+    report.divisions = {'1': 'East', '2': 'West'}
+    assert all(r['division_wins'] == 0 for r in payload(report)['rows'])
+    games.loc[games.team_id.eq('2') & games.week.eq(1), ['actual_points', 'win']] = float('nan')
+    row = next(r for r in payload(report)['rows'] if r['team_id'] == '2')
+    assert row['wins'] is None and row['points_for'] is None
+    assert row['division_wins'] == 0
+    assert not payload(ReportProcessor(archive, 1))['has_divisions']
+
+
+def test_standings_division_and_overall_ranks(archive):
+    from report_code.standings import payload
+    report = ReportProcessor(archive, 1, divisions={'1': 'East', '2': 'West'})
+    rows = {r['team_id']: r for r in payload(report)['rows']}
+    assert (rows['1']['division_rank'], rows['1']['overall_rank']) == (1, 2)
+    assert (rows['2']['division_rank'], rows['2']['overall_rank']) == (1, 1)
+    report.divisions = {'1': 'East', '2': 'East'}
+    rows = {r['team_id']: r for r in payload(report)['rows']}
+    assert rows['1']['division_rank'] == 2
+    report.silver_team_week[['actual_points', 'opponent_points']] = 20
+    report.silver_team_week['win'] = .5
+    assert all(r['overall_rank'] == r['division_rank'] == 1 for r in payload(report)['rows'])
+    report.silver_team_week.loc[0, 'win'] = float('nan')
+    assert payload(report)['rows'][-1]['overall_rank'] is None

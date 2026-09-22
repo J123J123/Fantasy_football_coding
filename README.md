@@ -30,15 +30,15 @@ publishing runs.
 
 Week is optional:
 
-- Default report week is `min(current_week, playoff_start_week - 1)`: the
-  metadata's current week capped at the final regular-season week. The current
-  week is included even if it is still in progress; no week is subtracted.
+- Default report week is `min(current_week - 1, playoff_start_week - 1)`: the
+  latest completed week capped at the final regular-season week. The active
+  week is excluded; finished seasons include their final week.
 - With `--backfill`, read current metadata and playoff settings from Yahoo.
   Without it, read `metadata.json` and the latest archived league settings;
   no Yahoo requests are made. `last_collected_week` does not select the report week.
 - Finished seasons still stop at the regular-season cutoff. For leagues explicitly
   configured without playoffs, `end_week` is the cutoff.
-- A `current_week` of zero skips the run. Missing current-week or playoff settings
+- No completed weeks (current week zero or one) skips the run. Missing current-week or playoff settings
   produce an error rather than including playoff weeks by guessing. Older archives
   missing `current_week` can be refreshed with `--backfill`.
 - Add `"week": 10` to an individual entry to pin a report period, or use

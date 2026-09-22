@@ -2,6 +2,7 @@ import pandas as pd
 from .boned_detail import detail
 from .common import ratio
 from .processor import records
+from .standings import payload as standings_payload
 
 
 def build(processor):
@@ -24,4 +25,5 @@ def payload(processor, table):
                      'difference': g.value.iloc[-1] - g.value.iloc[-2] if len(g)>1 else None,
                      'rank_delta': g['rank'].iloc[-1] - g['rank'].iloc[-2] if len(g)>1 else None})
     return {'description': 'Percent above or below opponents’ scoring average against everyone else. Lower ranks indicate easier scoring luck.',
-            'weeks': sorted(table.week.unique().tolist()), 'rows': rows}
+            'weeks': sorted(table.week.unique().tolist()), 'rows': rows,
+            'standings': standings_payload(processor)}

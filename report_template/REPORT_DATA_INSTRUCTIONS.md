@@ -420,7 +420,15 @@ Use JSON `null` when an efficiency value is undefined because there were zero ga
 
 # 11. `vobl`
 
-The position list is dynamic.
+The position list is dynamic. `description` must define VOBL (Value Over
+Baseline League) and VOBM (Value Over Baseline Market), including how each
+comparison is chosen. Each row also contains `market_total` and `market_values`
+with the same position keys as `values`; `total` and `values` remain VOBL.
+`weekly_baselines` contains one record per week/position with `week`, `position`,
+`baseline_player_id`, `baseline_player_name`, `baseline_points`,
+`market_player_id`, `market_player_name`, and `market_points`.
+Use null for unavailable points or players. Both report templates use one shared
+selector for the team values and weekly comparison-player chart.
 
 ```json
 "vobl": {
@@ -656,3 +664,25 @@ Use the Excel workbook and old PDFs as **reference implementations** for:
 
 For each metric, compare Python output against one or more known historical league/week reports until the values agree, then consider that metric migrated.
 
+
+`boned_index.standings` supplies the first section's standings tables. It contains
+`description`, `has_divisions`, and `rows` with `team_id`, `wins`, `losses`, `ties`,
+`win_pct`, `points_for`, `points_against`, `division_id`, and `division_name`.
+Division leagues also supply `division_wins`, `division_losses`, and
+`division_ties`. Rows are ordered by win percentage then points for, and the
+renderer groups them by division. Unknown results remain null.
+
+Both draft charts display segment values and a total above each bar, plus an
+exact-value table for small segments. A missing bucket makes the bar and its
+total unavailable; it is not treated as zero. Negative buckets extend below zero.
+
+Section 01 is titled Standings and displays only `boned_index.standings`;
+the cumulative scoring-index table and manager-by-week detail are combined in
+section 02 (Boned Index / Opponent Scoring Index). The total appears first, then
+the manager selector and weekly detail. The menu contains 10 sections, numbered
+01 through 10. For Week 1,
+the total-index section explains that no comparison baseline exists yet. Standings rows
+include `division_rank` and `overall_rank`. Division leagues display those
+columns in that order within each division; other leagues show overall rank as
+Rank. Both ranks use win percentage then points for, share ranks for exact ties,
+and remain null for teams with unavailable ranking inputs.

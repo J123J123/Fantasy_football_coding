@@ -60,12 +60,15 @@ def test_single_league_silver_only_cli(archive, tmp_path, monkeypatch, capsys):
 
 
 @pytest.mark.parametrize('payload, expected', [
-    ({'current_week': '5', 'playoff_start_week': '15'}, 5),
+    ({'current_week': '5', 'playoff_start_week': '15'}, 4),
     ({'current_week': '17', 'playoff_start_week': '15', 'is_finished': '1'}, 14),
-    ({'current_week': '14', 'playoff_start_week': '15'}, 14),
+    ({'current_week': '14', 'playoff_start_week': '15'}, 13),
     ({'current_week': '15', 'playoff_start_week': '15'}, 14),
-    ({'current_week': '1', 'playoff_start_week': '15'}, 1),
+    ({'current_week': '1', 'playoff_start_week': '15'}, 0),
     ({'current_week': '0'}, 0),
+    ({'current_week': '2', 'playoff_start_week': '15'}, 1),
+    ({'current_week': '18', 'uses_playoff': '0', 'end_week': '18', 'is_finished': '1'}, 18),
+    ({'current_week': '18', 'uses_playoff': '0', 'end_week': '18'}, 17),
     ({'current_week': '19', 'playoff_start_week': '16'}, 15),
     ({'current_week': '19', 'uses_playoff': '0', 'end_week': '18'}, 18),
 ])
@@ -78,8 +81,8 @@ def test_infer_remote_week(payload, expected, tmp_path, monkeypatch):
 
 def test_local_inference_and_explicit_week(archive):
     run = {'year': 2025, 'league_id': '1', 'nickname': 'One'}
-    # Use metadata current_week, not last_collected_week.
-    assert publish.resolve_week(run, archive, backfill=False, settings=None) == 2
+    # Exclude the active week, regardless of last_collected_week.
+    assert publish.resolve_week(run, archive, backfill=False, settings=None) == 1
     assert publish.resolve_week({**run, 'week': 1}, archive, backfill=True, settings=None) == 1
 
 
@@ -121,8 +124,8 @@ def test_default_config_local_build_without_week(archive, tmp_path, monkeypatch)
     monkeypatch.setattr(publish, 'ReportProcessor', lambda path, week: real_processor(path, week, simulation_count=10))
     monkeypatch.setattr(sys, 'argv', ['publish', '--data-dir', 'data'])
     publish.main()
-    assert (tmp_path / 'docs/One_2025_week2_pc.html').exists()
-    assert pd.read_csv(tmp_path / 'docs/data/One/2025/silver_player.csv.gz').week.max() == 2
+    assert (tmp_path / 'docs/One_2025_week1_pc.html').exists()
+    assert pd.read_csv(tmp_path / 'docs/data/One/2025/silver_player.csv.gz').week.max() == 1
 
 
 def test_backfill_uses_inferred_week_and_config_options(archive, tmp_path, monkeypatch):
@@ -140,9 +143,9 @@ def test_backfill_uses_inferred_week_and_config_options(archive, tmp_path, monke
     monkeypatch.setattr(publish, 'ReportProcessor', lambda path, week: real_processor(archive, week, simulation_count=10))
     monkeypatch.setattr(sys, 'argv', ['publish', '--config', str(config), '--backfill', '--docs-dir', str(tmp_path / 'docs')])
     publish.main()
-    assert calls[0][0] == (2024, '9', 1, 3, True)
+    assert calls[0][0] == (2024, '9', 1, 2, True)
     assert calls[0][1]['league_nickname'] == 'One'
-    assert (tmp_path / 'docs/One_2024_week3.html').exists()
+    assert (tmp_path / 'docs/One_2024_week2.html').exists()
 
 
 @pytest.mark.parametrize('template, expected', [
@@ -276,7 +279,28 @@ def test_collector_persists_current_week(tmp_path):
     from yahoo_fantasy_data.yahoo import update_metadata
     settings = Settings(data_dir=tmp_path)
     update_metadata(settings, 2025, '1', '461', '461.l.1',
-                    {'current_week': '17', 'end_week': '17'}, 14, {})
+                    {'current_week': '17', 'end_week': '17', 'is_finished': '1'}, 14, {})
     metadata = json.loads((tmp_path / '1/2025/metadata.json').read_text())
     assert metadata['current_week'] == '17'
     assert metadata['last_collected_week'] == 14
+    assert metadata['is_finished'] == '1'
+
+
+def test_single_report_cli_infers_completed_week(archive, tmp_path, monkeypatch):
+    from report_code.__main__ import main
+    destination = tmp_path / 'exports'
+    monkeypatch.setattr(sys, 'argv', ['report_code', str(archive), '--silver-dir', str(destination)])
+    main()
+    assert pd.read_csv(destination / 'silver_player.csv.gz').week.max() == 1
+
+
+def test_single_report_cli_skips_active_first_week(archive, tmp_path, monkeypatch, capsys):
+    from report_code.__main__ import main
+    metadata = json.loads((archive / 'metadata.json').read_text())
+    metadata['current_week'] = 1
+    (archive / 'metadata.json').write_text(json.dumps(metadata))
+    destination = tmp_path / 'exports'
+    monkeypatch.setattr(sys, 'argv', ['report_code', str(archive), '--silver-dir', str(destination)])
+    main()
+    assert not destination.exists()
+    assert 'no completed weeks' in capsys.readouterr().out

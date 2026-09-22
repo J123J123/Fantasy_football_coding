@@ -12,9 +12,9 @@ From the repository root:
   --week 5 --json report_code/output/week5.json --html report_code/output/week5.html
 ```
 
-Create the output directory first. Omit `--week` to use metadata `current_week`,
-falling back to `last_collected_week`. This is the archive's week, not today's
-NFL week. Input may be the league/season directory or its `metadata.json`.
+Create the output directory first. Omit `--week` to use the latest completed week (`current_week - 1`),
+capped at the regular-season end. Finished seasons include their final week.
+Inference uses the archive metadata; `last_collected_week` does not select the cutoff. Input may be the league/season directory or its `metadata.json`.
 
 To use stable nicknames instead of Yahoo team names, add `team_nicknames.json`
 beside `metadata.json` in the league/year folder (for example,
@@ -280,9 +280,10 @@ indexes. The exports preserve the silver tables' columns and missing values.
 Use `python -m report_code.publish --config report_runs.json --backfill` to collect
 and publish the league/year/nickname entries in the JSON run list. The permanent
 `docs/index.html` fetches the file list from GitHub in JavaScript; publishing does
-not rewrite it. When week is omitted, publishing uses `min(current_week, playoff_start_week - 1)`
+not rewrite it. When week is omitted, publishing uses `min(current_week - 1, playoff_start_week - 1)`
 from Yahoo metadata/settings (with backfill) or the local archive (without it).
-This includes the current week but caps the report at regular-season play. See the
+This excludes the active week and caps the report at regular-season play. Finished
+seasons include their final week; no completed weeks skips the run. See the
 [root README](../README.md) for workflow setup and additional options.
 
 Publishing saves weekly reports at `docs/NICKNAME_YEAR_weekN.html`
@@ -296,3 +297,13 @@ Set `"template": "original"`, `"pc"`, or `"both"` in `report_runs.json`;
 The single-report CLI also accepts `--template both`: with `--html report.html`
 it writes `report.html` and `report_pc.html`. With `--template pc` alone, it uses
 the exact `--html` path you supplied.
+
+The roster-value section defines VOBL (Value Over Baseline League) and VOBM
+(Value Over Baseline Market). A shared selector switches both the team/slot
+comparison and the weekly comparison-player chart. The weekly chart includes
+player names and actual fantasy points for every slot. Market values use an
+optimal legal free-agent lineup; league values use the league-size slot cutoff.
+Missing comparisons remain unavailable. Runs in `report_runs.json` infer the completed-week cutoff automatically.
+An explicit `week` or `--week` still overrides inference. Both baseline tables
+order slots QB, RB, WR, TE, FLEX, K, then any additional positions, with Total
+first in the team comparison.

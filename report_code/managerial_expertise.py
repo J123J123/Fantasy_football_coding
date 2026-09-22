@@ -1,7 +1,7 @@
 import pandas as pd
 from .common import NAN, total, ratio, win, section
 from .lineups import optimize
-from .vobl import weekly
+from .vobl import weekly, DESCRIPTION
 
 
 def build(processor):
@@ -47,4 +47,4 @@ def build(processor):
 
 
 def payload(processor, table):
-    return section(table,'Exact legal optimal lineups and projection-optimal decisions; IR/NA players excluded from optimization. VOBM/WOBM compare with the optimal free-agent lineup. Missing eligible-player scores make optimization unavailable.')
+    return section(table,DESCRIPTION + ' WOBL/WOBM count wins against those weekly lineups. Exact legal optimal lineups and projection-optimal decisions; IR/NA players excluded from optimization. VOBM/WOBM compare with the optimal free-agent lineup. Missing eligible-player scores make optimization unavailable.')

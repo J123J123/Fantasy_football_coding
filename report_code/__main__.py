@@ -20,7 +20,16 @@ def main():
     p.add_argument('--playoff-byes',type=int)
     p.add_argument('--divisions',help='JSON file mapping team IDs to division names')
     args=p.parse_args()
-    report=ReportProcessor(args.data_path,args.week,official_scores_path=args.official_scores,
+    week = args.week
+    if week is None:
+        from .publish import resolve_week
+        directory = Path(args.data_path)
+        if directory.is_file(): directory = directory.parent
+        week = resolve_week({'nickname': directory.name}, directory, backfill=False, settings=None)
+        if week == 0:
+            print('Skipping report: no completed weeks yet')
+            return
+    report=ReportProcessor(args.data_path,week,official_scores_path=args.official_scores,
                            playoff_teams=args.playoff_teams,playoff_byes=args.playoff_byes,
                            divisions=json.loads(Path(args.divisions).read_text()) if args.divisions else None)
     if args.strict: report.validate_reconciliation()

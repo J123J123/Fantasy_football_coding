@@ -59,7 +59,7 @@ def load_runs(path):
 
 
 def resolve_week(run, data_path, *, backfill, settings):
-    """Default to metadata's current week, capped at the regular-season end."""
+    """Default to completed weeks, capped at the regular-season end."""
     if run.get('week') is not None:
         return run['week']
     from yahoo_fantasy_data.utils import first_value
@@ -74,7 +74,9 @@ def resolve_week(run, data_path, *, backfill, settings):
     current = int(current)
     if current < 0:
         raise ValueError('current_week must be nonnegative')
-    if current == 0:
+    finished = str(first_value(metadata, 'is_finished')).lower() in ('1', 'true')
+    completed = current if finished else max(0, current - 1)
+    if completed == 0:
         return 0
 
     playoff_start = first_value(metadata, 'playoff_start_week')
@@ -108,7 +110,7 @@ def resolve_week(run, data_path, *, backfill, settings):
         raise ValueError(f"{run['nickname']}: playoff_start_week is missing or invalid; cannot determine the regular-season end")
     if not 1 <= regular_end <= 18:
         raise ValueError('Regular-season end must be between 1 and 18')
-    return min(current, regular_end)
+    return min(completed, regular_end)
 
 
 def main():
@@ -147,7 +149,7 @@ def main():
         week = args.week if args.week is not None else resolve_week(
             run, data_path, backfill=args.backfill, settings=settings)
         if week == 0:
-            print(f'Skipping {name}, {year}: season has not started', flush=True)
+            print(f'Skipping {name}, {year}: no completed weeks yet', flush=True)
             continue
         print(f'Building {name}, {year}, week {week}', flush=True)
         if args.backfill:

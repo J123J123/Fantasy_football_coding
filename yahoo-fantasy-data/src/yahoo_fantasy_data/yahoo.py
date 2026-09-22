@@ -143,6 +143,7 @@ def update_metadata(settings: Settings, season: int, league_id: str, game_id: st
         "league_name": first_value(payload, "name", old.get("league_name")),
         "league_type": "public", "start_week": first_value(payload, "start_week", old.get("start_week", 1)),
         "current_week": first_value(payload, "current_week", old.get("current_week")),
+        "is_finished": first_value(payload, "is_finished", old.get("is_finished")),
         "end_week": end_week, "last_collected_week": max(week, int(old.get("last_collected_week", 0))),
         "last_updated": datetime.now(UTC).isoformat(),
         "sources": {**old.get("sources", {}), **statuses},
