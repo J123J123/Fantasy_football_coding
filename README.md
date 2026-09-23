@@ -1,6 +1,6 @@
 # Fantasy football reports and data
 
-Collect Yahoo league archives, generate weekly HTML reports, and publish compressed
+Collect Yahoo and Sleeper league archives, generate weekly HTML reports, and publish compressed
 silver player/schedule tables with a searchable download page.
 
 ## Local CLI
@@ -21,7 +21,8 @@ The default run file is `report_runs.json`, a JSON list of dictionaries:
 ]
 ```
 
-Each entry selects a Yahoo league ID, season year, and local folder nickname.
+Each entry selects a league ID, season year, and local folder nickname.
+`provider` defaults to `yahoo`; set it to `sleeper` for Sleeper leagues.
 Entries can use different years. The included file selects all four 2025 leagues.
 Use another file with `python -m report_code.publish --config my_runs.json --backfill`.
 Paths are relative to the working directory; run from the repository root.
@@ -135,3 +136,52 @@ hosting, rather than opening the page with a `file://` URL.
 ```bash
 python -m pytest report_code/tests yahoo-fantasy-data/tests -m 'not integration' -q
 ```
+
+## Sleeper
+
+Your league **The Future 1%**, ID `1385727391816503296`, is configured for
+2026 in `report_runs.json` and `Notebook_Runner.ipynb`. Generate both report
+versions and silver downloads with:
+
+```bash
+.venv/bin/python -m report_code.publish --backfill --leagues The_Future_1pct --strict
+```
+
+Omit `--backfill` to rebuild from local snapshots. A normal all-league run also
+includes Sleeper, and the existing GitHub Action uses the same configuration.
+No Sleeper account credentials are needed. Add other leagues with:
+
+```json
+{"provider": "sleeper", "league_id": "1385727391816503296", "year": 2026,
+ "nickname": "The_Future_1pct", "template": "both"}
+```
+
+Archives use the shared `yahoo-fantasy-data/data/NICKNAME/YEAR/` directory for
+compatibility with existing publishing. Sleeper IDs are validated against the
+requested season; use each season's own league ID. Historical matchups supply
+weekly ownership, starters, player scores, and independent team totals. Future
+regular-season matchups supply the playoff simulation schedule. Names,
+positions, divisions, and settings reflect collection time. Team nickname
+overrides work as before, keyed by Sleeper roster ID.
+
+League scoring rules are applied to weekly stats for free-agent scores and to
+weekly projected stats for projections. The stats/projection service is public
+but undocumented; missing player values stay unavailable, and failed or
+incorrect-week responses stop collection. Historical projections can be revised
+by Sleeper and are not guaranteed to be the original pregame projections.
+Official roster-player scores take precedence over calculated scores. A
+commissioner score override remains an independent total and can cause strict
+reconciliation to fail.
+
+Sleeper's historical matchup API does not identify IR/taxi slots. IR players
+are treated as eligible bench players for roster optimization, lineup efficiency,
+and projection-alignment calculations. This convention is included in the report
+introduction; optimal lineups may therefore include players who occupied IR.
+Leagues with taxi slots still leave these calculations unavailable because taxi
+eligibility cannot be established. Standings, actual scoring, schedule comparisons,
+stud/dud counts, VOBL/VOBM, and playoff simulations still run. Draft analysis
+uses completed drafts for the selected season, not prior dynasty startup drafts.
+Best-ball, extra median games, and leagues starting after week 1 are rejected.
+Playoff odds retain the report model's documented seeding/tiebreak assumptions.
+
+API reference: [Sleeper documentation](https://docs.sleeper.com/).

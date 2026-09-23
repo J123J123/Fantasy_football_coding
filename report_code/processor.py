@@ -106,9 +106,10 @@ class ReportProcessor:
                 if snapshot is not None and not frame.week.eq(snapshot).all():
                     raise ValueError(f'{path}: row week does not match filename')
                 frame = frame[frame.week <= self.current_week]
-                if frame.empty:
+                if frame.empty and table != 'draft':
                     continue
-                snapshot = int(frame.week.max())
+                if not frame.empty:
+                    snapshot = int(frame.week.max())
             eligible.append((snapshot or 0, path, frame))
         if not eligible:
             raise FileNotFoundError(f'No {table} files through week {self.current_week} in {source}')
@@ -366,14 +367,17 @@ class ReportProcessor:
         data = {'meta': {'title': 'The Fantasy League Weekly Report™',
                         'league_name': self.metadata.get('league_name'), 'season': self.metadata.get('season'),
                         'current_week': self.current_week, 'generated_at': datetime.now(timezone.utc).isoformat(),
-                        'intro': 'Season-to-date fantasy analytics. Unavailable measurements are shown as —.'},
+                        'provider': self.metadata.get('provider', 'yahoo'),
+                        'intro': 'Season-to-date fantasy analytics. Unavailable measurements are shown as —. '
+                                 + ' '.join(self.metadata.get('notes', []))},
                 'teams': records(self.teams)}
         for name, table in self.gold_tables.items():
             module = importlib.import_module(f'.{name}', __package__)
             data[name] = module.payload(self, table)
         data['data_quality'] = {'weekly_reconciliation': records(self.silver_reconciliation),
                                 'season_reconciliation': records(self.silver_season_reconciliation),
-                                'sources': self.source_files}
+                                'sources': self.source_files,
+                                'notes': self.metadata.get('notes', [])}
         # Round-trip converts nested numpy scalars and NaN as well as table values.
         return json.loads(pd.Series({'payload': data}).to_json())['payload']
 
@@ -391,6 +395,9 @@ class ReportProcessor:
             raise ValueError("template must be 'original' or 'pc'")
         template = Path(template_path) if template_path else Path(__file__).resolve().parents[1] / 'report_template' / templates[template]
         html = template.read_text(encoding='utf-8')
+        if getattr(self, 'metadata', {}).get('provider') == 'sleeper':
+            # Display wording only; retain legacy JSON keys for compatibility.
+            html = html.replace('Yahoo', 'Sleeper')
         pattern = r'(<script\s+id="report-data"\s+type="application/json">).*?(</script>)'
         safe_json = self.to_json().replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')
         html, count = re.subn(pattern, lambda m: m[1] + '\n' + safe_json + '\n' + m[2], html, flags=re.S)

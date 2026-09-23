@@ -34,9 +34,11 @@ def load_runs(path):
         if not isinstance(run, dict):
             raise ValueError('Each run must be a JSON object')
         unknown = set(run) - {'league_id', 'year', 'nickname', 'week', 'enabled',
-                              'overwrite', 'strict', 'template'}
+                              'overwrite', 'strict', 'template', 'provider'}
         if unknown:
             raise ValueError(f'Unknown run fields: {sorted(unknown)}')
+        if run.get('provider', 'yahoo') not in ('yahoo', 'sleeper'):
+            raise ValueError('provider must be yahoo or sleeper')
         if type(run.get('year')) is not int or not 2000 <= run['year'] <= 2100:
             raise ValueError('Each run needs an integer year between 2000 and 2100')
         if not isinstance(run.get('league_id'), (str, int)) or isinstance(run['league_id'], bool) or not str(run['league_id']).isdigit():
@@ -63,7 +65,10 @@ def resolve_week(run, data_path, *, backfill, settings):
     if run.get('week') is not None:
         return run['week']
     from yahoo_fantasy_data.utils import first_value
-    if backfill:
+    if backfill and run.get('provider') == 'sleeper':
+        from .sleeper import league_metadata
+        metadata, _ = league_metadata(run['year'], str(run['league_id']))
+    elif backfill:
         from yahoo_fantasy_data.yahoo import league_metadata
         metadata, _, provider, _, key = league_metadata(run['year'], str(run['league_id']), settings)
     else:
@@ -153,7 +158,10 @@ def main():
             continue
         print(f'Building {name}, {year}, week {week}', flush=True)
         if args.backfill:
-            statuses = backfill_season(year, str(run['league_id']), 1, week,
+            collect = backfill_season
+            if run.get('provider') == 'sleeper':
+                from .sleeper import backfill_season as collect
+            statuses = collect(year, str(run['league_id']), 1, week,
                                        args.overwrite or run.get('overwrite', False),
                                        settings=settings, league_nickname=name,
                                        refresh_latest=True)

@@ -35,7 +35,8 @@ def eligibility(row):
 def eligible(positions,slot):
     if slot in positions: return True
     flex={'W/R':{'WR','RB'},'W/T':{'WR','TE'},'W/R/T':{'WR','RB','TE'},
-          'Q/W/R/T':{'QB','WR','RB','TE'},'FLEX':{'WR','RB','TE'},'SUPER_FLEX':{'QB','WR','RB','TE'}}
+          'Q/W/R/T':{'QB','WR','RB','TE'},'FLEX':{'WR','RB','TE'},'SUPER_FLEX':{'QB','WR','RB','TE'},
+          'IDP_FLEX':{'DL','LB','DB'}}
     return bool(positions & flex.get(slot,set()))
 
 
@@ -57,7 +58,9 @@ def roster_pool(players, archived):
     """Playable roster rows and whether any archived playable player is missing."""
     pool = players[~players.roster_slot.isin(NON_STARTERS - {'BN'})]
     archived = archived[~archived.roster_slot.isin(NON_STARTERS - {'BN'})]
-    return pool, not set(archived.player_id).issubset(set(pool.player_id))
+    unknown = ('roster_eligibility_known' in archived and
+               not archived.roster_eligibility_known.astype(str).str.lower().isin(['true', '1']).all())
+    return pool, unknown or not set(archived.player_id).issubset(set(pool.player_id))
 
 
 def add_player_lineup_columns(players, slots, roster):
