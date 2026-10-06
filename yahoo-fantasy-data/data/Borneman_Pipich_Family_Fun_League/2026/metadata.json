@@ -4,7 +4,7 @@
   "league_key": "sleeper.l.1381449584168955904",
   "league_name": "Borneman Pipich Family Fun League",
   "season": 2026,
-  "current_week": 4,
+  "current_week": 5,
   "is_finished": false,
   "start_week": 1,
   "end_week": 18,
@@ -15,5 +15,5 @@
     "Historical Sleeper IR players are treated as eligible bench players for lineup analysis. Taxi-slot eligibility remains unavailable.",
     "Player names, positions, team names, divisions and league settings reflect collection time; weekly ownership and starters come from historical matchups."
   ],
-  "last_collected_week": 3
+  "last_collected_week": 4
 }
